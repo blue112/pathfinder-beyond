@@ -1,0 +1,35 @@
+@font-face {
+    font-family: "medieval";
+    src:
+        url("assets/fonts/medievalsharp-bookoblique-webfont.woff2") format("woff2"),
+        url("assets/fonts/medievalsharp-bookoblique-webfont.woff") format("woff");
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "medieval";
+    src:
+        url("assets/fonts/medievalsharp-boldoblique-webfont.woff2") format("woff2"),
+        url("assets/fonts/medievalsharp-boldoblique-webfont.woff") format("woff");
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "medieval";
+    src:
+        url("assets/fonts/medievalsharp-bold-webfont.woff2") format("woff2"),
+        url("assets/fonts/medievalsharp-bold-webfont.woff") format("woff");
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "medieval";
+    src:
+        url("assets/fonts/medievalsharp-book-webfont.woff2") format("woff2"),
+        url("assets/fonts/medievalsharp-book-webfont.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}

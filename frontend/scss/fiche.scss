@@ -1,10 +1,47 @@
-.fiche {
-    border: 1px solid black;
-    width: 100%;
+@use "mixins";
+
+@use "fiche-grid";
+
+.d20 {
+    background: url("assets/d20.svg") no-repeat;
+    background-size: contain;
     height: 100%;
+    width: 30px;
+}
+
+h2,
+h3 {
+    text-align: center;
+    margin: 0;
+    font-size: 1.2em;
+    padding: 2px 0;
+}
+
+section > h2 {
+    background: #95493b;
+    color: #d6c086;
+    border: 3px solid #d6c086;
+    margin-bottom: 5px;
+}
+
+h3 {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.num {
+    font-family: sans;
+}
+
+.fiche {
+    width: 100%;
+    max-width: 1000px;
+    height: 100%;
+    margin: auto;
 
     section.meta {
         display: flex;
+        width: 100%;
 
         .left {
             flex: 1;
@@ -26,6 +63,7 @@
                     height: auto;
                     font-weight: bold;
                     font-size: 1.2em;
+                    margin-bottom: 15px;
                 }
             }
         }
@@ -57,13 +95,21 @@
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
+
+            display: flex;
+            justify-content: center;
+
+            &.mod {
+                color: #95493b;
+            }
         }
 
         .label {
-            font-size: 0.8em;
+            font-size: 0.7em;
             text-align: left;
             white-space: nowrap;
             overflow: hidden;
+            font-style: italic;
         }
 
         &.l {
@@ -90,6 +136,179 @@
         &.m-s // Margin small
         {
             margin-left: 5px;
+        }
+    }
+
+    section.caracteristics {
+        display: flex;
+        flex-direction: column;
+        .carac {
+            display: grid;
+            grid-template-columns: 4fr 1fr 2fr;
+            gap: 5px;
+            margin-bottom: 5px;
+            div {
+                padding: 3px;
+                flex: 1;
+                border: 3px solid #b8ae98;
+                background: #d7caaf;
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                &.label {
+                    flex: 3;
+                    @include mixins.red-label();
+                    font-size: 1em;
+                }
+
+                &.value {
+                    font-size: 0.8em;
+                }
+                &.mod {
+                    @include mixins.mod-box;
+                }
+            }
+        }
+    }
+
+    section.hp,
+    section.saving {
+        display: flex;
+        flex-direction: column;
+    }
+    section.hp div,
+    section.saving div,
+    section.fight > div,
+    section.speed,
+    section.initiative,
+    section.contact,
+    section.surprise,
+    section.ac {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        grid-gap: 5px;
+
+        .label {
+            @include mixins.red-label();
+            flex: 1 1 0;
+        }
+
+        .value {
+            display: flex;
+            flex: 1 1 0;
+
+            span.max {
+                margin-left: 5px;
+                flex: 1;
+                @include mixins.box(25px);
+            }
+            span.current {
+                @include mixins.mod-box(25px);
+                margin-right: 5px;
+                flex: 1;
+            }
+            span.separator {
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+
+    section.hp div.non-lethal,
+    section.surprise,
+    section.contact {
+        margin-top: 5px;
+
+        .label {
+            @include mixins.box;
+            font-size: 0.7em;
+            font-weight: normal;
+            text-align: center;
+        }
+    }
+
+    section.initiative,
+    section.speed,
+    section.contact,
+    section.surprise,
+    section.saving div,
+    section.fight > div,
+    section.ac {
+        .value {
+            @include mixins.mod-box(25px);
+            width: 100%;
+        }
+    }
+
+    section.saving {
+        > div {
+            margin-top: 5px;
+        }
+        h2 {
+            margin-top: 10px;
+        }
+    }
+
+    section.fight {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+
+        h2 {
+            margin-top: 20px;
+            margin-bottom: 0;
+            grid-row: 1;
+            grid-column: 1/4;
+        }
+        > div {
+            grid-row: 2;
+
+            .label {
+                text-align: center;
+            }
+        }
+
+        section.weapons {
+            grid-column: 1/4;
+            grid-row: 3;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+
+            .weapon {
+                border: 3px solid #d6c086;
+                background-color: #b8ae98;
+                padding: 5px;
+            }
+        }
+    }
+
+    section.skills .skill {
+        display: grid;
+        grid-template-columns: 1fr 50px;
+        margin-bottom: 2px;
+        border-bottom: 1px solid #b0a896;
+
+        .label {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            padding-right: 10px;
+        }
+        .value {
+            @include mixins.mod-box;
+            font-size: 0.8rem;
+            padding: 0;
+        }
+
+        &:has(.value:empty) {
+            color: #7a7a7a;
+            .value {
+                display: none;
+            }
+            height: 25px;
         }
     }
 }

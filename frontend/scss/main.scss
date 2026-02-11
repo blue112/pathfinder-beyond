@@ -1,4 +1,9 @@
 @use "fiche";
+@use "fonts";
+
+* {
+    box-sizing: border-box;
+}
 
 body,
 html {
@@ -9,5 +14,5 @@ html {
 
 body {
     background-color: #e1d5bb;
-    font-family: "MedievalSharp", cursive;
+    font-family: "medieval", serif;
 }

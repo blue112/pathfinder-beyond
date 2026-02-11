@@ -1,0 +1,28 @@
+@mixin box($paddingh: 3px) {
+    font-size: 0.8em;
+    border: 3px solid #b8ae98;
+    background: #d7caaf;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 3px $paddingh;
+}
+
+@mixin mod-box($paddingh: 3px) {
+    @include box($paddingh);
+
+    color: #95493b;
+    font-weight: bold;
+    font-family: sans;
+    font-size: 1.2em;
+}
+
+@mixin red-label($paddingh: 3px) {
+    @include box($paddingh);
+
+    font-weight: 700;
+    background: #d6c086;
+    border-color: #95493b;
+}
