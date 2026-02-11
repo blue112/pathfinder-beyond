@@ -1,0 +1,7 @@
+-lib hxnodejs
+-lib jsasync
+-cp externs
+-main Server
+-cp src
+-js bin/server.js
+-debug

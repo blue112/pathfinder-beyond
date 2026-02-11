@@ -1,0 +1,24 @@
+build-test-common.hxml
+-D js-es=6
+-js bin/test-es6.js
+
+--next
+
+build-test-common.hxml
+-D js-es=5
+-js bin/test-es5.js
+
+--next
+
+build-test-common.hxml
+-D jsasync-no-markers
+-D js-es=6
+-js bin/test-es6-no-marker.js
+
+--next
+
+build-test-common.hxml
+-D jsasync-no-markers
+-D js-es=5
+-js bin/test-es5-no-marker.js
+

@@ -1,0 +1,93 @@
+.fiche {
+  border: 1px solid black;
+  width: 100%;
+  height: 100%;
+}
+.fiche section.meta {
+  display: flex;
+}
+.fiche section.meta .left {
+  flex: 1;
+  display: flex;
+}
+.fiche section.meta .left .logo {
+  background-image: url("assets/pathfinder.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  flex: 1;
+}
+.fiche section.meta .left .logo span {
+  text-align: center;
+  width: 100%;
+  align-self: flex-end;
+  height: auto;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+.fiche section.meta .right {
+  flex: 2;
+  margin-top: 20px;
+}
+.fiche .field-line {
+  display: flex;
+  margin-bottom: 10px;
+}
+.fiche .field-line > * {
+  flex: 10;
+}
+.fiche .field {
+  margin-right: 15px;
+  margin-left: 15px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column-reverse;
+}
+.fiche .field .value {
+  font-weight: 600;
+  border-bottom: 1px solid #a19887;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.fiche .field .label {
+  font-size: 0.8em;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.fiche .field.l {
+  flex: 20;
+}
+.fiche .field.s {
+  flex: 5;
+}
+.fiche .field.xs {
+  flex: 2;
+}
+.fiche .field.xs .label {
+  text-align: center;
+}
+.fiche .field.xxs {
+  flex: 1;
+  min-width: 40px;
+}
+.fiche .field:has(+ .m-s) {
+  margin-right: 0;
+}
+.fiche .field.m-s {
+  margin-left: 5px;
+}
+
+body,
+html {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  background-color: #e1d5bb;
+  font-family: "MedievalSharp", cursive;
+}

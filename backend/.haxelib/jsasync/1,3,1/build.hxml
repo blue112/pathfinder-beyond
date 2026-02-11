@@ -1,0 +1,17 @@
+extraParams.hxml
+-cp src
+-main demo.Main
+-js bin/main.js
+-D js-es=6
+-D loop_unroll_max_cost=0
+-D analyzer-optimize
+
+# jsasync-no-markers will output code without any markers and doesn't require modifying the generated js file
+# it is probably less fragile but the resulting code is uglier
+#-D jsasync-no-markers
+
+# Enables the usage of @:jsasync on all classes inside the demo package.
+--macro jsasync.JSAsync.use("demo")
+
+# Disables the JSAsync output fixing pass even if markers were generated.
+#-D jsasync-no-fix-pass

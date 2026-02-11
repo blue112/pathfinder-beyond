@@ -1,0 +1,13 @@
+@use "fiche";
+
+body,
+html {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    background-color: #e1d5bb;
+    font-family: "MedievalSharp", cursive;
+}

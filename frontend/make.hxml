@@ -1,0 +1,5 @@
+-js ../backend/static/main.js
+-main App
+-cp src
+-debug
+-lib jsasync
