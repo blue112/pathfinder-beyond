@@ -1,3 +1,4 @@
+import js.html.DivElement;
 import macros.GetAllFields;
 import js.html.Element;
 import haxe.ds.StringMap;
@@ -8,8 +9,10 @@ class Fiche implements IJSAsync {
 	var availableFields:StringMap<Element>;
 	var character:FullCharacter;
 
+	var mainElem:DivElement;
+
 	public function new(fiche_id:String) {
-		var mainElem = Browser.document.createDivElement();
+		mainElem = Browser.document.createDivElement();
 		mainElem.classList.add("fiche");
 
 		character = {};
@@ -426,7 +429,21 @@ class Fiche implements IJSAsync {
 		}
 		trace("Available fields: " + [for (n in availableFields.keys()) n].join(", "));
 
+		bindD20();
+
 		load(fiche_id);
+	}
+
+	function rollD20() {
+		D20.roll();
+	}
+
+	function bindD20() {
+		for (i in mainElem.querySelectorAll(".d20")) {
+			i.addEventListener("click", () -> {
+				rollD20();
+			});
+		}
 	}
 
 	static public function convertFieldName(apiFieldName:String) {

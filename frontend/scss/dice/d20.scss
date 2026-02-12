@@ -1,0 +1,182 @@
+$containerWidth: 200px;
+$containerHeight: $containerWidth;
+
+$faceWidth: $containerWidth * 0.5;
+$faceHeight: $faceWidth * 0.86;
+
+$transitionDuration: 0.5s;
+$animationDuration: 1s;
+
+$angle: 53deg;
+$ringAngle: -11deg;
+$sideAngle: 360deg/5;
+$opacity: 0.75;
+$color: rgba(30, 180, 20, $opacity);
+
+$rotateX: -$angle;
+$translateZ: $faceWidth * 0.335;
+$translateY: -$faceHeight * 0.15;
+$translateRingZ: $faceWidth * 0.75;
+$translateRingY: $faceHeight * 0.78 + $translateY;
+$translateLowerZ: $translateZ;
+$translateLowerY: $faceHeight * 0.78 + $translateRingY;
+
+body.rolling {
+    overflow: hidden;
+
+    .backdrop {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+    }
+
+    .dice-tray {
+        display: flex;
+    }
+}
+
+.dice-tray {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+@keyframes roll {
+    10% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    90% {
+        transform: rotateX(240deg) rotateY(480deg) rotateZ(0deg);
+    }
+}
+
+.d20-container {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    perspective: 1500px;
+}
+
+.die-d20 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform $transitionDuration ease-out;
+
+    transform: rotateX($rotateX);
+
+    &.rolling {
+        animation: roll $animationDuration linear;
+    }
+
+    @for $i from 1 through 5 {
+        &[data-face="#{$i}"] {
+            $angleMultiplier: $i - 1;
+            transform: rotateX(-$angle) rotateY($sideAngle * $angleMultiplier);
+        }
+    }
+
+    @for $i from 16 through 20 {
+        &[data-face="#{$i}"] {
+            $angleMultiplier: $i - 15;
+            transform: rotateX(-$angle + 180deg) rotateY(-$sideAngle * $angleMultiplier);
+        }
+    }
+
+    @for $i from 6 through 10 {
+        &[data-face="#{$i}"] {
+            $angleMultiplier: $i - 6;
+            transform: rotateX(-$ringAngle) rotateZ(180deg) rotateY($sideAngle * $angleMultiplier);
+        }
+    }
+
+    @for $i from 11 through 15 {
+        &[data-face="#{$i}"] {
+            $angleMultiplier: $i - 8;
+            transform: rotateX(-$ringAngle) rotateY(-$sideAngle * $angleMultiplier - $sideAngle/2);
+        }
+    }
+
+    .face {
+        $horizontalMargin: -$faceWidth * 0.5;
+
+        position: absolute;
+        left: 50%;
+        top: 0;
+        margin: 0 $horizontalMargin;
+        border-left: $faceWidth * 0.5 solid transparent;
+        border-right: $faceWidth * 0.5 solid transparent;
+        border-bottom: $faceHeight solid $color;
+        width: 0px;
+        height: 0px;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+
+        counter-increment: steps 1;
+
+        &:before {
+            content: counter(steps);
+            position: absolute;
+            top: $faceHeight * 0.25;
+            left: -$faceWidth;
+            color: #fff;
+            text-shadow: 1px 1px 3px #000;
+            font-size: $faceHeight * 0.4;
+            text-align: center;
+            line-height: $faceHeight * 0.9;
+            width: $faceWidth * 2;
+            height: $faceHeight;
+        }
+
+        @for $i from 1 through 5 {
+            &:nth-child(#{$i}) {
+                $angleMultiplier: $i - 1;
+                transform: rotateY(-$sideAngle * $angleMultiplier) translateZ($translateZ) translateY($translateY) rotateX($angle);
+            }
+        }
+
+        @for $i from 16 through 20 {
+            &:nth-child(#{$i}) {
+                $angleMultiplier: $i - 18;
+                transform: rotateY($sideAngle * $angleMultiplier + $sideAngle/2)
+                    translateZ($translateLowerZ)
+                    translateY($translateLowerY)
+                    rotateZ(180deg)
+                    rotateX($angle);
+            }
+        }
+
+        @for $i from 6 through 10 {
+            &:nth-child(#{$i}) {
+                $angleMultiplier: $i - 11;
+                transform: rotateY(-$sideAngle * $angleMultiplier)
+                    translateZ($translateRingZ)
+                    translateY($translateRingY)
+                    rotateZ(180deg)
+                    rotateX($ringAngle);
+            }
+        }
+
+        @for $i from 11 through 15 {
+            &:nth-child(#{$i}) {
+                $angleMultiplier: $i - 8;
+                transform: rotateY($sideAngle * $angleMultiplier + $sideAngle/2)
+                    translateZ($translateRingZ)
+                    translateY($translateRingY)
+                    rotateX($ringAngle);
+            }
+        }
+    }
+}
