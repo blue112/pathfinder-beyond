@@ -1,1 +1,5 @@
 node_modules/
+.env
+bin/server.js
+bin/server.js.map
+static/main.js

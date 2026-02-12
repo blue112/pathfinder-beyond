@@ -1,3 +1,4 @@
+import model.DatabaseHandler;
 import haxe.Template;
 import express.Next;
 import express.Response;
@@ -7,6 +8,7 @@ import jsasync.IJSAsync;
 
 class Server implements IJSAsync {
 	static function main() {
+		DatabaseHandler.init();
 		var app = new express.Express();
 		app.use(Express.serveStatic("static"));
 		app.use("/", serveIndex);
