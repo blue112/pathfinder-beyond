@@ -1,8 +1,0 @@
-{
-"version":3,
-"file":"main.js",
-"sourceRoot":"",
-"sources":["file:////home/blue/workspace/pathfinder/beyond/frontend/src/App.hx","file:////home/blue/workspace/pathfinder/beyond/frontend/src/Fiche.hx","file:////usr/share/haxe/std/haxe/iterators/ArrayIterator.hx"],
-"names":[],
-"mappings":";;UAGuB,WACrB;AAAA;AAAA;WAGsB;AAAA,CACtB,4BAAM;AADgB,CAEtB;AAFsB,CAEtB;AAFsB,CAEtB;AAFsB,CAItB;AAJsB;YCJD;AAAA,CACrB,eAAe;AADM,CAErB,uBAAuB;AAFF,CAIrB,qBAAqB;AAJA,CA6YrB,iCAAkC;AA7Yb;mCC+Bd,gBAPT;AAAA,CAEmB,AAAlB,eAAkB;AAFnB,CASE,aAAa;AATf;;UAgB2B,WACzB;AAAA,SAAO,eAAU;AAAjB;QAOsB,WACtB;AAAA,SAAO,WAAM;AAAb;;;;;;"
-}

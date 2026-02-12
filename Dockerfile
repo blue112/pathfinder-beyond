@@ -3,6 +3,7 @@ FROM haxe:4.3.7 AS build
 RUN mkdir /build
 COPY backend/ /build/backend
 COPY frontend/ /build/frontend
+COPY shared/ /build/shared
 WORKDIR /build/backend
 RUN haxe make.hxml
 

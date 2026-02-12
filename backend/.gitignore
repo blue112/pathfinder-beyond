@@ -3,3 +3,4 @@ node_modules/
 bin/server.js
 bin/server.js.map
 static/main.js
+static/main.js.map

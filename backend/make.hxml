@@ -1,6 +1,7 @@
 -lib hxnodejs
 -lib jsasync
 -cp externs
+-cp ../shared
 -main Server
 -cp src
 -js bin/server.js

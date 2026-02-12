@@ -36,6 +36,9 @@ extern class Express extends Route {
 
 	inline static function serveStatic(root:String, ?options:StaticOptions):Middleware
 		return untyped Express["static"](root, options);
+
+	static function json(?options:Dynamic):Middleware;
+	static function raw(?options:Dynamic):Middleware;
 }
 
 enum abstract ExpressEvent(String) from String to String {

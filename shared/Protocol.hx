@@ -1,0 +1,79 @@
+enum FicheEventType {
+	CREATE(data:BasicFicheData);
+	SET_CHARACTERISTICS(data:Characteristics);
+}
+
+typedef FullCharacter = {
+	@:optional var basics:BasicFicheData;
+	@:optional var characteristics:Characteristics;
+	@:optional var characteristicsMod:Characteristics;
+}
+
+typedef Characteristics = {
+	var str:Int;
+	var dex:Int;
+	var con:Int;
+	var int:Int;
+	var wis:Int;
+	var cha:Int;
+};
+
+enum SavingThrow {
+	REFLEXES;
+	VIGOR;
+	WILL;
+}
+
+typedef BasicFicheData = {
+	playerName:String,
+	characterName:String,
+	alignement:CharacterAlignement,
+	characterClass:CharacterClass,
+	level:Int,
+	divinityName:String,
+	origin:String,
+	race:CharacterRace,
+	gender:String,
+	sizeCategory:SizeCategory,
+	age:Int,
+	heightCm:Int,
+	weightKg:Int,
+	hair:String,
+	eyes:String,
+};
+
+enum CharacterRace {
+	HUMAN;
+	DWARF;
+	ELF;
+	HALF_ELF;
+	GNOME;
+	HALF_ORC;
+}
+
+enum CharacterClass {
+	ROUBLARD;
+}
+
+enum CharacterAlignement {
+	ALIGNEMENT_LB;
+	ALIGNEMENT_NB;
+	ALIGNEMENT_CB;
+	ALIGNEMENT_LN;
+	ALIGNEMENT_N;
+	ALIGNEMENT_LM;
+	ALIGNEMENT_NM;
+	ALIGNEMENT_CM;
+}
+
+enum SizeCategory {
+	SIZE_I;
+	SIZE_MIN;
+	SIZE_TP;
+	SIZE_P;
+	SIZE_M;
+	SIZE_G;
+	SIZE_TG;
+	SIZE_GIG;
+	SIZE_C;
+}
