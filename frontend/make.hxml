@@ -1,5 +1,6 @@
 -js ../backend/static/main.js
 -main App
+-cp ../shared
 -cp src
 -debug
 -lib jsasync

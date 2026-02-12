@@ -1,9 +1,18 @@
+import macros.GetAllFields;
+import js.html.Element;
+import haxe.ds.StringMap;
+import jsasync.IJSAsync;
 import js.Browser;
 
-class Fiche {
-	public function new() {
+class Fiche implements IJSAsync {
+	var availableFields:StringMap<Element>;
+	var character:FullCharacter;
+
+	public function new(fiche_id:String) {
 		var mainElem = Browser.document.createDivElement();
 		mainElem.classList.add("fiche");
+
+		character = {};
 
 		mainElem.innerHTML = "
         <section class='meta'>
@@ -14,67 +23,67 @@ class Fiche {
                 <div class='field-line'>
                     <div class='field' data-id='character-name'>
                         <div class='label'>Nom du personnage</div>
-                        <div class='value'>Alysa</div>
+                        <div class='value'></div>
                     </div>
                     <div class='field' data-id='alignement'>
                         <div class='label'>Alignement</div>
-                        <div class='value'>Neutre/Bon</div>
+                        <div class='value'></div>
                     </div>
                     <div class='field' data-id='player-name'>
                         <div class='label'>Joueur/Joueuse</div>
-                        <div class='value'>Ysa</div>
+                        <div class='value'></div>
                     </div>
                 </div>
                 <div class='field-line'>
-                    <div class='field l' data-id='class'>
+                    <div class='field l' data-id='character-class'>
                         <div class='label'>Classe</div>
-                        <div class='value'>Roublarde</div>
+                        <div class='value'></div>
                     </div>
                     <div class='field xxs m-s' data-id='level'>
                         <div class='label'>Niveau</div>
-                        <div class='value'>3</div>
+                        <div class='value'></div>
                     </div>
                     <div class='field' data-id='divinity-name'>
                         <div class='label'>Divinité</div>
-                        <div class='value'>Aucune</div>
+                        <div class='value'></div>
                     </div>
                     <div class='field' data-id='origin'>
                         <div class='label'>Origine</div>
-                        <div class='value'>Ville</div>
+                        <div class='value'></div>
                     </div>
                 </div>
                 <div class='field-line'>
                     <div class='field' data-id='race'>
                         <div class='label'>Race</div>
-                        <div class='value'>Humaine</div>
+                        <div class='value'></div>
                     </div>
-                    <div class='field xs' data-id='size-cat'>
+                    <div class='field xs' data-id='size-category'>
                         <div class='label'>Catégorie de taille</div>
-                        <div class='value'>M</div>
+                        <div class='value'></div>
                     </div>
                     <div class='field xs m-s' data-id='gender'>
                         <div class='label'>Genre</div>
-                        <div class='value'>F</div>
+                        <div class='value'></div>
                     </div>
                     <div class='field xs m-s' data-id='age'>
                         <div class='label'>Age</div>
-                        <div class='value num'>19</div>
+                        <div class='value num'></div>
                     </div>
-                    <div class='field xs  m-s' data-id='height'>
+                    <div class='field xs  m-s' data-id='height-cm'>
                         <div class='label'>Taille</div>
-                        <div class='value num'>152</div>
+                        <div class='value num'></div>
                     </div>
-                    <div class='field xs  m-s' data-id='height'>
+                    <div class='field xs  m-s' data-id='weight-kg'>
                         <div class='label'>Poids</div>
-                        <div class='value num'>60</div>
+                        <div class='value num'></div>
                     </div>
                     <div class='field s' data-id='hair'>
                         <div class='label'>Cheveux</div>
-                        <div class='value'>M/Marrons</div>
+                        <div class='value'></div>
                     </div>
                     <div class='field s' data-id='eyes'>
                         <div class='label'>Yeux</div>
-                        <div class='value'>Marrons</div>
+                        <div class='value'></div>
                     </div>
                 </div>
             </div>
@@ -83,163 +92,163 @@ class Fiche {
             <h2>Caractéristiques</h2>
             <div class='carac' data-id='str'>
                 <div class='label'>FORCE</div>
-                <div class='value'>12</div>
-                <div class='mod'>+1</div>
+                <div class='value'></div>
+                <div class='mod'></div>
             </div>
             <div class='carac' data-id='dex'>
                 <div class='label'>DEXTÉRITÉ</div>
-                <div class='value'>12</div>
-                <div class='mod'>+1</div>
+                <div class='value'></div>
+                <div class='mod'></div>
             </div>
             <div class='carac' data-id='con'>
                 <div class='label'>CONSTITUTION</div>
-                <div class='value'>12</div>
-                <div class='mod'>+1</div>
+                <div class='value'></div>
+                <div class='mod'></div>
             </div>
             <div class='carac' data-id='int'>
                 <div class='label'>INTELLIGENCE</div>
-                <div class='value'>12</div>
-                <div class='mod'>+1</div>
+                <div class='value'></div>
+                <div class='mod'></div>
             </div>
             <div class='carac' data-id='wis'>
                 <div class='label'>SAGESSE</div>
-                <div class='value'>12</div>
-                <div class='mod'>+1</div>
+                <div class='value'></div>
+                <div class='mod'></div>
             </div>
             <div class='carac' data-id='cha'>
                 <div class='label'>CHARISME</div>
-                <div class='value'>12</div>
-                <div class='mod'>+1</div>
+                <div class='value'></div>
+                <div class='mod'></div>
             </div>
         </section>
-        <section class='hp' data-id='hp'>
-            <div class='lethal' data-id='hp'>
+        <section class='hp'>
+            <div class='lethal'>
                 <div class='label'>Points de Vie</div>
                 <div class='value'>
-                    <span class='current'>21</span>
+                    <span class='current' data-id='hp'></span>
                     <span class='separator'>/</span>
-                    <span class='max'>24</span>
+                    <span class='max' data-id='hp-max'></span>
                 </div>
             </div>
-            <div class='non-lethal' data-id='non-lethal-hp'>
+            <div class='non-lethal'>
                 <div class='label'>Blessures non léthales</div>
                 <div class='value'>
-                    <span class='current'>0</span>
+                    <span class='current' data-id='non-lethal-damages'></span>
                     <span class='separator'>/</span>
-                    <span class='max'>21</span>
+                    <span class='max' data-id='non-lethal-max'></span>
                 </div>
             </div>
         </section>
         <section class='speed' data-id='speed'>
             <div class='label'>Déplacement</div>
-            <div class='value'>8c par tour</div>
+            <div class='value'></div>
         </section>
         <section class='initiative' data-id='initiative'>
             <div class='label'>Initiative</div>
-            <div class='value'><span class='d20'></span><span class='mod'> + 3</span></div>
+            <div class='value'><span class='d20'></span><span class='mod'></span></div>
         </section>
         <section class='ac' data-id='ac'>
             <div class='label'>CA</div>
-            <div class='value'>17</div>
+            <div class='value'></div>
         </section>
         <section class='contact' data-id='ac-contact'>
             <div class='label'>Contact</div>
-            <div class='value'>13</div>
+            <div class='value'></div>
         </section>
         <section class='surprise' data-id='ac-surprise'>
             <div class='label'>Pris au dépourvu</div>
-            <div class='value'>12</div>
+            <div class='value'></div>
         </section>
         <section class='saving'>
             <h2>Jets de sauvegarde</h2>
             <div class='reflexes' data-id='saving-reflexes'>
                 <div class='label'>Reflexes</div>
-                <div class='value'><span class='d20'></span> + 8</div>
+                <div class='value'><span class='d20'></span><span class='mod'></span></div>
             </div>
             <div class='vigor' data-id='saving-vigor'>
                 <div class='label'>Vigueur</div>
-                <div class='value'><span class='d20'></span> + 2</div>
+                <div class='value'><span class='d20'></span><span class='mod'></span></div>
             </div>
             <div class='will' data-id='saving-will'>
                 <div class='label'>Volonté</div>
-                <div class='value'><span class='d20'></span> - 1</div>
+                <div class='value'><span class='d20'></span><span class='mod'></span></div>
             </div>
         </section>
         <section class='fight'>
             <h2>Combat</h2>
             <div class='bba' data-id='bba'>
                 <div class='label'>Bonus de Base à l'Attaque</div>
-                <div class='value'>+ 2</div>
+                <div class='value'></div>
             </div>
             <div class='bmo' data-id='bmo'>
                 <div class='label'>Manoeuvre Offensive</div>
-                <div class='value'><span class='d20'></span> + 2</div>
+                <div class='value'><span class='d20'></span> <span class='mod'></span></div>
             </div>
             <div class='dmd' data-id='dmd'>
                 <div class='label'>Manoeuvre Défensive</div>
-                <div class='value'>16</div>
+                <div class='value'></div>
             </div>
             <section class='weapons'>
                 <h2>Armes</h2>
                 <div class='weapon'>
-                    <h3>Arc court de maître</h3>
+                    <h3></h3>
                     <div class='field-line'>
                         <div class='field s'>
                             <div class='label'>Jet pour toucher</div>
-                            <div class='value mod num'><span class='d20'></span> + 6</div>
+                            <div class='value mod num'><span class='d20'></span> <span class='mod'></span></div>
                         </div>
                         <div class='field s'>
                             <div class='label'>Critique</div>
-                            <div class='value num'>Si 20: x3</div>
+                            <div class='value num'></div>
                         </div>
                         <div class='field s'>
                             <div class='label'>Dégats</div>
-                            <div class='value mod num'>1d6 + 4</div>
+                            <div class='value mod num'></div>
                         </div>
                     </div>
                     <div class='field-line'>
                         <div class='field s'>
                             <div class='label'>Type</div>
-                            <div class='value'>Perforant</div>
+                            <div class='value'></div>
                         </div>
                         <div class='field xs'>
                             <div class='label'>Portée</div>
-                            <div class='value num'>12c</div>
+                            <div class='value num'></div>
                         </div>
                         <div class='field s'>
                             <div class='label'>Munitions</div>
-                            <div class='value'>12 flèches</div>
+                            <div class='value'></div>
                         </div>
                     </div>
                 </div>
                 <div class='weapon'>
-                    <h3>Rapière</h3>
+                    <h3></h3>
                     <div class='field-line'>
                         <div class='field s'>
                             <div class='label'>Jet pour toucher</div>
-                            <div class='value mod num'><span class='d20'></span> + 3</div>
+                            <div class='value mod num'><span class='d20'></span><span class='mod'></span></div>
                         </div>
                         <div class='field s'>
                             <div class='label'>Critique</div>
-                            <div class='value num'>Si 19 ou 20: x3</div>
+                            <div class='value num'></div>
                         </div>
                         <div class='field s'>
                             <div class='label'>Dégats</div>
-                            <div class='value mod num'>1d8 + 3</div>
+                            <div class='value mod num'></div>
                         </div>
                     </div>
                     <div class='field-line'>
                         <div class='field s'>
                             <div class='label'>Type</div>
-                            <div class='value'>Tranchant</div>
+                            <div class='value'></div>
                         </div>
                         <div class='field xs'>
                             <div class='label'>Portée</div>
-                            <div class='value num'>Contact</div>
+                            <div class='value num'></div>
                         </div>
                         <div class='field s'>
                             <div class='label'>Munitions</div>
-                            <div class='value'>/</div>
+                            <div class='value'></div>
                         </div>
 
                     </div>
@@ -250,11 +259,11 @@ class Fiche {
             <h2>Compétences</h2>
             <div class='skill'>
                 <div class='label'>Acrobaties</div>
-                <div class='value'>+7</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Artisanat</div>
-                <div class='value'>+1</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Art de la magie</div>
@@ -262,7 +271,7 @@ class Fiche {
             </div>
             <div class='skill'>
                 <div class='label'>Bluff</div>
-                <div class='value'>+7</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Connaissance (Exploration)</div>
@@ -270,7 +279,7 @@ class Fiche {
             </div>
             <div class='skill'>
                 <div class='label'>Connaissance (Folfklore Local)</div>
-                <div class='value'>+3</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Connaissance (Géographie)</div>
@@ -306,43 +315,43 @@ class Fiche {
             </div>
             <div class='skill'>
                 <div class='label'>Déguisement</div>
-                <div class='value'>+7</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Diplomatie</div>
-                <div class='value'>+7</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Discrétion</div>
-                <div class='value'>+8</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Dressage</div>
-                <div class='value'>+4</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Équitation</div>
-                <div class='value'>+3</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Escalade</div>
-                <div class='value'>+1</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Escamotage</div>
-                <div class='value'>+7</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Estimation</div>
-                <div class='value'>-1</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Évasion</div>
-                <div class='value'>+4</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Intimidation</div>
-                <div class='value'>+7</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Linguistique</div>
@@ -350,15 +359,15 @@ class Fiche {
             </div>
             <div class='skill'>
                 <div class='label'>Natation</div>
-                <div class='value'>+1</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Perception</div>
-                <div class='value'>+4</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Premiers secours</div>
-                <div class='value'>-1</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Profession</div>
@@ -366,31 +375,31 @@ class Fiche {
             </div>
             <div class='skill'>
                 <div class='label'>Psychologie</div>
-                <div class='value'>-1</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Représ.</div>
-                <div class='value'>+3</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Représ.</div>
-                <div class='value'>+3</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Sabotage</div>
-                <div class='value'>+8</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Survie</div>
-                <div class='value'>+3</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Utilisation d'objets magiques</div>
-                <div class='value'>+7</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
                 <div class='label'>Vol</div>
-                <div class='value'>+3</div>
+                <div class='value'></div>
             </div>
             <div class='skill'>
             </div>
@@ -399,5 +408,130 @@ class Fiche {
         ";
 
 		Browser.document.body.appendChild(mainElem);
+
+		availableFields = new StringMap();
+		for (i in mainElem.querySelectorAll("*")) {
+			var e:Element = cast i;
+			var id = e.dataset.id;
+			if (id != null) {
+				var value = e.querySelector(".value");
+				if (value != null)
+					e = value;
+				var mod = e.querySelector(".mod");
+				if (mod != null)
+					e = mod;
+
+				availableFields.set(id, e);
+			}
+		}
+		trace("Available fields: " + [for (n in availableFields.keys()) n].join(", "));
+
+		load(fiche_id);
+	}
+
+	static public function convertFieldName(apiFieldName:String) {
+		var kCase = "";
+		for (i in 0...apiFieldName.length) {
+			var c = apiFieldName.charAt(i);
+			if (c == c.toUpperCase()) {
+				kCase += "-";
+			}
+			kCase += c.toLowerCase();
+		}
+
+		return kCase;
+	}
+
+	private function updateCharacts() {
+		character.characteristicsMod = cast {};
+		for (i in Reflect.fields(character.characteristics)) {
+			var value:Int = Reflect.getProperty(character.characteristics, i);
+			var mod:Int = Std.int(value / 2) - 5;
+			Reflect.setProperty(character.characteristicsMod, i, mod);
+			availableFields.get(i).innerText = Std.string(value);
+			var modField = availableFields.get(i).parentElement.querySelector(".mod");
+			modField.innerText = mod.asMod(false);
+		}
+	}
+
+	private function calculateFields() {
+		if (character.characteristics == null)
+			return;
+
+		var vd = Rules.getVD(character);
+		availableFields.get("speed").innerText = '${vd}c par tour';
+		var dexMod = character.characteristicsMod.dex;
+		availableFields.get("initiative").innerText = dexMod.asMod(true);
+
+		var maxHP = Rules.getMaxHitPoints(character).string();
+		availableFields.get("hp-max").innerText = maxHP;
+		availableFields.get("hp").innerText = maxHP;
+		availableFields.get("non-lethal-max").innerText = maxHP;
+		availableFields.get("non-lethal-damages").innerText = 0.string();
+
+		availableFields.get("ac").innerText = Rules.getAC(character).string();
+		availableFields.get("ac-contact").innerText = Rules.getACContact(character).string();
+		availableFields.get("ac-surprise").innerText = Rules.getACSurprise(character).string();
+
+		availableFields.get("saving-reflexes").innerText = Rules.getSavingThrowMod(character, REFLEXES).asMod(true);
+		availableFields.get("saving-vigor").innerText = Rules.getSavingThrowMod(character, VIGOR).asMod(true);
+		availableFields.get("saving-will").innerText = Rules.getSavingThrowMod(character, WILL).asMod(true);
+		availableFields.get("bba").innerText = Rules.getBBA(character).asMod(false);
+		availableFields.get("bmo").innerText = Rules.getBMO(character).asMod(true);
+		availableFields.get("dmd").innerText = Rules.getDMD(character).string();
+	}
+
+	@:jsasync private function load(fiche_id:String) {
+		var ficheIdRegex = ~/^[0-9a-f-]{36}$/;
+		if (!ficheIdRegex.match(fiche_id))
+			return;
+
+		var result:Array<FicheEventType> = Api.load('/fiche/$fiche_id').jsawait();
+		for (i in result) {
+			switch (i) {
+				case CREATE(data):
+					this.character.basics = data;
+					var outData:Dynamic = Reflect.copy(data);
+					outData.alignement = data.alignement.alignementToString();
+					outData.characterClass = data.characterClass.classToString();
+					outData.sizeCategory = data.sizeCategory.sizeCategoryToString();
+					for (f in Reflect.fields(data)) {
+						var fieldName = convertFieldName(f);
+						if (availableFields.exists(fieldName)) {
+							var value = Reflect.getProperty(outData, f);
+							if (Std.is(value, Int)) {
+								value = Std.string(value);
+							}
+							if (Std.is(value, String)) {
+								availableFields.get(fieldName).innerHTML = value;
+							} else {
+								trace('Invalid value for $fieldName: $value');
+							}
+						} else {
+							Browser.console.warn('[PFB] Field does not exist: $fieldName');
+						}
+					}
+				case SET_CHARACTERISTICS(data):
+					this.character.characteristics = data;
+					updateCharacts();
+			}
+		}
+
+		calculateFields();
+	}
+
+	@:expose("generate")
+	static public function generateCharac(ficheId:String) {
+		var charac = GetAllFields.getNames(Characteristics);
+		var obj = {};
+		for (i in charac) {
+			var values = [for (i in 0...4) dice(6)];
+			values.sort((a, b) -> a - b);
+			values.splice(0, 1);
+			var total = values.fold((i, r) -> i + r, 0);
+			Reflect.setField(obj, i, total);
+		}
+		trace(obj);
+		Api.pushEvent(ficheId, SET_CHARACTERISTICS(cast obj));
 	}
 }
