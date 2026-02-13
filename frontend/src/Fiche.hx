@@ -193,69 +193,6 @@ class Fiche implements IJSAsync {
             </div>
             <section class='weapons'>
                 <h2>Armes</h2>
-                <div class='weapon'>
-                    <h3></h3>
-                    <div class='field-line'>
-                        <div class='field s'>
-                            <div class='label'>Jet pour toucher</div>
-                            <div class='value mod num'><span class='d20'></span> <span class='mod'></span></div>
-                        </div>
-                        <div class='field s'>
-                            <div class='label'>Critique</div>
-                            <div class='value num'></div>
-                        </div>
-                        <div class='field s'>
-                            <div class='label'>Dégats</div>
-                            <div class='value mod num'></div>
-                        </div>
-                    </div>
-                    <div class='field-line'>
-                        <div class='field s'>
-                            <div class='label'>Type</div>
-                            <div class='value'></div>
-                        </div>
-                        <div class='field xs'>
-                            <div class='label'>Portée</div>
-                            <div class='value num'></div>
-                        </div>
-                        <div class='field s'>
-                            <div class='label'>Munitions</div>
-                            <div class='value'></div>
-                        </div>
-                    </div>
-                </div>
-                <div class='weapon'>
-                    <h3></h3>
-                    <div class='field-line'>
-                        <div class='field s'>
-                            <div class='label'>Jet pour toucher</div>
-                            <div class='value mod num'><span class='d20'></span><span class='mod'></span></div>
-                        </div>
-                        <div class='field s'>
-                            <div class='label'>Critique</div>
-                            <div class='value num'></div>
-                        </div>
-                        <div class='field s'>
-                            <div class='label'>Dégats</div>
-                            <div class='value mod num'></div>
-                        </div>
-                    </div>
-                    <div class='field-line'>
-                        <div class='field s'>
-                            <div class='label'>Type</div>
-                            <div class='value'></div>
-                        </div>
-                        <div class='field xs'>
-                            <div class='label'>Portée</div>
-                            <div class='value num'></div>
-                        </div>
-                        <div class='field s'>
-                            <div class='label'>Munitions</div>
-                            <div class='value'></div>
-                        </div>
-
-                    </div>
-                </div>
             </section>
         </section>
         <section class='skills'>
@@ -434,6 +371,22 @@ class Fiche implements IJSAsync {
 		load(fiche_id);
 	}
 
+	function getField(parentElement:Element, id:String) {
+		var elem = parentElement.querySelector('[data-id="$id"]');
+		if (elem == null)
+			return null;
+
+		var e:Element = cast elem;
+		var value = e.querySelector(".value");
+		if (value != null)
+			e = value;
+		var mod = e.querySelector(".mod");
+		if (mod != null)
+			e = mod;
+
+		return e;
+	}
+
 	function rollD20() {
 		D20.roll();
 	}
@@ -457,6 +410,68 @@ class Fiche implements IJSAsync {
 		}
 
 		return kCase;
+	}
+
+	private function addWeapon(weapon:Weapon) {
+		var divWeapon = Browser.document.createDivElement();
+		divWeapon.classList.add("weapon");
+		divWeapon.innerHTML = "
+            <h3></h3>
+            <div class='field-line'>
+                <div class='field s' data-id='attack'>
+                    <div class='label'>Jet pour toucher</div>
+                    <div class='value mod num'><span class='d20'></span><span class='mod'></span></div>
+                </div>
+                <div class='field s' data-id='critical'>
+                    <div class='label'>Critique</div>
+                    <div class='value num'></div>
+                </div>
+                <div class='field s' data-id='damage'>
+                    <div class='label'>Dégats</div>
+                    <div class='value mod num'></div>
+                </div>
+            </div>
+            <div class='field-line'>
+                <div class='field s' data-id='type'>
+                    <div class='label'>Type</div>
+                    <div class='value'></div>
+                </div>
+                <div class='field xs' data-id='range'>
+                    <div class='label'>Portée</div>
+                    <div class='value num'></div>
+                </div>
+                <div class='field s' data-id='ammo'>
+                    <div class='label'>Munitions</div>
+                    <div class='value'></div>
+                </div>
+            </div>";
+
+		divWeapon.querySelector("h3").innerText = weapon.name;
+		getField(divWeapon, "ammo").innerText = weapon.munitions;
+		getField(divWeapon, "range").innerText = if (weapon.range != null) '${weapon.range}c' else 'Contact';
+		getField(divWeapon, "type").innerText = [
+			for (dt in weapon.damage_types)
+				switch (dt) {
+					case PERFORANT:
+						"Perforant";
+					case TRANCHANT:
+						"Tranchant";
+					case CONTONDANT:
+						"Contondant";
+				}
+		].join(" / ");
+		getField(divWeapon, "attack").innerText = ((switch (weapon.weaponAttackCharacteristic) {
+			case STRENGTH: character.characteristicsMod.str;
+			case DEXTERITY: character.characteristicsMod.dex;
+		}) + Rules.getBBA(character) + weapon.attack_modifier).asMod();
+		getField(divWeapon,
+			"damage").innerText = [for (d in weapon.damage_dices) '1d' + d].join(" + ")
+				+ " + "
+				+ (weapon.damage_modifier + switch (weapon.weaponDamageCharacteristic) {
+					case STRENGTH: character.characteristicsMod.str;
+					case DEXTERITY: character.characteristicsMod.dex;
+				});
+		mainElem.querySelector(".weapons").appendChild(divWeapon);
 	}
 
 	private function updateCharacts() {
@@ -531,13 +546,46 @@ class Fiche implements IJSAsync {
 				case SET_CHARACTERISTICS(data):
 					this.character.characteristics = data;
 					updateCharacts();
+				case ADD_WEAPON(weapon):
+					addWeapon(weapon);
 			}
 		}
 
 		calculateFields();
 	}
 
-	@:expose("generate")
+	@:expose("debug")
+	static public function debug(what:String) {
+		var ficheId = Browser.window.location.pathname.split("/")[2];
+		if (what == "carac") {
+			generateCharac(ficheId);
+			return "Ok";
+		} else if (what == "weapon") {
+			debugAddWeapon(ficheId);
+			return "Ok";
+		}
+
+		return 'Unknown debug $what';
+	}
+
+	static public function debugAddWeapon(ficheId:String) {
+		Api.pushEvent(ficheId, ADD_WEAPON({
+			name: "Arc Court",
+			attack_modifier: 0,
+			damage_modifier: 0,
+			weaponDamageCharacteristic: DEXTERITY,
+			weaponAttackCharacteristic: DEXTERITY,
+			damage_types: [PERFORANT],
+			munitions: "Illimitées",
+			range: 12,
+			critical_text: {
+				nums: [20],
+				damageMultiplier: 3
+			},
+			damage_dices: [6]
+		}));
+	}
+
 	static public function generateCharac(ficheId:String) {
 		var charac = GetAllFields.getNames(Characteristics);
 		var obj = {};

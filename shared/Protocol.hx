@@ -1,7 +1,37 @@
 enum FicheEventType {
 	CREATE(data:BasicFicheData);
 	SET_CHARACTERISTICS(data:Characteristics);
+	ADD_WEAPON(weapon:Weapon);
 }
+
+typedef Weapon = {
+	var name:String;
+	var damage_dices:Array<Int>;
+	var attack_modifier:Int;
+	var weaponAttackCharacteristic:Characteristic;
+	var weaponDamageCharacteristic:Characteristic;
+	var damage_modifier:Int;
+	var critical_text:WeaponCriticalStat;
+	var damage_types:Array<WeaponDamageType>;
+	var range:Null<Int>;
+	var munitions:String;
+};
+
+enum WeaponDamageType {
+	PERFORANT;
+	TRANCHANT;
+	CONTONDANT;
+}
+
+enum Characteristic {
+	STRENGTH;
+	DEXTERITY;
+}
+
+typedef WeaponCriticalStat = {
+	var nums:Array<Int>;
+	var damageMultiplier:Int;
+};
 
 typedef FullCharacter = {
 	@:optional var basics:BasicFicheData;

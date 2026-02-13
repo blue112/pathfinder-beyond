@@ -1,6 +1,5 @@
 import express.Express;
 import haxe.Unserializer;
-import js.html.idb.Database;
 import jsasync.IJSAsync;
 import model.FicheEvent;
 import model.DatabaseHandler;
