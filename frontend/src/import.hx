@@ -8,4 +8,5 @@ using ProtocolUtil;
 using Lambda;
 using Formatter;
 using Std;
+using StringTools;
 #end

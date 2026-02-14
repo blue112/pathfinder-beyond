@@ -2,7 +2,7 @@
     display: grid;
     grid-gap: 5px 20px;
     grid-auto-rows: 40px;
-    grid-template-columns: 4fr 3fr 3fr;
+    grid-template-columns: 2fr 2fr 3fr;
 }
 
 section.meta {
@@ -19,27 +19,20 @@ section.hp {
 }
 section.speed {
     grid-column: 2;
-    grid-row: 10;
+    grid-row: 8/10;
 }
 section.initiative {
     grid-column: 2;
-    grid-row: 11;
-}
-section.ac {
-    grid-column: 2;
-    grid-row: 7;
-}
-section.contact {
-    grid-column: 2;
-    grid-row: 8;
-}
-section.surprise {
-    grid-column: 2;
-    grid-row: 9;
+    grid-row: 10/12;
 }
 section.saving {
     grid-column: 2;
-    grid-row: 12/15;
+    grid-row: 12/16;
+}
+section.armor {
+    grid-column: 1;
+    grid-row: 11;
+    margin-top: 15px;
 }
 section.fight {
     grid-column: 1/3;

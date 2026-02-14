@@ -1,3 +1,4 @@
+import js.html.MouseEvent;
 import RulesSkills.SkillType;
 import js.html.DivElement;
 import macros.GetAllFields;
@@ -128,6 +129,7 @@ class Fiche implements IJSAsync {
             </div>
         </section>
         <section class='hp'>
+            <h2>Points de vie</h2>
             <div class='lethal'>
                 <div class='label'>Points de Vie</div>
                 <div class='value'>
@@ -145,25 +147,34 @@ class Fiche implements IJSAsync {
                 </div>
             </div>
         </section>
-        <section class='speed' data-id='speed'>
-            <div class='label'>Déplacement</div>
-            <div class='value'></div>
+        <section class='speed'>
+            <h2>Déplacement</h2>
+            <section data-id='speed'>
+                <div class='label'>Déplacement</div>
+                <div class='value'></div>
+            </section>
         </section>
-        <section class='initiative' data-id='initiative'>
-            <div class='label'>Initiative</div>
-            <div class='value'><span class='d20'></span><span class='mod'></span></div>
+        <section class='initiative'>
+            <h2>Initiative</h2>
+            <section data-id='initiative'>
+                <div class='label'>Initiative</div>
+                <div class='value'><span class='d20'></span><span class='mod'></span></div>
+            </section>
         </section>
-        <section class='ac' data-id='ac'>
-            <div class='label'>CA</div>
-            <div class='value'></div>
-        </section>
-        <section class='contact' data-id='ac-contact'>
-            <div class='label'>Contact</div>
-            <div class='value'></div>
-        </section>
-        <section class='surprise' data-id='ac-surprise'>
-            <div class='label'>Pris au dépourvu</div>
-            <div class='value'></div>
+        <section class='armor'>
+            <h2>Défense</h2>
+            <section class='ac' data-id='ac'>
+                <div class='label'>CA</div>
+                <div class='value'></div>
+            </section>
+            <section class='contact' data-id='ac-contact'>
+                <div class='label'>Contact</div>
+                <div class='value'></div>
+            </section>
+            <section class='surprise' data-id='ac-surprise'>
+                <div class='label'>Pris au dépourvu</div>
+                <div class='value'></div>
+            </section>
         </section>
         <section class='saving'>
             <h2>Jets de sauvegarde</h2>
@@ -241,16 +252,22 @@ class Fiche implements IJSAsync {
 		return e;
 	}
 
-	function rollD20() {
-		D20.roll();
+	function rollD20(elem:Element) {
+		var parent = elem.parentElement;
+		var mod = null;
+		if (parent.querySelector(".mod") != null) {
+			mod = Std.parseInt(parent.querySelector(".mod").innerText.replace(" ", ""));
+		}
+		D20.roll(mod);
 	}
 
 	function bindD20() {
-		for (i in mainElem.querySelectorAll(".d20")) {
-			i.addEventListener("click", () -> {
-				rollD20();
-			});
-		}
+		mainElem.addEventListener('click', (e:MouseEvent) -> {
+			var elem:Element = cast e.target;
+			if (elem.classList.contains("d20") || elem.classList.contains("mod")) {
+				rollD20(elem);
+			}
+		});
 	}
 
 	static public function convertFieldName(apiFieldName:String) {
@@ -273,7 +290,7 @@ class Fiche implements IJSAsync {
             <h3></h3>
             <div class='field-line'>
                 <div class='field s' data-id='attack'>
-                    <div class='label'>Jet pour toucher</div>
+                    <div class='label'>Pour toucher</div>
                     <div class='value mod num'><span class='d20'></span><span class='mod'></span></div>
                 </div>
                 <div class='field s' data-id='critical'>
@@ -359,7 +376,7 @@ class Fiche implements IJSAsync {
 		availableFields.get("saving-reflexes").innerText = Rules.getSavingThrowMod(character, REFLEXES).asMod(true);
 		availableFields.get("saving-vigor").innerText = Rules.getSavingThrowMod(character, VIGOR).asMod(true);
 		availableFields.get("saving-will").innerText = Rules.getSavingThrowMod(character, WILL).asMod(true);
-		availableFields.get("bba").innerText = Rules.getBBA(character).asMod(false);
+		availableFields.get("bba").innerText = Rules.getBBA(character).asMod(true);
 		availableFields.get("bmo").innerText = Rules.getBMO(character).asMod(true);
 		availableFields.get("dmd").innerText = Rules.getDMD(character).string();
 
@@ -395,6 +412,8 @@ class Fiche implements IJSAsync {
 			return;
 
 		var result:Array<FicheEventType> = Api.load('/fiche/$fiche_id').jsawait();
+		trace('Fetched ${result.length} events for this fiche');
+		var startTime = Date.now().getTime();
 		for (i in result) {
 			switch (i) {
 				case CREATE(data):
@@ -430,6 +449,8 @@ class Fiche implements IJSAsync {
 		}
 
 		calculateFields();
+		var elapsed = Date.now().getTime() - startTime;
+		trace('Computed in ${elapsed}ms');
 	}
 
 	@:expose("debug")
