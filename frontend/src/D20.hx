@@ -45,6 +45,6 @@ class D20 {
             </div>';
 		Browser.document.body.append(d20Tray);
 		var d20:DivElement = cast d20Tray.querySelector(".die-d20");
-		d20.dataset.face = "20";
+		d20.dataset.face = (Std.random(20) + 1).string();
 	}
 }

@@ -1,4 +1,8 @@
+import RulesSkills.SkillType;
 import Protocol;
+
+using Rules;
+using Lambda;
 
 class Rules {
 	static var bbaTables = [ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],];
@@ -9,6 +13,36 @@ class Rules {
 			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 1, 1, 12],
 		]
 	];
+
+	static public function getSkillRank(char:FullCharacter, skill:SkillType) {
+		return char.skillRanks.count(n -> n == skill);
+	}
+
+	static public function getCaracMod(char:FullCharacter, carac:Characteristic) {
+		return switch (carac) {
+			case STRENGTH: char.characteristicsMod.str;
+			case INTELLIGENCE: char.characteristicsMod.int;
+			case DEXTERITY: char.characteristicsMod.dex;
+			case WISDOM: char.characteristicsMod.wis;
+			case CHARISMA: char.characteristicsMod.cha;
+			case CONSTITUTION: char.characteristicsMod.con;
+		}
+	}
+
+	static public function getSkillsMods(char:FullCharacter) {
+		return RulesSkills.skills.map(n -> {
+			var ranks = char.getSkillRank(n.name);
+			var isClassSkill = n.classSkillFor.contains(char.basics.characterClass);
+			var canUse = !n.needTraining || ranks > 0;
+			return {
+				label: n.label,
+				classSkill: isClassSkill,
+				ranks: ranks,
+				canUse: canUse,
+				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (isClassSkill && ranks > 0) 3 else 0)
+			}
+		});
+	}
 
 	static public function getBMO(char:FullCharacter) {
 		return getBBA(char) + char.characteristicsMod.str + char.characteristicsMod.dex + getSizeMod(char, true);

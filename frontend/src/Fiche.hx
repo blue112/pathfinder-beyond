@@ -1,9 +1,12 @@
+import RulesSkills.SkillType;
 import js.html.DivElement;
 import macros.GetAllFields;
 import js.html.Element;
 import haxe.ds.StringMap;
 import jsasync.IJSAsync;
 import js.Browser;
+
+using Rules;
 
 class Fiche implements IJSAsync {
 	var availableFields:StringMap<Element>;
@@ -15,7 +18,7 @@ class Fiche implements IJSAsync {
 		mainElem = Browser.document.createDivElement();
 		mainElem.classList.add("fiche");
 
-		character = {};
+		character = {skillRanks: []};
 
 		mainElem.innerHTML = "
         <section class='meta'>
@@ -196,154 +199,6 @@ class Fiche implements IJSAsync {
             </section>
         </section>
         <section class='skills'>
-            <h2>Compétences</h2>
-            <div class='skill'>
-                <div class='label'>Acrobaties</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Artisanat</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Art de la magie</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Bluff</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Exploration)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Folfklore Local)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Géographie)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Histoire)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Ingénierie)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Mystères)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Nature)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Noblesse)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Plans)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Connaissance (Religion)</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Déguisement</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Diplomatie</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Discrétion</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Dressage</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Équitation</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Escalade</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Escamotage</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Estimation</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Évasion</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Intimidation</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Linguistique</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Natation</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Perception</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Premiers secours</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Profession</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Psychologie</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Représ.</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Représ.</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Sabotage</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Survie</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Utilisation d'objets magiques</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-                <div class='label'>Vol</div>
-                <div class='value'></div>
-            </div>
-            <div class='skill'>
-            </div>
-            </div>
         </section>
         ";
 
@@ -364,7 +219,6 @@ class Fiche implements IJSAsync {
 				availableFields.set(id, e);
 			}
 		}
-		trace("Available fields: " + [for (n in availableFields.keys()) n].join(", "));
 
 		bindD20();
 
@@ -460,17 +314,14 @@ class Fiche implements IJSAsync {
 						"Contondant";
 				}
 		].join(" / ");
-		getField(divWeapon, "attack").innerText = ((switch (weapon.weaponAttackCharacteristic) {
-			case STRENGTH: character.characteristicsMod.str;
-			case DEXTERITY: character.characteristicsMod.dex;
-		}) + Rules.getBBA(character) + weapon.attack_modifier).asMod();
+		getField(divWeapon,
+			"attack").innerText = (character.getCaracMod(weapon.weaponAttackCharacteristic) + Rules.getBBA(character) + weapon.attack_modifier).asMod();
 		getField(divWeapon,
 			"damage").innerText = [for (d in weapon.damage_dices) '1d' + d].join(" + ")
 				+ " + "
-				+ (weapon.damage_modifier + switch (weapon.weaponDamageCharacteristic) {
-					case STRENGTH: character.characteristicsMod.str;
-					case DEXTERITY: character.characteristicsMod.dex;
-				});
+				+ (weapon.damage_modifier + character.getCaracMod(weapon.weaponDamageCharacteristic));
+
+		getField(divWeapon, "critical").innerHTML = "Si " + weapon.critical_text.nums.join(",") + ": x" + weapon.critical_text.damageMultiplier;
 		mainElem.querySelector(".weapons").appendChild(divWeapon);
 	}
 
@@ -511,6 +362,31 @@ class Fiche implements IJSAsync {
 		availableFields.get("bba").innerText = Rules.getBBA(character).asMod(false);
 		availableFields.get("bmo").innerText = Rules.getBMO(character).asMod(true);
 		availableFields.get("dmd").innerText = Rules.getDMD(character).string();
+
+		addSkills();
+	}
+
+	function addSkills() {
+		var skillsDiv = mainElem.querySelector(".skills");
+		skillsDiv.innerHTML = "<h2>Compétences</h2>";
+
+		for (skill in character.getSkillsMods()) {
+			var skillDiv = Browser.document.createDivElement();
+			skillDiv.classList.add("skill");
+			skillDiv.innerHTML = "
+                <div class='label'></div>
+                <div class='mod'></div>
+                <div class='ranks'></div>";
+
+			skillDiv.querySelector(".label").innerHTML = skill.label + (if (skill.classSkill) " <ins title='Compétence de classe'>(C)</ins>" else "");
+			if (skill.canUse)
+				skillDiv.querySelector(".mod").innerText = skill.mod.asMod();
+			skillDiv.querySelector(".ranks").innerText = skill.ranks.string();
+
+			skillDiv.classList.add("class-skill");
+
+			skillsDiv.appendChild(skillDiv);
+		}
 	}
 
 	@:jsasync private function load(fiche_id:String) {
@@ -548,6 +424,8 @@ class Fiche implements IJSAsync {
 					updateCharacts();
 				case ADD_WEAPON(weapon):
 					addWeapon(weapon);
+				case TRAIN_SKILL(skill):
+					character.skillRanks.push(skill);
 			}
 		}
 
@@ -555,7 +433,7 @@ class Fiche implements IJSAsync {
 	}
 
 	@:expose("debug")
-	static public function debug(what:String) {
+	static public function debug(what:String, param1:String) {
 		var ficheId = Browser.window.location.pathname.split("/")[2];
 		if (what == "carac") {
 			generateCharac(ficheId);
@@ -563,9 +441,20 @@ class Fiche implements IJSAsync {
 		} else if (what == "weapon") {
 			debugAddWeapon(ficheId);
 			return "Ok";
+		} else if (what == "skill") {
+			return debugIncreaseSkill(ficheId, param1);
 		}
 
 		return 'Unknown debug $what';
+	}
+
+	static public function debugIncreaseSkill(ficheId:String, skillName:String) {
+		var skill = SkillType.createByName(skillName.toUpperCase());
+		if (skill == null) {
+			return "Skill type not found";
+		}
+		Api.pushEvent(ficheId, TRAIN_SKILL(skill));
+		return "Ok";
 	}
 
 	static public function debugAddWeapon(ficheId:String) {

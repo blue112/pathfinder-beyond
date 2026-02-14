@@ -1,7 +1,10 @@
+import RulesSkills.SkillType;
+
 enum FicheEventType {
 	CREATE(data:BasicFicheData);
 	SET_CHARACTERISTICS(data:Characteristics);
 	ADD_WEAPON(weapon:Weapon);
+	TRAIN_SKILL(skill:SkillType);
 }
 
 typedef Weapon = {
@@ -26,6 +29,10 @@ enum WeaponDamageType {
 enum Characteristic {
 	STRENGTH;
 	DEXTERITY;
+	CONSTITUTION;
+	INTELLIGENCE;
+	WISDOM;
+	CHARISMA;
 }
 
 typedef WeaponCriticalStat = {
@@ -37,6 +44,7 @@ typedef FullCharacter = {
 	@:optional var basics:BasicFicheData;
 	@:optional var characteristics:Characteristics;
 	@:optional var characteristicsMod:Characteristics;
+	@:optional var skillRanks:Array<SkillType>;
 }
 
 typedef Characteristics = {
