@@ -12,6 +12,7 @@ using Rules;
 class Fiche implements IJSAsync {
 	var availableFields:StringMap<Element>;
 	var character:FullCharacter;
+	var fiche_id:String;
 
 	var mainElem:DivElement;
 
@@ -19,9 +20,14 @@ class Fiche implements IJSAsync {
 		mainElem = Browser.document.createDivElement();
 		mainElem.classList.add("fiche");
 
+		this.fiche_id = fiche_id;
+
 		character = {skillRanks: []};
 
 		mainElem.innerHTML = "
+		<section class='actions'>
+			<a class='see-dice-rolls'>Voir les lancés de dés</a>
+		</section>
         <section class='meta'>
             <div class='left'>
                 <div class='logo'><span>Feuille de personnage</span></div>
@@ -232,8 +238,24 @@ class Fiche implements IJSAsync {
 		}
 
 		bindD20();
+		bindMenu();
 
 		load(fiche_id);
+	}
+
+	function bindMenu() {
+		mainElem.querySelector("a.see-dice-rolls").addEventListener("click", () -> {
+			new DiceRollHistory(fiche_id);
+		});
+	}
+
+	function bindD20() {
+		mainElem.addEventListener('click', (e:MouseEvent) -> {
+			var elem:Element = cast e.target;
+			if (elem.classList.contains("d20") || elem.classList.contains("mod")) {
+				rollD20(elem);
+			}
+		});
 	}
 
 	function getField(parentElement:Element, id:String) {
@@ -252,22 +274,21 @@ class Fiche implements IJSAsync {
 		return e;
 	}
 
-	function rollD20(elem:Element) {
+	@:jsasync function rollD20(elem:Element) {
 		var parent = elem.parentElement;
 		var mod = null;
 		if (parent.querySelector(".mod") != null) {
 			mod = Std.parseInt(parent.querySelector(".mod").innerText.replace(" ", ""));
 		}
-		D20.roll(mod);
-	}
+		while (parent.dataset.id == null && parent != Browser.document.body) {
+			parent = parent.parentElement;
+		}
+		if (parent == Browser.document.body) {
+			throw "Cannot find parent id for this dice roll";
+		}
 
-	function bindD20() {
-		mainElem.addEventListener('click', (e:MouseEvent) -> {
-			var elem:Element = cast e.target;
-			if (elem.classList.contains("d20") || elem.classList.contains("mod")) {
-				rollD20(elem);
-			}
-		});
+		var apiResult = Api.rollDice(fiche_id, 20, parent.dataset.id).jsawait();
+		D20.roll(mod, apiResult.result);
 	}
 
 	static public function convertFieldName(apiFieldName:String) {

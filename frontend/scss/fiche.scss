@@ -1,6 +1,7 @@
 @use "mixins";
 
 @use "fiche-grid";
+@use "sass:color";
 
 $backgroundColor: #e1d5bb;
 
@@ -299,7 +300,7 @@ h3 {
                 padding: 5px;
 
                 h3{
-                    border-color: darken($color: #b8ae98, $amount: 20);
+                    border-color: color.adjust($color: #b8ae98, $lightness: -20%);
                 }
             }
         }
@@ -314,7 +315,7 @@ h3 {
 
         &:hover
         {
-            background: darken($color: $backgroundColor, $amount: 3)
+            background: color.adjust($color: $backgroundColor, $lightness: -3%)
         }
 
         .label {

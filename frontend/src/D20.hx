@@ -3,7 +3,7 @@ import js.html.DivElement;
 import js.Browser;
 
 class D20 {
-	static public function roll(mod:Int) {
+	static public function roll(mod:Int, result:Int) {
 		var backdrop = if (Browser.document.getElementById("backdrop") != null) Browser.document.getElementById("backdrop") else {
 			var backdrop = Browser.document.createDivElement();
 			backdrop.classList.add("backdrop");
@@ -19,8 +19,6 @@ class D20 {
 		}
 
 		Browser.document.body.classList.add("rolling");
-
-		var dice = Std.random(20) + 1;
 
 		var d20Tray = Browser.document.createDivElement();
 		d20Tray.classList.add("dice-tray");
@@ -55,16 +53,16 @@ class D20 {
             ';
 		Browser.document.body.append(d20Tray);
 		var d20:DivElement = cast d20Tray.querySelector(".die-d20");
-		d20.dataset.face = dice.string();
+		d20.dataset.face = result.string();
 		Timer.delay(() -> {
-			d20Tray.querySelector("h3").innerText = 'Résultat: ${dice + mod}';
+			d20Tray.querySelector("h3").innerText = 'Résultat: ${result + mod}';
 			if (mod != null) {
-				d20Tray.querySelector("h3").innerText += ' ($dice + $mod)';
+				d20Tray.querySelector("h3").innerText += ' ($result + $mod)';
 			}
 			d20Tray.classList.add("reveal");
-			var cls = if (dice == 20) {
+			var cls = if (result == 20) {
 				"critical-success";
-			} else if (dice == 1) "critical-fail"; else null;
+			} else if (result == 1) "critical-fail"; else null;
 			if (cls != null) {
 				backdrop.classList.add(cls);
 				d20Tray.classList.add(cls);

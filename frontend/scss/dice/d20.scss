@@ -9,7 +9,7 @@ $animationDuration: 1s;
 
 $angle: 53deg;
 $ringAngle: -11deg;
-$sideAngle: 360deg/5;
+$sideAngle: calc(360deg/5);
 $opacity: 0.75;
 $color: rgba(30, 180, 20, $opacity);
 
@@ -143,7 +143,7 @@ body.rolling {
     @for $i from 11 through 15 {
         &[data-face="#{$i}"] {
             $angleMultiplier: $i - 8;
-            transform: rotateX(-$ringAngle) rotateY(-$sideAngle * $angleMultiplier - $sideAngle/2);
+            transform: rotateX(-$ringAngle) rotateY(-$sideAngle * $angleMultiplier - calc($sideAngle/2));
         }
     }
 
@@ -188,7 +188,7 @@ body.rolling {
         @for $i from 16 through 20 {
             &:nth-child(#{$i}) {
                 $angleMultiplier: $i - 18;
-                transform: rotateY($sideAngle * $angleMultiplier + $sideAngle/2)
+                transform: rotateY($sideAngle * $angleMultiplier + calc($sideAngle/2))
                     translateZ($translateLowerZ)
                     translateY($translateLowerY)
                     rotateZ(180deg)
@@ -210,7 +210,7 @@ body.rolling {
         @for $i from 11 through 15 {
             &:nth-child(#{$i}) {
                 $angleMultiplier: $i - 8;
-                transform: rotateY($sideAngle * $angleMultiplier + $sideAngle/2)
+                transform: rotateY($sideAngle * $angleMultiplier + calc($sideAngle/2))
                     translateZ($translateRingZ)
                     translateY($translateRingY)
                     rotateX($ringAngle);

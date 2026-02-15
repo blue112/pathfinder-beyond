@@ -1,3 +1,4 @@
+import haxe.Json;
 import haxe.Serializer;
 import js.lib.Promise;
 import haxe.Unserializer;
@@ -11,6 +12,29 @@ class Api implements IJSAsync {
 		var r = Browser.window.fetch('/api$route').jsawait();
 		var h = r.text().jsawait();
 		return Unserializer.run(h);
+	}
+
+	@:jsasync static public function getRolls(ficheId:String):Promise<Array<{
+		result:Int,
+		ts:Int,
+		field_name:String,
+		faces:Int
+	}>> {
+		var r = Browser.window.fetch('/api/fiche/$ficheId/rolls').jsawait();
+		var j = r.json().jsawait();
+		return j;
+	}
+
+	@:jsasync static public function rollDice(ficheId:String, faces:Int, field:String):Promise<{result:Int, roll_id:Int}> {
+		var r = Browser.window.fetch('/api/fiche/$ficheId/roll', {
+			method: "post",
+			headers: {
+				"Content-type": "application/json",
+			},
+			body: Json.stringify({faceCount: faces, fieldName: field})
+		}).jsawait();
+		var j = r.json().jsawait();
+		return j;
 	}
 
 	@:jsasync static public function pushEvent(ficheId:String, event:FicheEventType):Promise<Dynamic> {

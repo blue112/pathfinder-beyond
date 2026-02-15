@@ -1,0 +1,41 @@
+.popup
+{
+    .main {
+        position: absolute;
+        top: 10%;
+        height: 80%;
+        width: 80%;
+        left: 10%;
+        background: white;
+        border: 2px solid black;
+        z-index: 2;
+
+        h2
+        {
+            margin: 20px 0;
+            font-size: 1.3em;
+        }
+
+        a.close
+        {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    }
+
+    .backdrop {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+    }
+}

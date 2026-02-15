@@ -1,3 +1,4 @@
+import model.DiceRoll;
 import express.Express;
 import haxe.Unserializer;
 import jsasync.IJSAsync;
@@ -14,19 +15,54 @@ class FicheRouter implements IJSAsync {
 	static public function getRouter() {
 		var router = new Router();
 		router.post("/createFiche", onCreateFiche);
-		router.get("/:ficheId", getFiche);
+		router.get("/:ficheId", checkFicheExists, getFiche);
+		router.post("/:ficheId/roll", checkFicheExists, onDiceRoll);
+		router.get("/:ficheId/rolls", checkFicheExists, fetchDiceRolls);
 		router.put("/debug/:ficheId/push", Express.raw({type: "*/*"}), onPushEvent);
 		return router;
 	}
 
-	@:jsasync static public function getFiche(req:Request, res:Response, next:Next) {
-		var ficheId = (req.params : Dynamic).ficheId;
+	@:jsasync static public function fetchDiceRolls(req:Request, res:Response, next:Next) {
+		var fiche_id = req.fiche.fiche_id;
+		var rolls = DiceRoll.fetch(fiche_id).jsawait();
 
+		return res.json(rolls.map(r -> r.toPublic()));
+	}
+
+	@:jsasync static public function onDiceRoll(req:Request, res:Response, next:Next) {
+		var body:{faceCount:Int, fieldName:String} = cast req.body;
+		if (!Std.isOfType(body.faceCount, Int) || body.faceCount > 100 || body.faceCount < 2) {
+			res.status(400).json({error: "Invalid dice"});
+			return;
+		}
+		if (!Std.isOfType(body.fieldName, String) || body.fieldName.length > 50 || body.fieldName.length < 2) {
+			res.status(400).json({error: "Invalid field"});
+			return;
+		}
+
+		var fiche_id = req.fiche.fiche_id;
+
+		var roll = new DiceRoll(fiche_id, body.fieldName, body.faceCount);
+		roll.roll();
+		var inserted = roll.insert().jsawait();
+		res.json({result: roll.result, roll_id: inserted});
+	}
+
+	@:jsasync static public function checkFicheExists(req:Request, res:Response, next:Next) {
+		var ficheId = (req.params : Dynamic).ficheId;
 		var fiche = DatabaseHandler.exec("SELECT * FROM fiche WHERE fiche_id = ?", [ficheId]).jsawait();
 		if (fiche.length == 0) {
 			res.status(404).end("Not found");
 			return;
 		}
+
+		req.fiche = fiche[0];
+
+		next.call();
+	}
+
+	@:jsasync static public function getFiche(req:Request, res:Response, next:Next) {
+		var ficheId = req.fiche.fiche_id;
 
 		var events = DatabaseHandler.exec("SELECT event_type, event_params FROM fiche_events WHERE fiche_id = ?", [ficheId]).jsawait().map(e -> {
 			var ev = FicheEventType.createByName(e.event_type, Unserializer.run(e.event_params.toString()));
