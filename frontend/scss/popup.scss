@@ -1,5 +1,4 @@
-.popup
-{
+.popup {
     .main {
         position: absolute;
         top: 10%;
@@ -10,20 +9,22 @@
         border: 2px solid black;
         z-index: 2;
 
-        h2
-        {
+        h2 {
             margin: 20px 0;
             font-size: 1.3em;
         }
 
-        a.close
-        {
+        a.close {
             position: absolute;
             right: 0;
             top: 0;
             padding: 20px;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        .content {
+            font-family: sans-serif;
         }
     }
 

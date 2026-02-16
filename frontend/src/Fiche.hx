@@ -14,6 +14,8 @@ class Fiche implements IJSAsync {
 	var character:FullCharacter;
 	var fiche_id:String;
 
+	var fieldsNames:StringMap<String>;
+
 	var mainElem:DivElement;
 
 	public function new(fiche_id:String) {
@@ -104,32 +106,32 @@ class Fiche implements IJSAsync {
         <section class='caracteristics'>
             <h2>Caractéristiques</h2>
             <div class='carac' data-id='str'>
-                <div class='label'>FORCE</div>
+                <div class='label'>Force</div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='dex'>
-                <div class='label'>DEXTÉRITÉ</div>
+                <div class='label'>Dextérité</div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='con'>
-                <div class='label'>CONSTITUTION</div>
+                <div class='label'>Constitution</div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='int'>
-                <div class='label'>INTELLIGENCE</div>
+                <div class='label'>Intelligence</div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='wis'>
-                <div class='label'>SAGESSE</div>
+                <div class='label'>Sagesse</div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='cha'>
-                <div class='label'>CHARISME</div>
+                <div class='label'>Charisme</div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
@@ -222,6 +224,7 @@ class Fiche implements IJSAsync {
 		Browser.document.body.appendChild(mainElem);
 
 		availableFields = new StringMap();
+		fieldsNames = new StringMap();
 		for (i in mainElem.querySelectorAll("*")) {
 			var e:Element = cast i;
 			var id = e.dataset.id;
@@ -234,6 +237,10 @@ class Fiche implements IJSAsync {
 					e = mod;
 
 				availableFields.set(id, e);
+				var label = (cast i : Element).querySelector(".label");
+				if (label != null) {
+					fieldsNames.set(id, label.innerText);
+				}
 			}
 		}
 
@@ -245,7 +252,7 @@ class Fiche implements IJSAsync {
 
 	function bindMenu() {
 		mainElem.querySelector("a.see-dice-rolls").addEventListener("click", () -> {
-			new DiceRollHistory(fiche_id);
+			new DiceRollHistory(fiche_id, fieldsNames);
 		});
 	}
 
@@ -411,6 +418,7 @@ class Fiche implements IJSAsync {
 		for (skill in character.getSkillsMods()) {
 			var skillDiv = Browser.document.createDivElement();
 			skillDiv.classList.add("skill");
+			skillDiv.dataset.id = 'skill-${skill.id}';
 			skillDiv.innerHTML = "
                 <div class='label'></div>
                 <div class='mod'></div>
@@ -424,6 +432,8 @@ class Fiche implements IJSAsync {
 			skillDiv.classList.add("class-skill");
 
 			skillsDiv.appendChild(skillDiv);
+
+			fieldsNames.set(skillDiv.dataset.id, skill.label);
 		}
 	}
 

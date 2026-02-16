@@ -35,6 +35,7 @@ class Rules {
 			var isClassSkill = n.classSkillFor.contains(char.basics.characterClass);
 			var canUse = !n.needTraining || ranks > 0;
 			return {
+				id: n.name.getName().toLowerCase(),
 				label: n.label,
 				classSkill: isClassSkill,
 				ranks: ranks,

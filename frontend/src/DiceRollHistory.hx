@@ -1,3 +1,4 @@
+import haxe.ds.StringMap;
 import js.Browser;
 import jsasync.IJSAsync;
 
@@ -5,11 +6,13 @@ using DateTools;
 
 class DiceRollHistory extends Popup implements IJSAsync {
 	var fiche_id:String;
+	var fieldsNames:StringMap<String>;
 
-	public function new(fiche_id:String) {
-		super("Lancés de dés");
+	public function new(fiche_id:String, fieldsNames:StringMap<String>) {
+		super("Derniers lancés de dés");
 
 		this.fiche_id = fiche_id;
+		this.fieldsNames = fieldsNames;
 
 		fill();
 	}
@@ -21,7 +24,10 @@ class DiceRollHistory extends Popup implements IJSAsync {
 		data.reverse();
 		for (i in data) {
 			var elem = Browser.document.createLIElement();
-			elem.innerHTML = '${Date.fromTime(i.ts).format("%d/%m/%y %H:%I:%S")}, 1d${i.faces} ${i.field_name} : ${i.result}';
+			var fieldLabel = fieldsNames.get(i.field_name);
+			if (fieldLabel == null)
+				fieldLabel = 'FIXME(${i.field_name})';
+			elem.innerHTML = '<small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%I:%S")}]</small> <strong>${fieldLabel}</strong> 1d${i.faces} : <strong>${i.result}</strong>';
 			list.appendChild(elem);
 		}
 
