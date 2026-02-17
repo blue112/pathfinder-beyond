@@ -36,6 +36,7 @@ class Rules {
 			var canUse = !n.needTraining || ranks > 0;
 			return {
 				id: n.name.getName().toLowerCase(),
+				name: n.name,
 				label: n.label,
 				classSkill: isClassSkill,
 				ranks: ranks,
@@ -132,6 +133,9 @@ class Rules {
 		for (i in 1...char.basics.level) {
 			total += dice(hd) + predilectionClassBonus;
 		}
+
+		// Mod cons
+		total += char.characteristicsMod.con * char.basics.level;
 
 		return total;
 	}

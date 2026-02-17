@@ -6,6 +6,7 @@ import js.html.Element;
 import haxe.ds.StringMap;
 import jsasync.IJSAsync;
 import js.Browser;
+import elems.*;
 
 using Rules;
 
@@ -139,19 +140,26 @@ class Fiche implements IJSAsync {
         <section class='hp'>
             <h2>Points de vie</h2>
             <div class='lethal'>
-                <div class='label'>Points de Vie</div>
+                <div class='label'>
+					<div class='actions-hover'>
+						<a class='plus'>+</a>
+					</div>
+					<span class='text'>Points de Vie</span>
+				</div>
                 <div class='value'>
-                    <span class='current' data-id='hp'></span>
-                    <span class='separator'>/</span>
-                    <span class='max' data-id='hp-max'></span>
+                    <div class='current' data-id='hp'>
+						<span class='value'></span>
+					</div>
+                    <div class='separator'>/</div>
+                    <div class='max' data-id='hp-max'></div>
                 </div>
             </div>
             <div class='non-lethal'>
                 <div class='label'>Blessures non léthales</div>
                 <div class='value'>
-                    <span class='current' data-id='non-lethal-damages'></span>
-                    <span class='separator'>/</span>
-                    <span class='max' data-id='non-lethal-max'></span>
+                    <div class='current' data-id='non-lethal-damages'></div>
+                    <div class='separator'>/</div>
+                    <div class='max' data-id='non-lethal-max'></div>
                 </div>
             </div>
         </section>
@@ -246,8 +254,28 @@ class Fiche implements IJSAsync {
 
 		bindD20();
 		bindMenu();
+		bindHPActions();
 
 		load(fiche_id);
+	}
+
+	function bindHPActions() {
+		var p = mainElem.querySelector(".hp .plus");
+		p.addEventListener("click", () -> {
+			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)"];
+			new ContextMenu(p, menuLabels, (choice) -> {
+				new AmountChoice(menuLabels[choice], if (choice == 0) "Combien de PV retirer ?" else "Combien de PV ajouter ?", (result) -> {
+					if (result == 0)
+						return;
+
+					if (choice == 0)
+						result = -result;
+
+					Api.pushEvent(fiche_id, CHANGE_HP(result));
+				});
+				return true;
+			});
+		});
 	}
 
 	function bindMenu() {
@@ -420,9 +448,13 @@ class Fiche implements IJSAsync {
 			skillDiv.classList.add("skill");
 			skillDiv.dataset.id = 'skill-${skill.id}';
 			skillDiv.innerHTML = "
+				<div class='actions-hover'>
+					<a class='plus'>+</a>
+				</div>
                 <div class='label'></div>
                 <div class='mod'></div>
-                <div class='ranks'></div>";
+                <div class='ranks'></div>
+			";
 
 			skillDiv.querySelector(".label").innerHTML = skill.label + (if (skill.classSkill) " <ins title='Compétence de classe'>(C)</ins>" else "");
 			if (skill.canUse)
@@ -430,6 +462,38 @@ class Fiche implements IJSAsync {
 			skillDiv.querySelector(".ranks").innerText = skill.ranks.string();
 
 			skillDiv.classList.add("class-skill");
+
+			skillDiv.querySelector(".actions-hover .plus").addEventListener("click", () -> {
+				skillDiv.classList.add('active');
+				var choicesText = [
+					"Ajouter un rang",
+					"Retirer un rang",
+					"(Ajouter un modificateur permanent)",
+					"(Ajouter un modificateur temporaire)",
+				];
+				var menu = new ContextMenu(skillDiv.querySelector(".actions-hover .plus"), choicesText, (choice:Int) -> {
+					if (choice == 0 || choice == 1) {
+						if (choice == 1 && skill.ranks == 0) {
+							new Alert("Action impossible", "Aucun rang à retirer sur " + skill.label);
+							return true;
+						}
+
+						var text = choicesText[choice];
+						new YesNoAlert("Confirmer ?", text + " à la compétence " + skill.label + " ?", () -> {
+							if (choice == 0)
+								Api.pushEvent(fiche_id, TRAIN_SKILL(skill.name));
+							else
+								Api.pushEvent(fiche_id, DECREASE_SKILL(skill.name));
+						});
+					} else {
+						new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée");
+					}
+					return true;
+				});
+				menu.onClose = () -> {
+					skillDiv.classList.remove('active');
+				};
+			});
 
 			skillsDiv.appendChild(skillDiv);
 

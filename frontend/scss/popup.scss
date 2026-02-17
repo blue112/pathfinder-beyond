@@ -1,6 +1,8 @@
+@use "alert";
+
 .popup {
     .main {
-        position: absolute;
+        position: fixed;
         top: 10%;
         height: 80%;
         width: 80%;
@@ -25,12 +27,16 @@
 
         .content {
             font-family: sans-serif;
+
+            .del {
+                cursor: pointer;
+            }
         }
     }
 
     .backdrop {
         content: "";
-        position: absolute;
+        position: fixed;
         left: 0;
         right: 0;
         top: 0;
