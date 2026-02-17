@@ -5,7 +5,15 @@ enum FicheEventType {
 	SET_CHARACTERISTICS(data:Characteristics);
 	ADD_WEAPON(weapon:Weapon);
 	TRAIN_SKILL(skill:SkillType);
+	DECREASE_SKILL(skill:SkillType);
+	CHANGE_HP(amount:Int);
 }
+
+typedef FicheEventTs = {
+	var type:FicheEventType;
+	var ts:Float;
+	var id:Int;
+};
 
 typedef Weapon = {
 	var name:String;
@@ -45,6 +53,7 @@ typedef FullCharacter = {
 	@:optional var characteristics:Characteristics;
 	@:optional var characteristicsMod:Characteristics;
 	@:optional var skillRanks:Array<SkillType>;
+	var current_hp:Int;
 }
 
 typedef Characteristics = {

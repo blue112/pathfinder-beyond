@@ -16,6 +16,7 @@ class Fiche implements IJSAsync {
 	var fiche_id:String;
 
 	var fieldsNames:StringMap<String>;
+	var ficheEvents:Array<FicheEventTs>;
 
 	var mainElem:DivElement;
 
@@ -25,11 +26,12 @@ class Fiche implements IJSAsync {
 
 		this.fiche_id = fiche_id;
 
-		character = {skillRanks: []};
+		character = {skillRanks: [], current_hp: 0};
 
 		mainElem.innerHTML = "
 		<section class='actions'>
 			<a class='see-dice-rolls'>Voir les lancés de dés</a>
+			<a class='history'>Historique</a>
 		</section>
         <section class='meta'>
             <div class='left'>
@@ -282,6 +284,9 @@ class Fiche implements IJSAsync {
 		mainElem.querySelector("a.see-dice-rolls").addEventListener("click", () -> {
 			new DiceRollHistory(fiche_id, fieldsNames);
 		});
+		mainElem.querySelector("a.history").addEventListener("click", () -> {
+			new FicheEventHistory(fiche_id, ficheEvents);
+		});
 	}
 
 	function bindD20() {
@@ -410,6 +415,10 @@ class Fiche implements IJSAsync {
 		}
 	}
 
+	private function updateHP() {
+		character.current_hp = Rules.getMaxHitPoints(character);
+	}
+
 	private function calculateFields() {
 		if (character.characteristics == null)
 			return;
@@ -421,7 +430,7 @@ class Fiche implements IJSAsync {
 
 		var maxHP = Rules.getMaxHitPoints(character).string();
 		availableFields.get("hp-max").innerText = maxHP;
-		availableFields.get("hp").innerText = maxHP;
+		availableFields.get("hp").innerText = character.current_hp.string();
 		availableFields.get("non-lethal-max").innerText = maxHP;
 		availableFields.get("non-lethal-damages").innerText = 0.string();
 
@@ -506,46 +515,56 @@ class Fiche implements IJSAsync {
 		if (!ficheIdRegex.match(fiche_id))
 			return;
 
-		var result:Array<FicheEventType> = Api.load('/fiche/$fiche_id').jsawait();
-		trace('Fetched ${result.length} events for this fiche');
+		var result:Array<FicheEventTs> = Api.load('/fiche/$fiche_id').jsawait();
+		ficheEvents = result;
 		var startTime = Date.now().getTime();
+		trace('Fetched ${result.length} events for this fiche');
 		for (i in result) {
-			switch (i) {
-				case CREATE(data):
-					this.character.basics = data;
-					var outData:Dynamic = Reflect.copy(data);
-					outData.alignement = data.alignement.alignementToString();
-					outData.characterClass = data.characterClass.classToString();
-					outData.sizeCategory = data.sizeCategory.sizeCategoryToString();
-					for (f in Reflect.fields(data)) {
-						var fieldName = convertFieldName(f);
-						if (availableFields.exists(fieldName)) {
-							var value = Reflect.getProperty(outData, f);
-							if (Std.is(value, Int)) {
-								value = Std.string(value);
-							}
-							if (Std.is(value, String)) {
-								availableFields.get(fieldName).innerHTML = value;
-							} else {
-								trace('Invalid value for $fieldName: $value');
-							}
-						} else {
-							Browser.console.warn('[PFB] Field does not exist: $fieldName');
-						}
-					}
-				case SET_CHARACTERISTICS(data):
-					this.character.characteristics = data;
-					updateCharacts();
-				case ADD_WEAPON(weapon):
-					addWeapon(weapon);
-				case TRAIN_SKILL(skill):
-					character.skillRanks.push(skill);
-			}
+			processEvent(i.type);
 		}
 
 		calculateFields();
 		var elapsed = Date.now().getTime() - startTime;
-		trace('Computed in ${elapsed}ms');
+		trace('Fiche processed in ${elapsed}ms');
+	}
+
+	function processEvent(type:FicheEventType) {
+		switch (type) {
+			case CREATE(data):
+				this.character.basics = data;
+				var outData:Dynamic = Reflect.copy(data);
+				outData.alignement = data.alignement.alignementToString();
+				outData.characterClass = data.characterClass.classToString();
+				outData.sizeCategory = data.sizeCategory.sizeCategoryToString();
+				for (f in Reflect.fields(data)) {
+					var fieldName = convertFieldName(f);
+					if (availableFields.exists(fieldName)) {
+						var value = Reflect.getProperty(outData, f);
+						if (Std.is(value, Int)) {
+							value = Std.string(value);
+						}
+						if (Std.is(value, String)) {
+							availableFields.get(fieldName).innerHTML = value;
+						} else {
+							trace('Invalid value for $fieldName: $value');
+						}
+					} else {
+						Browser.console.warn('[PFB] Field does not exist: $fieldName');
+					}
+				}
+			case SET_CHARACTERISTICS(data):
+				this.character.characteristics = data;
+				updateCharacts();
+				updateHP();
+			case ADD_WEAPON(weapon):
+				addWeapon(weapon);
+			case TRAIN_SKILL(skill):
+				character.skillRanks.push(skill);
+			case DECREASE_SKILL(skill):
+				character.skillRanks.remove(skill);
+			case CHANGE_HP(amount):
+				character.current_hp = Math.min(character.current_hp + amount, character.getMaxHitPoints()).int();
+		}
 	}
 
 	@:expose("debug")

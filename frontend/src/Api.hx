@@ -37,6 +37,14 @@ class Api implements IJSAsync {
 		return j;
 	}
 
+	@:jsasync static public function delEvent(ficheId:String, eventId:Int):Promise<Dynamic> {
+		var r = Browser.window.fetch('/api/fiche/$ficheId/$eventId', {
+			method: "delete",
+		}).jsawait();
+		var j = r.json().jsawait();
+		return j;
+	}
+
 	@:jsasync static public function pushEvent(ficheId:String, event:FicheEventType):Promise<Dynamic> {
 		var r = Browser.window.fetch('/api/fiche/debug/$ficheId/push', {
 			method: "put",
