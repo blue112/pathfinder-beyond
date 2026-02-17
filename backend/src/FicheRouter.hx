@@ -16,6 +16,7 @@ class FicheRouter implements IJSAsync {
 		var router = new Router();
 		router.post("/createFiche", onCreateFiche);
 		router.get("/:ficheId", checkFicheExists, getFiche);
+		router.delete("/:ficheId/:eventId", checkFicheExists, onDelEvent);
 		router.post("/:ficheId/roll", checkFicheExists, onDiceRoll);
 		router.get("/:ficheId/rolls", checkFicheExists, fetchDiceRolls);
 		router.put("/debug/:ficheId/push", Express.raw({type: "*/*"}), onPushEvent);
@@ -70,6 +71,13 @@ class FicheRouter implements IJSAsync {
 		});
 
 		res.hx(events);
+	}
+
+	@:jsasync static public function onDelEvent(req:Request, res:Response, next:Next) {
+		var ficheId = (req.params : Dynamic).ficheId;
+		var eventId = (req.params : Dynamic).eventId;
+		DatabaseHandler.exec("DELETE FROM fiche_events WHERE fiche_id = ? AND id = ?", [ficheId, eventId]).jsawait();
+		res.json({success: true});
 	}
 
 	@:jsasync static public function onPushEvent(req:Request, res:Response, next:Next) {
