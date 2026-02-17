@@ -16,12 +16,13 @@ class DatabaseHandler implements IJSAsync {
 	];
 
 	@:jsasync static public function init() {
-		connection = Mysql.createConnection({
+		connection = Mysql.createPool({
+			connectionLimit: 2,
 			host: "mysql",
 			database: "pfb",
 			user: "pfb",
 			password: Node.process.env.get("DB_PASSWORD"),
-		}).jsawait();
+		});
 		checkMigration().jsawait();
 		trace('Connected to MySQL');
 	}
