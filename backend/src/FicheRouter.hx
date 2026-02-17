@@ -65,10 +65,12 @@ class FicheRouter implements IJSAsync {
 	@:jsasync static public function getFiche(req:Request, res:Response, next:Next) {
 		var ficheId = req.fiche.fiche_id;
 
-		var events = DatabaseHandler.exec("SELECT event_type, event_params FROM fiche_events WHERE fiche_id = ?", [ficheId]).jsawait().map(e -> {
-			var ev = FicheEventType.createByName(e.event_type, Unserializer.run(e.event_params.toString()));
-			return ev;
-		});
+		var events:Array<FicheEventTs> = DatabaseHandler.exec("SELECT id, event_type, event_params, ts_ms FROM fiche_events WHERE fiche_id = ?", [ficheId])
+			.jsawait()
+			.map(e -> {
+				var ev = FicheEventType.createByName(e.event_type, Unserializer.run(e.event_params.toString()));
+				return {type: ev, ts: e.ts_ms, id: e.id};
+			});
 
 		res.hx(events);
 	}

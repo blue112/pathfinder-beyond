@@ -16,9 +16,9 @@ class FicheEvent implements IJSAsync {
 		var event_name = event.getName();
 		var event_params = event.getParameters();
 		Serializer.USE_ENUM_INDEX = false;
-		var r = DatabaseHandler.exec("INSERT INTO fiche_events(fiche_id, event_type, event_params) VALUES(?, ?, ?)",
-			[fiche_id, event_name, Serializer.run(event_params)])
+		var r:Int = DatabaseHandler.execInsert("INSERT INTO fiche_events(fiche_id, event_type, event_params, ts_ms) VALUES(?, ?, ?, ?)",
+			[fiche_id, event_name, Serializer.run(event_params), Date.now().getTime()])
 			.jsawait();
-		trace(r);
+		trace('Event inserted on fiche $fiche_id as event #$r');
 	}
 }
