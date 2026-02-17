@@ -1,6 +1,8 @@
 import Protocol.CharacterClass;
 import Protocol.Characteristic;
 
+using Lambda;
+
 typedef RuleSkill = {
 	name:SkillType,
 	label:String,
@@ -295,4 +297,8 @@ class RulesSkills {
 			classSkillFor: [],
 		},
 	];
+
+	static public function getSkillLabel(skill:SkillType) {
+		return skills.find(s -> s.name == skill).label;
+	}
 }

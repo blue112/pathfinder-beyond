@@ -1,3 +1,4 @@
+import RulesSkills;
 import js.Browser;
 import jsasync.IJSAsync;
 
@@ -17,7 +18,16 @@ class FicheEventHistory extends Popup implements IJSAsync {
 		events.reverse();
 		for (i in events) {
 			var elem = Browser.document.createLIElement();
-			elem.innerHTML = '<a class="del">x</a> <small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%I:%S")}]</small> <strong>${i.type.string()}</strong>';
+			var event = switch (i.type) {
+				case CREATE(data): "Création du personnage";
+				case SET_CHARACTERISTICS(data): "Lancer de caractéristiques";
+				case ADD_WEAPON(weapon): 'Ajout d\'une arme (${weapon.name.htmlEscape()})';
+				case TRAIN_SKILL(skill): 'Ajout d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
+				case DECREASE_SKILL(skill): 'Retrait d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
+				case CHANGE_HP(amount) if (amount > 0): 'Soins (${amount} pv)';
+				case CHANGE_HP(amount): 'Dégats subis (${- amount} pv)';
+			}
+			elem.innerHTML = '<a class="del">x</a> <small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%I:%S")}]</small> $event';
 			list.appendChild(elem);
 			elem.querySelector(".del").addEventListener("click", () -> {
 				trace(Api.delEvent(fiche_id, i.id).then((_) -> {
