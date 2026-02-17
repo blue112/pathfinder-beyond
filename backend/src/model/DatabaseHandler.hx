@@ -25,7 +25,6 @@ class DatabaseHandler implements IJSAsync {
 			password: Node.process.env.get("DB_PASSWORD"),
 		});
 		checkMigration().jsawait();
-		trace('Connected to MySQL');
 	}
 
 	@:jsasync static public function execInsert(query:String, ?parameters:Array<Dynamic>):Promise<Dynamic> {

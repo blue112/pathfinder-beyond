@@ -124,3 +124,14 @@ enum SizeCategory {
 	SIZE_GIG;
 	SIZE_C;
 }
+
+enum WSClientMessage {
+	SUB_EVENTS(fiche_id:String, latest_event:Int);
+	PING;
+}
+
+enum WSServerMessage {
+	SUB_OK;
+	NEW_EVENTS(fiche_id:String, events:Array<FicheEventTs>);
+	PONG;
+}

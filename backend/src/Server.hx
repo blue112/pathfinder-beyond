@@ -10,9 +10,13 @@ class Server implements IJSAsync {
 	static function main() {
 		DatabaseHandler.init();
 		var app = new express.Express();
+		js.Node.require('express-ws')(app);
 		app.use(Express.json({inflate: false}));
 		app.use(Express.serveStatic("static"));
 		app.use("/api/fiche", FicheRouter.getRouter());
+		app.ws("/api/ws", (ws, req) -> {
+			new WebsocketClient(ws, req.ip);
+		});
 		app.use("/", serveIndex);
 		app.listen(8000, () -> {
 			trace('Started, listing on :8000');

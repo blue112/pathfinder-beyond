@@ -19,6 +19,7 @@ class Fiche implements IJSAsync {
 	var ficheEvents:Array<FicheEventTs>;
 
 	var mainElem:DivElement;
+	var ws:WsTalker;
 
 	public function new(fiche_id:String) {
 		mainElem = Browser.document.createDivElement();
@@ -526,6 +527,17 @@ class Fiche implements IJSAsync {
 		calculateFields();
 		var elapsed = Date.now().getTime() - startTime;
 		trace('Fiche processed in ${elapsed}ms');
+
+		ws = new WsTalker(() -> {
+			ws.subscribe(fiche_id, ficheEvents[ficheEvents.length - 1].id);
+		}, () -> {});
+		ws.onNewEvent = (fiche_id:String, event:FicheEventTs) -> {
+			if (fiche_id == this.fiche_id) {
+				ficheEvents.push(event);
+				processEvent(event.type);
+				calculateFields();
+			}
+		};
 	}
 
 	function processEvent(type:FicheEventType) {

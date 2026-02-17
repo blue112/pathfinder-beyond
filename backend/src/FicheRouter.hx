@@ -19,7 +19,7 @@ class FicheRouter implements IJSAsync {
 		router.delete("/:ficheId/:eventId", checkFicheExists, onDelEvent);
 		router.post("/:ficheId/roll", checkFicheExists, onDiceRoll);
 		router.get("/:ficheId/rolls", checkFicheExists, fetchDiceRolls);
-		router.put("/debug/:ficheId/push", Express.raw({type: "*/*"}), onPushEvent);
+		router.put("/debug/:ficheId/push", checkFicheExists, Express.raw({type: "*/*"}), onPushEvent);
 		return router;
 	}
 
@@ -65,30 +65,20 @@ class FicheRouter implements IJSAsync {
 	@:jsasync static public function getFiche(req:Request, res:Response, next:Next) {
 		var ficheId = req.fiche.fiche_id;
 
-		var events:Array<FicheEventTs> = DatabaseHandler.exec("SELECT id, event_type, event_params, ts_ms FROM fiche_events WHERE fiche_id = ?", [ficheId])
-			.jsawait()
-			.map(e -> {
-				var ev = FicheEventType.createByName(e.event_type, Unserializer.run(e.event_params.toString()));
-				return {type: ev, ts: e.ts_ms, id: e.id};
-			});
+		var events:Array<FicheEventTs> = FicheEvent.getEvents(ficheId).jsawait();
 
 		res.hx(events);
 	}
 
 	@:jsasync static public function onDelEvent(req:Request, res:Response, next:Next) {
-		var ficheId = (req.params : Dynamic).ficheId;
+		var ficheId = req.fiche.fiche_id;
 		var eventId = (req.params : Dynamic).eventId;
 		DatabaseHandler.exec("DELETE FROM fiche_events WHERE fiche_id = ? AND id = ?", [ficheId, eventId]).jsawait();
 		res.json({success: true});
 	}
 
 	@:jsasync static public function onPushEvent(req:Request, res:Response, next:Next) {
-		var ficheId = (req.params : Dynamic).ficheId;
-		var fiche = DatabaseHandler.exec("SELECT * FROM fiche WHERE fiche_id = ?", [ficheId]).jsawait();
-		if (fiche.length == 0) {
-			res.status(404).end("Not found");
-			return;
-		}
+		var ficheId = req.fiche.fiche_id;
 
 		var event = Unserializer.run((cast req.body).toString());
 		if (!Std.isOfType(event, FicheEventType)) {
@@ -99,6 +89,9 @@ class FicheRouter implements IJSAsync {
 		var fe = new FicheEvent(ficheId, event);
 		fe.insert().jsawait();
 		res.json({"success": true});
+
+		// Notify
+		WebsocketClient.notifySubs(ficheId, fe.toPublic());
 	}
 
 	@:jsasync static public function onCreateFiche(req:Request, res:Response, next:Next) {
