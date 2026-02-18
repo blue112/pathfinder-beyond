@@ -27,7 +27,14 @@ class Fiche implements IJSAsync {
 
 		this.fiche_id = fiche_id;
 
-		character = {skillRanks: [], current_hp: 0};
+		character = {
+			skillRanks: [],
+			current_hp: 0,
+			levelUpDices: [],
+			level: 1,
+			max_hp_modifier: 0,
+			additionalClassSkills: [],
+		};
 
 		mainElem.innerHTML = "
 		<section class='actions'>
@@ -60,7 +67,10 @@ class Fiche implements IJSAsync {
                     </div>
                     <div class='field xxs m-s' data-id='level'>
                         <div class='label'>Niveau</div>
-                        <div class='value'></div>
+                        <div class='value'>
+							<span class='text'></span>
+							<div class='actions-hover'><a class='plus'>+</a></div>
+						</div>
                     </div>
                     <div class='field' data-id='divinity-name'>
                         <div class='label'>Divinité</div>
@@ -110,32 +120,32 @@ class Fiche implements IJSAsync {
         <section class='caracteristics'>
             <h2>Caractéristiques</h2>
             <div class='carac' data-id='str'>
-                <div class='label'>Force</div>
+                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Force</span></div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='dex'>
-                <div class='label'>Dextérité</div>
+                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Dextérité</span></div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='con'>
-                <div class='label'>Constitution</div>
+                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Constitution</span></div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='int'>
-                <div class='label'>Intelligence</div>
+                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Intelligence</span></div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='wis'>
-                <div class='label'>Sagesse</div>
+                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Sagesse</span></div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
             <div class='carac' data-id='cha'>
-                <div class='label'>Charisme</div>
+                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Charisme</span></div>
                 <div class='value'></div>
                 <div class='mod'></div>
             </div>
@@ -246,6 +256,9 @@ class Fiche implements IJSAsync {
 				var mod = e.querySelector(".mod");
 				if (mod != null)
 					e = mod;
+				var text = e.querySelector(".text");
+				if (text != null)
+					e = text;
 
 				availableFields.set(id, e);
 				var label = (cast i : Element).querySelector(".label");
@@ -258,8 +271,52 @@ class Fiche implements IJSAsync {
 		bindD20();
 		bindMenu();
 		bindHPActions();
+		bindCaracActions();
+		bindLevelActions();
 
 		load(fiche_id);
+	}
+
+	function bindLevelActions() {
+		var menuLabels = ["Monter de niveau"];
+		var action = mainElem.querySelector(".field[data-id=level] .plus");
+		action.addEventListener("click", () -> {
+			new ContextMenu(cast action, menuLabels, (choice) -> {
+				new YesNoAlert("Montée de niveau", "Valider la montée de niveau ?", () -> {
+					onActionLevelUp();
+				});
+				return true;
+			});
+		});
+	}
+
+	@:jsasync function onActionLevelUp() {
+		var hd = Rules.getHitDice(character.basics.characterClass);
+		var diceRoll = Api.rollDice(fiche_id, hd, "level").jsawait();
+		var result = diceRoll.result;
+		new Alert("Montée de niveau", 'Résultat du lancer de dé de point de vie (d${hd}): $result');
+		Api.pushEvent(fiche_id, LEVEL_UP(result));
+	}
+
+	function bindCaracActions() {
+		var menuLabels = ["Ajouter un modificateur temporaire", "Ajouter un modificateur permanent"];
+		var actions = mainElem.querySelectorAll(".carac .plus");
+		for (p in actions) {
+			var id = p.parentElement.parentElement.parentElement.dataset.id;
+			p.addEventListener("click", () -> {
+				new ContextMenu(cast p, menuLabels, (choice) -> {
+					if (choice == 1) {
+						new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true}, (result) -> {
+							if (result == 0)
+								return;
+
+							Api.pushEvent(fiche_id, CHANGE_CARAC(id.parseCarac(), result));
+						});
+					}
+					return true;
+				});
+			});
+		}
 	}
 
 	function bindHPActions() {
@@ -330,6 +387,7 @@ class Fiche implements IJSAsync {
 
 		var apiResult = Api.rollDice(fiche_id, 20, parent.dataset.id).jsawait();
 		D20.roll(mod, apiResult.result);
+		return apiResult.result;
 	}
 
 	static public function convertFieldName(apiFieldName:String) {
@@ -445,6 +503,7 @@ class Fiche implements IJSAsync {
 		availableFields.get("bba").innerText = Rules.getBBA(character).asMod(true);
 		availableFields.get("bmo").innerText = Rules.getBMO(character).asMod(true);
 		availableFields.get("dmd").innerText = Rules.getDMD(character).string();
+		availableFields.get("level").innerText = character.level.string();
 
 		addSkills();
 	}
@@ -568,28 +627,72 @@ class Fiche implements IJSAsync {
 				this.character.characteristics = data;
 				updateCharacts();
 				updateHP();
+			case ADD_CLASS_SKILL(skill):
+				if (!Rules.isClassSkill(character, skill))
+					this.character.additionalClassSkills.push(skill);
+
+			case CHANGE_CARAC(c, amount):
+				switch (c) {
+					case STRENGTH: this.character.characteristics.str += amount;
+					case DEXTERITY: this.character.characteristics.dex += amount;
+					case CONSTITUTION:
+						var oldMod = Math.floor(this.character.characteristics.con / 2);
+						this.character.characteristics.con += amount;
+						var newMod = Math.floor(this.character.characteristics.con / 2);
+						// We need to update current HP depending on mod
+						var diffHP = (newMod - oldMod) * character.level;
+						if (diffHP > 0) character.current_hp = Math.min(character.current_hp + diffHP, character.getMaxHitPoints()).int();
+					case INTELLIGENCE: this.character.characteristics.int += amount;
+					case WISDOM: this.character.characteristics.wis += amount;
+					case CHARISMA: this.character.characteristics.cha += amount;
+				}
+				updateCharacts();
 			case ADD_WEAPON(weapon):
 				addWeapon(weapon);
+			case LEVEL_UP(hp_dice):
+				character.level += 1;
+				hp_dice = Math.min(hp_dice, Rules.getHitDice(character.basics.characterClass)).int(); // ?
+				character.levelUpDices.push(hp_dice);
 			case TRAIN_SKILL(skill):
 				character.skillRanks.push(skill);
 			case DECREASE_SKILL(skill):
 				character.skillRanks.remove(skill);
 			case CHANGE_HP(amount):
 				character.current_hp = Math.min(character.current_hp + amount, character.getMaxHitPoints()).int();
+			case CHANGE_MAX_HP(amount):
+				character.max_hp_modifier += amount;
 		}
 	}
 
 	@:expose("debug")
-	static public function debug(what:String, param1:String) {
+	static public function debug(what:String, param1:String, param2:String, param3:String, param4:String, param5:String, param6:String) {
 		var ficheId = Browser.window.location.pathname.split("/")[2];
-		if (what == "carac") {
+		if (what == "caracroll") {
 			generateCharac(ficheId);
+			return "Ok";
+		} else if (what == "maxhp") {
+			Api.pushEvent(ficheId, CHANGE_MAX_HP(param1.parseInt()));
+		} else if (what == "levelup") {
+			Api.pushEvent(ficheId, LEVEL_UP(param1.parseInt()));
+		} else if (what == "caracset") {
+			Api.pushEvent(ficheId, SET_CHARACTERISTICS({
+				str: param1.parseInt(),
+				dex: param2.parseInt(),
+				con: param3.parseInt(),
+				int: param4.parseInt(),
+				wis: param5.parseInt(),
+				cha: param6.parseInt(),
+			}));
 			return "Ok";
 		} else if (what == "weapon") {
 			debugAddWeapon(ficheId);
 			return "Ok";
-		} else if (what == "skill") {
-			return debugIncreaseSkill(ficheId, param1);
+		} else if (what == "cskill") {
+			var skill = SkillType.createByName(param1.toUpperCase());
+			if (skill == null) {
+				return "Skill type not found";
+			}
+			Api.pushEvent(ficheId, ADD_CLASS_SKILL(skill));
 		}
 
 		return 'Unknown debug $what';

@@ -29,37 +29,41 @@ class Rules {
 		}
 	}
 
+	static public function isClassSkill(char:FullCharacter, skill:SkillType) {
+		return RulesSkills.getSkill(skill).classSkillFor.contains(char.basics.characterClass);
+	}
+
 	static public function getSkillsMods(char:FullCharacter) {
 		return RulesSkills.skills.map(n -> {
 			var ranks = char.getSkillRank(n.name);
-			var isClassSkill = n.classSkillFor.contains(char.basics.characterClass);
+			var classSkill = isClassSkill(char, n.name) || char.additionalClassSkills.contains(n.name);
 			var canUse = !n.needTraining || ranks > 0;
 			return {
 				id: n.name.getName().toLowerCase(),
 				name: n.name,
 				label: n.label,
-				classSkill: isClassSkill,
+				classSkill: classSkill,
 				ranks: ranks,
 				canUse: canUse,
-				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (isClassSkill && ranks > 0) 3 else 0)
+				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0)
 			}
 		});
 	}
 
 	static public function getBMO(char:FullCharacter) {
-		return getBBA(char) + char.characteristicsMod.str + char.characteristicsMod.dex + getSizeMod(char, true);
+		return getBBA(char) + char.characteristicsMod.str + getSizeMod(char, true);
 	}
 
 	static public function getDMD(char:FullCharacter) {
-		return 15;
+		return 10 + getBBA(char) + char.characteristicsMod.str + char.characteristicsMod.dex + getSizeMod(char, true);
 	}
 
 	static public function getBBA(char:FullCharacter) {
-		return bbaTables.get(char.basics.characterClass)[char.basics.level];
+		return bbaTables.get(char.basics.characterClass)[char.level - 1];
 	}
 
 	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
-		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.basics.level];
+		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
 		return switch (st) {
 			case REFLEXES: char.characteristicsMod.dex + baseBonus;
 			case VIGOR: char.characteristicsMod.con + baseBonus;
@@ -67,7 +71,7 @@ class Rules {
 		}
 	}
 
-	static public function getSizeMod(char:FullCharacter, forBMO:Bool) {
+	static public function getSizeMod(char:FullCharacter, forBMOOrDMD:Bool) {
 		var sizeMod = switch (char.basics.sizeCategory) {
 			case SIZE_I: 8;
 			case SIZE_MIN: 4;
@@ -79,7 +83,7 @@ class Rules {
 			case SIZE_GIG: -4;
 			case SIZE_C: -8;
 		}
-		if (forBMO)
+		if (forBMOOrDMD)
 			return -sizeMod;
 		return sizeMod;
 	}
@@ -129,13 +133,15 @@ class Rules {
 		var hd = getHitDice(char.basics.characterClass);
 		var total = hd + predilectionClassBonus;
 
-		// For now just roll it
-		for (i in 1...char.basics.level) {
-			total += dice(hd) + predilectionClassBonus;
+		// Add predilection bonus and cons
+		for (i in 1...char.level) {
+			total += predilectionClassBonus + char.characteristicsMod.con;
+		}
+		for (dice in char.levelUpDices) {
+			total += dice;
 		}
 
-		// Mod cons
-		total += char.characteristicsMod.con * char.basics.level;
+		total += char.max_hp_modifier;
 
 		return total;
 	}

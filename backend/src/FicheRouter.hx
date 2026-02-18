@@ -101,7 +101,6 @@ class FicheRouter implements IJSAsync {
 			fiche.alignement = body.alignement.parseCharacterAlignement();
 			fiche.characterClass = body.characterClass.parseCharacterClass();
 			fiche.sizeCategory = body.sizeCategory.parseSizeCategory();
-			fiche.level = body.level.parseInt();
 			fiche.age = body.age.parseInt();
 			fiche.heightCm = body.heightCm.parseInt();
 			fiche.weightKg = body.weightKg.parseInt();

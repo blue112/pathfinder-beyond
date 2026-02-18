@@ -3,10 +3,14 @@ import RulesSkills.SkillType;
 enum FicheEventType {
 	CREATE(data:BasicFicheData);
 	SET_CHARACTERISTICS(data:Characteristics);
+	CHANGE_CARAC(carac:Characteristic, amount:Int);
 	ADD_WEAPON(weapon:Weapon);
 	TRAIN_SKILL(skill:SkillType);
 	DECREASE_SKILL(skill:SkillType);
 	CHANGE_HP(amount:Int);
+	CHANGE_MAX_HP(amount:Int);
+	LEVEL_UP(hpDice:Int);
+	ADD_CLASS_SKILL(skill:SkillType);
 }
 
 typedef FicheEventTs = {
@@ -52,8 +56,12 @@ typedef FullCharacter = {
 	@:optional var basics:BasicFicheData;
 	@:optional var characteristics:Characteristics;
 	@:optional var characteristicsMod:Characteristics;
-	@:optional var skillRanks:Array<SkillType>;
+	var skillRanks:Array<SkillType>;
 	var current_hp:Int;
+	var max_hp_modifier:Int;
+	var levelUpDices:Array<Int>;
+	var level:Int;
+	var additionalClassSkills:Array<SkillType>;
 }
 
 typedef Characteristics = {
@@ -76,7 +84,6 @@ typedef BasicFicheData = {
 	characterName:String,
 	alignement:CharacterAlignement,
 	characterClass:CharacterClass,
-	level:Int,
 	divinityName:String,
 	origin:String,
 	race:CharacterRace,

@@ -22,6 +22,22 @@ class ProtocolUtil {
 		return null;
 	}
 
+	static public function parseCarac(c:String):Characteristic {
+		return if (c == "str") STRENGTH else if (c == "dex") DEXTERITY else if (c == "wis") WISDOM else if (c == "int") INTELLIGENCE else if (c == "cha")
+			CHARISMA else if (c == "con") CONSTITUTION else null;
+	}
+
+	static public function caracToString(c:Characteristic, withPrefix:Bool) {
+		return switch (c) {
+			case STRENGTH: if (withPrefix) "de la force" else "force";
+			case DEXTERITY: if (withPrefix) "de la dextérité" else "dextérité";
+			case WISDOM: if (withPrefix) "de la sagesse" else "force";
+			case INTELLIGENCE: if (withPrefix) "de l'intelligence" else "intelligence";
+			case CHARISMA: if (withPrefix) "du charisme" else "charisme";
+			case CONSTITUTION: if (withPrefix) "de la constitution" else "constitution";
+		};
+	}
+
 	static public function classToString(cls:CharacterClass) {
 		return switch (cls) {
 			case ROUBLARD:

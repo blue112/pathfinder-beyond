@@ -298,7 +298,11 @@ class RulesSkills {
 		},
 	];
 
+	static public function getSkill(skill:SkillType) {
+		return skills.find(s -> s.name == skill);
+	}
+
 	static public function getSkillLabel(skill:SkillType) {
-		return skills.find(s -> s.name == skill).label;
+		return getSkill(skill).label;
 	}
 }

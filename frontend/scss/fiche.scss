@@ -176,7 +176,7 @@ h3 {
             grid-template-columns: 4fr 1fr 2fr;
             gap: 5px;
             margin-bottom: 5px;
-            div {
+            > div {
                 padding: 3px;
                 flex: 1;
                 border: 3px solid #b8ae98;
@@ -190,6 +190,14 @@ h3 {
                     flex: 3;
                     @include mixins.red-label();
                     font-size: 1em;
+
+                    display: grid;
+                    grid-template-columns: 25px 1fr;
+                    gap: 5px;
+
+                    .text {
+                        grid-column: 2;
+                    }
                 }
 
                 &.value {
@@ -327,7 +335,8 @@ h3 {
     }
 
     div.skill:hover,
-    div.label:hover {
+    div.label:hover,
+    div.value:has(.actions-hover):hover {
         display: grid;
         grid-template-columns: auto 1fr;
         padding: 0;
@@ -382,6 +391,21 @@ h3 {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    .field div.value:hover {
+        overflow: visible;
+        grid-template-columns: 1fr auto;
+        .actions-hover {
+            padding: 0;
+            grid-column: 2;
+            background: none;
+
+            menu {
+                top: 0px;
+                left: 0px;
             }
         }
     }
