@@ -110,6 +110,7 @@ enum CharacterRace {
 
 enum CharacterClass {
 	ROUBLARD;
+	CONJURATEUR;
 }
 
 enum CharacterAlignement {

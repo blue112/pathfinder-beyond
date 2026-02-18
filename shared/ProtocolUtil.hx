@@ -42,6 +42,8 @@ class ProtocolUtil {
 		return switch (cls) {
 			case ROUBLARD:
 				"Roublard(e)";
+			case CONJURATEUR:
+				"Conjurateur";
 		}
 	}
 

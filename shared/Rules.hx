@@ -5,12 +5,20 @@ using Rules;
 using Lambda;
 
 class Rules {
-	static var bbaTables = [ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],];
+	static var bbaTables = [
+		ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+		CONJURATEUR => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+	];
 	static var savingThrowTables = [
 		ROUBLARD => [
 			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6],
 			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 1, 1, 12],
+		],
+		CONJURATEUR => [
+			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 1, 1, 12],
+			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6],
+			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 		]
 	];
 
@@ -131,7 +139,7 @@ class Rules {
 
 	static public function getHitDice(cls:CharacterClass) {
 		return switch (cls) {
-			case ROUBLARD:
+			case CONJURATEUR, ROUBLARD:
 				8;
 		}
 	}
