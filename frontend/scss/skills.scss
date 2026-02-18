@@ -27,7 +27,7 @@
     }
     .mod {
         @include mixins.mod-box;
-        font-size: 0.8rem;
+        font-size: 1rem;
         padding: 0;
         cursor: pointer;
     }
