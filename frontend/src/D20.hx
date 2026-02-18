@@ -2,8 +2,12 @@ import haxe.Timer;
 import js.html.DivElement;
 import js.Browser;
 
+@:expose("Dice")
 class D20 {
-	static public function roll(mod:Int, result:Int) {
+	static public function roll(mod:Int, result:Int, numFaces:Int = 20) {
+		var initialNumFaces = numFaces;
+		var resultOnDice = result;
+
 		var backdrop = if (Browser.document.getElementById("backdrop") != null) Browser.document.getElementById("backdrop") else {
 			var backdrop = Browser.document.createDivElement();
 			backdrop.classList.add("backdrop");
@@ -20,49 +24,49 @@ class D20 {
 
 		Browser.document.body.classList.add("rolling");
 
+		if (numFaces == 3) {
+			numFaces = 6;
+			resultOnDice = (result * 2) - 1 + Std.random(2);
+		}
+
 		var d20Tray = Browser.document.createDivElement();
 		d20Tray.classList.add("dice-tray");
 		d20Tray.innerHTML = '
-        <div class="d20-container">
-            <div class="die-d20 rolling">
-                    <figure class="face face-1"></figure>
-                    <figure class="face face-2"></figure>
-                    <figure class="face face-3"></figure>
-                    <figure class="face face-4"></figure>
-                    <figure class="face face-5"></figure>
-                    <figure class="face face-6"></figure>
-                    <figure class="face face-7"></figure>
-                    <figure class="face face-8"></figure>
-                    <figure class="face face-9"></figure>
-                    <figure class="face face-10"></figure>
-                    <figure class="face face-11"></figure>
-                    <figure class="face face-12"></figure>
-                    <figure class="face face-13"></figure>
-                    <figure class="face face-14"></figure>
-                    <figure class="face face-15"></figure>
-                    <figure class="face face-16"></figure>
-                    <figure class="face face-17"></figure>
-                    <figure class="face face-18"></figure>
-                    <figure class="face face-19"></figure>
-                    <figure class="face face-20"></figure>
-                </div>
-            </div>
-            <h3>-</h3>
-            <h3 class="critical critical-fail">Échec critique !</h3>
-            <h3 class="critical critical-success">Réussite critique !</h3>
+        <div class="dice-container">
+            <div class="die-d$numFaces rolling">
+			</div>
+		</div>
+		<h3>-</h3>
+		<h3 class="critical critical-fail">Échec critique !</h3>
+		<h3 class="critical critical-success">Réussite critique !</h3>
             ';
+
+		var dice:DivElement = cast d20Tray.querySelector('.die-d$numFaces');
+		for (i in 0...numFaces) {
+			var face = Browser.document.createElement("FIGURE");
+			face.classList.add("face");
+			face.classList.add('face-${i + 1}');
+			dice.appendChild(face);
+		}
 		Browser.document.body.append(d20Tray);
-		var d20:DivElement = cast d20Tray.querySelector(".die-d20");
-		d20.dataset.face = result.string();
+
+		dice.dataset.face = resultOnDice.string();
 		Timer.delay(() -> {
 			d20Tray.querySelector("h3").innerText = 'Résultat: ${result + mod}';
 			if (mod != null) {
 				d20Tray.querySelector("h3").innerText += ' ($result + $mod)';
 			}
 			d20Tray.classList.add("reveal");
-			var cls = if (result == 20) {
-				"critical-success";
-			} else if (result == 1) "critical-fail"; else null;
+
+			var cls = if (numFaces == 20) {
+				if (result == 20) {
+					"critical-success";
+				} else if (result == 1)
+					"critical-fail";
+				else
+					null;
+			} else null;
+
 			if (cls != null) {
 				backdrop.classList.add(cls);
 				d20Tray.classList.add(cls);

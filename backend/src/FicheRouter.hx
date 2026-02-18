@@ -101,6 +101,7 @@ class FicheRouter implements IJSAsync {
 			fiche.alignement = body.alignement.parseCharacterAlignement();
 			fiche.characterClass = body.characterClass.parseCharacterClass();
 			fiche.sizeCategory = body.sizeCategory.parseSizeCategory();
+			fiche.usePredilectionHP = cast(body.usePredilectionHP, Bool);
 			fiche.age = body.age.parseInt();
 			fiche.heightCm = body.heightCm.parseInt();
 			fiche.weightKg = body.weightKg.parseInt();
@@ -111,9 +112,9 @@ class FicheRouter implements IJSAsync {
 					res.status(400).end('Missing field $i');
 					return;
 				}
-				var value = Reflect.getProperty(fiche, i);
-				if (value == null || value == "") {
-					res.status(400).end('Invalid value for $i');
+				var value:Dynamic = Reflect.getProperty(fiche, i);
+				if (value == null || value == "" && value != false) {
+					res.status(400).end('Invalid value for $i ("$value")');
 					return;
 				}
 			}
