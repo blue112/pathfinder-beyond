@@ -9,9 +9,9 @@ $animationDuration: 1s;
 
 $angle: 53deg;
 $ringAngle: -11deg;
-$sideAngle: calc(360deg/5);
+$sideAngle: calc(360deg / 5);
 $opacity: 0.75;
-$color: rgba(30, 180, 20, $opacity);
+$color: rgba(216, 112, 15, $opacity);
 
 $rotateX: -$angle;
 $translateZ: $faceWidth * 0.335;
@@ -44,6 +44,7 @@ body.rolling {
 
     .dice-tray {
         display: flex;
+        font-family: sans;
     }
 }
 
@@ -61,8 +62,7 @@ body.rolling {
     align-items: center;
     flex-direction: column;
 
-    h3
-    {
+    h3 {
         color: white;
         font-size: 3em;
         margin-top: 40px;
@@ -70,13 +70,11 @@ body.rolling {
         transition: all 1s;
         opacity: 0;
     }
-    &.reveal h3
-    {
+    &.reveal h3 {
         opacity: 1;
     }
 
-    h3.critical
-    {
+    h3.critical {
         display: none;
     }
 
