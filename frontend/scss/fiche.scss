@@ -335,11 +335,47 @@ h3 {
     }
 
     div.skill:hover,
+    div.skill.active,
     div.label:hover,
-    div.value:has(.actions-hover):hover {
+    div.label.active,
+    div.value:has(.actions-hover):hover,
+    div.value.active {
         display: grid;
         grid-template-columns: auto 1fr;
         padding: 0;
+        position: relative;
+
+        menu {
+            position: absolute;
+            left: 0px;
+            top: 15px;
+            background-color: color.adjust($color: variables.$backgroundColor, $lightness: 10%);
+            width: 300px;
+            padding: 0;
+            margin-top: 10px;
+            margin-bottom: 0;
+            font-weight: normal;
+            font-size: 1rem;
+
+            ul {
+                padding: 0;
+                list-style: none;
+                line-height: 1.2;
+
+                li {
+                    border-bottom: 1px dotted #555555;
+                    padding: 10px;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    &:hover {
+                        background-color: #c2ffaf;
+                    }
+                }
+            }
+        }
 
         .actions-hover {
             grid-column: 1;
@@ -360,37 +396,6 @@ h3 {
                 cursor: pointer;
 
                 position: relative;
-
-                menu {
-                    position: absolute;
-                    left: -7px;
-                    background-color: color.adjust($color: variables.$backgroundColor, $lightness: 10%);
-                    width: 300px;
-                    padding: 0;
-                    margin-top: 10px;
-                    margin-bottom: 0;
-                    font-weight: normal;
-                    font-size: 1rem;
-
-                    ul {
-                        padding: 0;
-                        list-style: none;
-                        line-height: 1.2;
-
-                        li {
-                            border-bottom: 1px dotted #555555;
-                            padding: 10px;
-
-                            &:last-child {
-                                border-bottom: none;
-                            }
-
-                            &:hover {
-                                background-color: #c2ffaf;
-                            }
-                        }
-                    }
-                }
             }
         }
     }

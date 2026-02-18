@@ -10,6 +10,7 @@ class ContextMenu {
 	public var onClose:Void->Void;
 
 	public function new(parentElement:Element, menuElements:Array<String>, onChoice:Int->Bool) {
+		parentElement.classList.add("active");
 		menu = Browser.document.createMenuElement();
 		menu.innerHTML = "<ul></ul>";
 		for (i in 0...menuElements.length) {
@@ -32,6 +33,7 @@ class ContextMenu {
 	}
 
 	function close() {
+		menu.parentElement.classList.remove("active");
 		menu.parentElement.removeChild(menu);
 		Browser.document.body.removeEventListener("click", onClick);
 		if (onClose != null)

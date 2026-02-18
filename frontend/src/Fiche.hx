@@ -303,9 +303,10 @@ class Fiche implements IJSAsync {
 		var menuLabels = ["Ajouter un modificateur temporaire", "Ajouter un modificateur permanent"];
 		var actions = mainElem.querySelectorAll(".carac .plus");
 		for (p in actions) {
-			var id = p.parentElement.parentElement.parentElement.dataset.id;
+			var main = p.parentElement.parentElement;
+			var id = main.parentElement.dataset.id;
 			p.addEventListener("click", () -> {
-				new ContextMenu(cast p, menuLabels, (choice) -> {
+				new ContextMenu(main, menuLabels, (choice) -> {
 					if (choice == 1) {
 						new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true}, (result) -> {
 							if (result == 0)
@@ -324,7 +325,7 @@ class Fiche implements IJSAsync {
 		var p = mainElem.querySelector(".hp .plus");
 		p.addEventListener("click", () -> {
 			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)"];
-			new ContextMenu(p, menuLabels, (choice) -> {
+			new ContextMenu(p.parentElement.parentElement, menuLabels, (choice) -> {
 				new AmountChoice(menuLabels[choice], if (choice == 0) "Combien de PV retirer ?" else "Combien de PV ajouter ?", (result) -> {
 					if (result == 0)
 						return;
@@ -555,14 +556,13 @@ class Fiche implements IJSAsync {
 			skillDiv.classList.add("class-skill");
 
 			skillDiv.querySelector(".actions-hover .plus").addEventListener("click", () -> {
-				skillDiv.classList.add('active');
 				var choicesText = [
 					"Ajouter un rang",
 					"Retirer un rang",
 					"(Ajouter un modificateur permanent)",
 					"(Ajouter un modificateur temporaire)",
 				];
-				var menu = new ContextMenu(skillDiv.querySelector(".actions-hover .plus"), choicesText, (choice:Int) -> {
+				var menu = new ContextMenu(skillDiv, choicesText, (choice:Int) -> {
 					if (choice == 0 || choice == 1) {
 						if (choice == 1 && skill.ranks == 0) {
 							new Alert("Action impossible", "Aucun rang à retirer sur " + skill.label);
@@ -581,9 +581,6 @@ class Fiche implements IJSAsync {
 					}
 					return true;
 				});
-				menu.onClose = () -> {
-					skillDiv.classList.remove('active');
-				};
 			});
 
 			skillsDiv.appendChild(skillDiv);
