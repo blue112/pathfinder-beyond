@@ -11,6 +11,7 @@ enum FicheEventType {
 	CHANGE_MAX_HP(amount:Int);
 	LEVEL_UP(hpDice:Int);
 	ADD_CLASS_SKILL(skill:SkillType);
+	SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
 }
 
 typedef FicheEventTs = {
@@ -62,6 +63,7 @@ typedef FullCharacter = {
 	var levelUpDices:Array<Int>;
 	var level:Int;
 	var additionalClassSkills:Array<SkillType>;
+	var skillModifiers:Map<SkillType, Int>;
 }
 
 typedef Characteristics = {

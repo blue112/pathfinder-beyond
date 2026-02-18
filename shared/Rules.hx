@@ -37,7 +37,15 @@ class Rules {
 		return RulesSkills.skills.map(n -> {
 			var ranks = char.getSkillRank(n.name);
 			var classSkill = isClassSkill(char, n.name) || char.additionalClassSkills.contains(n.name);
+			var specialMod = 0;
+			if (n.name.match(DISCRETION) && char.basics.sizeCategory.match(SIZE_P)) {
+				specialMod = 4;
+			}
 			var canUse = !n.needTraining || ranks > 0;
+			var charMod = char.skillModifiers.get(n.name);
+			if (charMod == null)
+				charMod = 0;
+
 			return {
 				id: n.name.getName().toLowerCase(),
 				name: n.name,
@@ -45,8 +53,8 @@ class Rules {
 				classSkill: classSkill,
 				ranks: ranks,
 				canUse: canUse,
-				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0)
-			}
+				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod
+			};
 		});
 	}
 

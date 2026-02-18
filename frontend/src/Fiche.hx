@@ -34,6 +34,7 @@ class Fiche implements IJSAsync {
 			level: 1,
 			max_hp_modifier: 0,
 			additionalClassSkills: [],
+			skillModifiers: new Map(),
 		};
 
 		mainElem.innerHTML = "
@@ -661,6 +662,8 @@ class Fiche implements IJSAsync {
 				character.current_hp = Math.min(character.current_hp + amount, character.getMaxHitPoints()).int();
 			case CHANGE_MAX_HP(amount):
 				character.max_hp_modifier += amount;
+			case SET_SKILL_MODIFIER(skill, mod):
+				character.skillModifiers.set(skill, mod);
 		}
 	}
 
@@ -672,8 +675,17 @@ class Fiche implements IJSAsync {
 			return "Ok";
 		} else if (what == "maxhp") {
 			Api.pushEvent(ficheId, CHANGE_MAX_HP(param1.parseInt()));
+			return "Ok";
 		} else if (what == "levelup") {
 			Api.pushEvent(ficheId, LEVEL_UP(param1.parseInt()));
+			return "Ok";
+		} else if (what == "skillmod") {
+			var skill = SkillType.createByName(param1.toUpperCase());
+			if (skill == null) {
+				return "Skill type not found";
+			}
+			Api.pushEvent(ficheId, SET_SKILL_MODIFIER(skill, param2.parseInt()));
+			return "Ok";
 		} else if (what == "caracset") {
 			Api.pushEvent(ficheId, SET_CHARACTERISTICS({
 				str: param1.parseInt(),
