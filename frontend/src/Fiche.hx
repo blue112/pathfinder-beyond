@@ -546,11 +546,18 @@ class Fiche implements IJSAsync {
                 <div class='label'></div>
                 <div class='mod'></div>
                 <div class='ranks'></div>
+                <div class='skill-mod'></div>
 			";
 
 			skillDiv.querySelector(".label").innerHTML = skill.label + (if (skill.classSkill) " <ins title='Compétence de classe'>(C)</ins>" else "");
 			if (skill.canUse)
 				skillDiv.querySelector(".mod").innerText = skill.mod.asMod();
+
+			if (character.skillModifiers.exists(skill.name)) {
+				skillDiv.querySelector(".skill-mod").innerText = character.skillModifiers.get(skill.name).asMod();
+				skillDiv.classList.add("has-skill-mod");
+			}
+
 			skillDiv.querySelector(".ranks").innerText = skill.ranks.string();
 
 			skillDiv.classList.add("class-skill");

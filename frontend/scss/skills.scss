@@ -17,6 +17,13 @@
         .actions-hover {
             padding: 0 5px;
         }
+
+        .skill-mod {
+            display: block;
+            &:empty {
+                display: none;
+            }
+        }
     }
 
     .label {
@@ -31,6 +38,14 @@
         padding: 0;
         cursor: pointer;
     }
+    .skill-mod {
+        @include mixins.box;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 70px;
+        background: rgb(168, 255, 160);
+    }
     .ranks {
         @include mixins.box;
         font-size: 0.8rem;
@@ -43,6 +58,10 @@
         border-bottom: 2px dotted #555555;
         margin-left: 3px;
         cursor: help;
+    }
+
+    &.has-skill-mod .mod {
+        background: rgb(199, 252, 194);
     }
 
     &:has(.mod:empty) {
