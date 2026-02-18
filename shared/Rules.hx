@@ -137,9 +137,9 @@ class Rules {
 	}
 
 	static public function getMaxHitPoints(char:FullCharacter) {
-		var predilectionClassBonus = 1;
+		var predilectionClassBonus = if (char.basics.usePredilectionHP) 1 else 0;
 		var hd = getHitDice(char.basics.characterClass);
-		var total = hd + predilectionClassBonus;
+		var total = hd + predilectionClassBonus + char.characteristicsMod.con;
 
 		// Add predilection bonus and cons
 		for (i in 1...char.level) {

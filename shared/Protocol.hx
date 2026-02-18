@@ -90,6 +90,7 @@ typedef BasicFicheData = {
 	origin:String,
 	race:CharacterRace,
 	gender:String,
+	usePredilectionHP:Bool,
 	sizeCategory:SizeCategory,
 	age:Int,
 	heightCm:Int,
