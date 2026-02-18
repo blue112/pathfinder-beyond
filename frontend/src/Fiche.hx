@@ -375,9 +375,26 @@ class Fiche implements IJSAsync {
 
 	@:jsasync function rollD20(elem:Element) {
 		var parent = elem.parentElement;
-		var mod = null;
+		var modInt = null;
 		if (parent.querySelector(".mod") != null) {
-			mod = Std.parseInt(parent.querySelector(".mod").innerText.replace(" ", ""));
+			var mod = parent.querySelector(".mod").innerText.replace(" ", "");
+			if (mod.contains("d")) // It's not a d20?
+			{
+				var diceRegex = ~/([1-9])d([1-9][0-9]*)((\+|-)[0-9]+)/;
+				diceRegex.match(mod);
+				var numDice = diceRegex.matched(1).parseInt();
+				var diceType = diceRegex.matched(2).parseInt();
+				var mod = diceRegex.matched(3).parseInt();
+				if (numDice > 1) {
+					new Alert("Non implémenté", "Plus qu'un seul dé à la fois non implémenté");
+					return 0;
+				}
+
+				var apiResult = Api.rollDice(fiche_id, diceType, parent.dataset.id).jsawait();
+				D20.roll(mod, apiResult.result, diceType);
+				return apiResult.result + mod;
+			}
+			modInt = Std.parseInt(mod);
 		}
 		while (parent.dataset.id == null && parent != Browser.document.body) {
 			parent = parent.parentElement;
