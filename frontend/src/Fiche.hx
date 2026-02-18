@@ -404,7 +404,7 @@ class Fiche implements IJSAsync {
 		}
 
 		var apiResult = Api.rollDice(fiche_id, 20, parent.dataset.id).jsawait();
-		D20.roll(mod, apiResult.result);
+		D20.roll(modInt, apiResult.result);
 		return apiResult.result;
 	}
 
@@ -470,14 +470,18 @@ class Fiche implements IJSAsync {
 				}
 		].join(" / ");
 		getField(divWeapon,
-			"attack").innerText = (character.getCaracMod(weapon.weaponAttackCharacteristic) + Rules.getBBA(character) + weapon.attack_modifier).asMod();
+			"attack").innerText = (character.getCaracMod(weapon.weaponAttackCharacteristic) + Rules.getSizeMod(character, false) + Rules.getBBA(character)
+				+ weapon.attack_modifier).asMod();
 		getField(divWeapon,
 			"damage").innerText = [for (d in weapon.damage_dices) '1d' + d].join(" + ")
-				+ " + "
-				+ (weapon.damage_modifier + character.getCaracMod(weapon.weaponDamageCharacteristic));
+				+ " "
+				+ (weapon.damage_modifier + character.getCaracMod(weapon.weaponDamageCharacteristic)).asMod(true);
 
 		getField(divWeapon, "critical").innerHTML = "Si " + weapon.critical_text.nums.join(",") + ": x" + weapon.critical_text.damageMultiplier;
 		mainElem.querySelector(".weapons").appendChild(divWeapon);
+
+		fieldsNames.set("damage", "Dégats d'arme");
+		fieldsNames.set("attack", "Jet pour toucher");
 	}
 
 	private function updateCharacts() {
