@@ -12,12 +12,27 @@ enum FicheEventType {
 	LEVEL_UP(hpDice:Int);
 	ADD_CLASS_SKILL(skill:SkillType);
 	SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
+	ADD_EXCEPTIONAL_SKILL_MODIFIER(skill:SkillType, mod:Int, why:String);
+	ADD_PROTECTION(armor:Protection);
 }
 
 typedef FicheEventTs = {
 	var type:FicheEventType;
 	var ts:Float;
 	var id:Int;
+};
+
+enum ProtectionType {
+	ARMOR;
+	SHIELD;
+	NATURAL_ARMOR;
+}
+
+typedef Protection = {
+	var name:String;
+	var type:ProtectionType;
+	var armor:Int;
+	var max_dex:Null<Int>;
 };
 
 typedef Weapon = {
@@ -64,6 +79,14 @@ typedef FullCharacter = {
 	var level:Int;
 	var additionalClassSkills:Array<SkillType>;
 	var skillModifiers:Map<SkillType, Int>;
+	var exceptionalSkillModifiers:Array<ExceptionalSkillModifier>;
+	var protections:Array<Protection>;
+}
+
+typedef ExceptionalSkillModifier = {
+	var skill:SkillType;
+	var mod:Int;
+	var why:String;
 }
 
 typedef Characteristics = {
@@ -146,3 +169,10 @@ enum WSServerMessage {
 	NEW_EVENTS(fiche_id:String, events:Array<FicheEventTs>);
 	PONG;
 }
+
+typedef FicheNote = {
+	last_edit:Float,
+	order:Null<Int>,
+	id:Int,
+	content:String,
+};

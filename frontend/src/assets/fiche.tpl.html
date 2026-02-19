@@ -1,0 +1,224 @@
+<div class="grid">
+    <section class="actions">
+        <a class="see-dice-rolls">Voir les lancés de dés</a>
+        <a class="history">Historique</a>
+    </section>
+    <section class="meta">
+        <div class="left">
+            <div class="logo"><span>Feuille de personnage</span></div>
+        </div>
+        <div class="right">
+            <div class="field-line">
+                <div class="field" data-id="character-name">
+                    <div class="label">Nom du personnage</div>
+                    <div class="value"></div>
+                </div>
+                <div class="field" data-id="alignement">
+                    <div class="label">Alignement</div>
+                    <div class="value"></div>
+                </div>
+                <div class="field" data-id="player-name">
+                    <div class="label">Joueur/Joueuse</div>
+                    <div class="value"></div>
+                </div>
+            </div>
+            <div class="field-line">
+                <div class="field l" data-id="character-class">
+                    <div class="label">Classe</div>
+                    <div class="value"></div>
+                </div>
+                <div class="field xxs m-s" data-id="level">
+                    <div class="label">Niveau</div>
+                    <div class="value">
+                        <span class="text"></span>
+                        <div class="actions-hover"><a class="plus">+</a></div>
+                    </div>
+                </div>
+                <div class="field" data-id="divinity-name">
+                    <div class="label">Divinité</div>
+                    <div class="value"></div>
+                </div>
+                <div class="field" data-id="origin">
+                    <div class="label">Origine</div>
+                    <div class="value"></div>
+                </div>
+            </div>
+            <div class="field-line">
+                <div class="field" data-id="race">
+                    <div class="label">Race</div>
+                    <div class="value"></div>
+                </div>
+                <div class="field xs" data-id="size-category">
+                    <div class="label">Catégorie de taille</div>
+                    <div class="value"></div>
+                </div>
+                <div class="field xs m-s" data-id="gender">
+                    <div class="label">Genre</div>
+                    <div class="value"></div>
+                </div>
+                <div class="field xs m-s" data-id="age">
+                    <div class="label">Age</div>
+                    <div class="value num"></div>
+                </div>
+                <div class="field xs m-s" data-id="height-cm">
+                    <div class="label">Taille</div>
+                    <div class="value num"></div>
+                </div>
+                <div class="field xs m-s" data-id="weight-kg">
+                    <div class="label">Poids</div>
+                    <div class="value num"></div>
+                </div>
+                <div class="field s" data-id="hair">
+                    <div class="label">Cheveux</div>
+                    <div class="value"></div>
+                </div>
+                <div class="field s" data-id="eyes">
+                    <div class="label">Yeux</div>
+                    <div class="value"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="caracteristics">
+        <h2>Caractéristiques</h2>
+        <div class="carac" data-id="str">
+            <div class="label">
+                <div class="actions-hover"><a class="plus">+</a></div>
+                <span class="text">Force</span>
+            </div>
+            <div class="value"></div>
+            <div class="mod"></div>
+        </div>
+        <div class="carac" data-id="dex">
+            <div class="label">
+                <div class="actions-hover"><a class="plus">+</a></div>
+                <span class="text">Dextérité</span>
+            </div>
+            <div class="value"></div>
+            <div class="mod"></div>
+        </div>
+        <div class="carac" data-id="con">
+            <div class="label">
+                <div class="actions-hover"><a class="plus">+</a></div>
+                <span class="text">Constitution</span>
+            </div>
+            <div class="value"></div>
+            <div class="mod"></div>
+        </div>
+        <div class="carac" data-id="int">
+            <div class="label">
+                <div class="actions-hover"><a class="plus">+</a></div>
+                <span class="text">Intelligence</span>
+            </div>
+            <div class="value"></div>
+            <div class="mod"></div>
+        </div>
+        <div class="carac" data-id="wis">
+            <div class="label">
+                <div class="actions-hover"><a class="plus">+</a></div>
+                <span class="text">Sagesse</span>
+            </div>
+            <div class="value"></div>
+            <div class="mod"></div>
+        </div>
+        <div class="carac" data-id="cha">
+            <div class="label">
+                <div class="actions-hover"><a class="plus">+</a></div>
+                <span class="text">Charisme</span>
+            </div>
+            <div class="value"></div>
+            <div class="mod"></div>
+        </div>
+    </section>
+    <section class="hp">
+        <h2>Points de vie</h2>
+        <div class="lethal">
+            <div class="label">
+                <div class="actions-hover">
+                    <a class="plus">+</a>
+                </div>
+                <span class="text">Points de Vie</span>
+            </div>
+            <div class="value">
+                <div class="current" data-id="hp">
+                    <span class="value"></span>
+                </div>
+                <div class="separator">/</div>
+                <div class="max" data-id="hp-max"></div>
+            </div>
+        </div>
+        <div class="non-lethal">
+            <div class="label">Blessures non léthales</div>
+            <div class="value">
+                <div class="current" data-id="non-lethal-damages"></div>
+                <div class="separator">/</div>
+                <div class="max" data-id="non-lethal-max"></div>
+            </div>
+        </div>
+    </section>
+    <section class="speed">
+        <h2>Déplacement</h2>
+        <section data-id="speed">
+            <div class="label">Déplacement</div>
+            <div class="value"></div>
+        </section>
+    </section>
+    <section class="initiative">
+        <h2>Initiative</h2>
+        <section data-id="initiative">
+            <div class="label">Initiative</div>
+            <div class="value"><span class="d20"></span><span class="mod"></span></div>
+        </section>
+    </section>
+    <section class="armor">
+        <h2>Défense</h2>
+        <section class="ac" data-id="ac">
+            <div class="label">CA</div>
+            <div class="value"></div>
+        </section>
+        <section class="contact" data-id="ac-contact">
+            <div class="label">Contact</div>
+            <div class="value"></div>
+        </section>
+        <section class="surprise" data-id="ac-surprise">
+            <div class="label">Pris au dépourvu</div>
+            <div class="value"></div>
+        </section>
+    </section>
+    <section class="armorlist"></section>
+    <section class="saving">
+        <h2>Jets de sauvegarde</h2>
+        <div class="reflexes" data-id="saving-reflexes">
+            <div class="label">Reflexes</div>
+            <div class="value"><span class="d20"></span><span class="mod"></span></div>
+        </div>
+        <div class="vigor" data-id="saving-vigor">
+            <div class="label">Vigueur</div>
+            <div class="value"><span class="d20"></span><span class="mod"></span></div>
+        </div>
+        <div class="will" data-id="saving-will">
+            <div class="label">Volonté</div>
+            <div class="value"><span class="d20"></span><span class="mod"></span></div>
+        </div>
+    </section>
+    <section class="fight">
+        <h2>Combat</h2>
+        <div class="bba" data-id="bba">
+            <div class="label">Bonus de Base à l'Attaque</div>
+            <div class="value"></div>
+        </div>
+        <div class="bmo" data-id="bmo">
+            <div class="label">Manoeuvre Offensive</div>
+            <div class="value"><span class="d20"></span> <span class="mod"></span></div>
+        </div>
+        <div class="dmd" data-id="dmd">
+            <div class="label">Manoeuvre Défensive</div>
+            <div class="value"></div>
+        </div>
+        <section class="weapons">
+            <h2>Armes</h2>
+        </section>
+    </section>
+    <section class="skills"></section>
+</div>
+<section class="notes"></section>

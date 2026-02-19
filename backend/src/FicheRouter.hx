@@ -19,6 +19,9 @@ class FicheRouter implements IJSAsync {
 		router.delete("/:ficheId/:eventId", checkFicheExists, onDelEvent);
 		router.post("/:ficheId/roll", checkFicheExists, onDiceRoll);
 		router.get("/:ficheId/rolls", checkFicheExists, fetchDiceRolls);
+		router.get("/:ficheId/notes", checkFicheExists, fetchNotes);
+		router.post("/:ficheId/notes", checkFicheExists, onInsertNote);
+		router.put("/:ficheId/notes/:noteId", checkFicheExists, onUpdateNote);
 		router.put("/debug/:ficheId/push", checkFicheExists, Express.raw({type: "*/*"}), onPushEvent);
 		return router;
 	}
@@ -28,6 +31,47 @@ class FicheRouter implements IJSAsync {
 		var rolls = DiceRoll.fetch(fiche_id).jsawait();
 
 		return res.json(rolls.map(r -> r.toPublic()));
+	}
+
+	@:jsasync static public function onUpdateNote(req:Request, res:Response, next:Next) {
+		var fiche_id = req.fiche.fiche_id;
+		var note_id = (req.params : Dynamic).noteId;
+		var content = (req.body : Dynamic).content;
+		if (content == null || content.length > 50000 || content.length == 0) {
+			res.status(400).json({error: "Invalid content"});
+			return;
+		}
+
+		DatabaseHandler.execInsert("UPDATE fiche_notes SET last_edit_ts_ms = ?, content = ? WHERE fiche_id = ? AND note_id = ?",
+			[Date.now().getTime(), content, fiche_id, note_id])
+			.jsawait();
+
+		res.json({success: true});
+	}
+
+	@:jsasync static public function onInsertNote(req:Request, res:Response, next:Next) {
+		var fiche_id = req.fiche.fiche_id;
+		var content = (req.body : Dynamic).content;
+		if (content == null || content.length > 50000 || content.length == 0) {
+			res.status(400).json({error: "Invalid content"});
+			return;
+		}
+
+		DatabaseHandler.execInsert("INSERT INTO fiche_notes(fiche_id, last_edit_ts_ms, content) VALUES(?, ?, ?)", [fiche_id, Date.now().getTime(), content])
+			.jsawait();
+		res.json({success: true});
+	}
+
+	@:jsasync static public function fetchNotes(req:Request, res:Response, next:Next) {
+		var fiche_id = req.fiche.fiche_id;
+		var notes = DatabaseHandler.exec("SELECT * FROM fiche_notes WHERE fiche_id = ?", [fiche_id]).jsawait();
+		var outNotes:Array<FicheNote> = notes.map(n -> {
+			last_edit: n.last_edit_ts_ms,
+			order: n.note_order,
+			id: n.note_id,
+			content: n.content,
+		});
+		res.hx(outNotes);
 	}
 
 	@:jsasync static public function onDiceRoll(req:Request, res:Response, next:Next) {
@@ -50,8 +94,8 @@ class FicheRouter implements IJSAsync {
 	}
 
 	@:jsasync static public function checkFicheExists(req:Request, res:Response, next:Next) {
-		var ficheId = (req.params : Dynamic).ficheId;
-		var fiche = DatabaseHandler.exec("SELECT * FROM fiche WHERE fiche_id = ?", [ficheId]).jsawait();
+		var fiche_id = (req.params : Dynamic).ficheId;
+		var fiche = DatabaseHandler.exec("SELECT * FROM fiche WHERE fiche_id = ?", [fiche_id]).jsawait();
 		if (fiche.length == 0) {
 			res.status(404).end("Not found");
 			return;
@@ -63,9 +107,9 @@ class FicheRouter implements IJSAsync {
 	}
 
 	@:jsasync static public function getFiche(req:Request, res:Response, next:Next) {
-		var ficheId = req.fiche.fiche_id;
+		var fiche_id = req.fiche.fiche_id;
 
-		var events:Array<FicheEventTs> = FicheEvent.getEvents(ficheId).jsawait();
+		var events:Array<FicheEventTs> = FicheEvent.getEvents(fiche_id).jsawait();
 
 		res.hx(events);
 	}

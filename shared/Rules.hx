@@ -113,7 +113,10 @@ class Rules {
 			total += char.characteristicsMod.dex;
 		}
 
-		// Fixme bonus armure, bonus bouclier
+		if (includeArmor) {
+			total += char.protections.fold((i, r) -> r + i.armor, 0); // For now, just sum it all up
+		}
+
 		return total;
 	}
 

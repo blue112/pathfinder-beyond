@@ -1,3 +1,5 @@
+@use "variables";
+
 @mixin box($paddingh: 3px) {
     font-size: 0.8em;
     border: 3px solid #b8ae98;
@@ -13,7 +15,7 @@
 @mixin mod-box($paddingh: 3px) {
     @include box($paddingh);
 
-    color: #95493b;
+    color: variables.$redColor;
     font-weight: bold;
     font-family: sans;
     font-size: 1.2em;
@@ -24,5 +26,5 @@
 
     font-weight: 700;
     background: #d6c086;
-    border-color: #95493b;
+    border-color: variables.$redColor;
 }

@@ -31,8 +31,15 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case CHANGE_HP(amount): 'Dégats subis (${- amount} pv)';
 				case CHANGE_MAX_HP(amount): 'Changement des PV max (${amount.asMod()} pv)';
 				case LEVEL_UP(dice): 'Montée d\'un niveau ! Dé de vie = + $dice pv';
+				case ADD_PROTECTION(armor): 'Ajout ${switch (armor.type) {
+					case ARMOR: "d'une armure";
+					case SHIELD: "d'un bouclier";
+					case NATURAL_ARMOR: "d'une armure naturelle";
+				}}: ${armor.name} (+${armor.armor} CA)';
+				case ADD_EXCEPTIONAL_SKILL_MODIFIER(skill, mod,
+					why): 'Ajout d\'un modificateur exceptionnel sur ${RulesSkills.getSkillLabel(skill)}: ${mod.asMod()} (${why.htmlEscape()})';
 			}
-			elem.innerHTML = '<a class="del">x</a> <small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%I:%S")}]</small> $event';
+			elem.innerHTML = '<a class="del">x</a> <small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> $event';
 			list.appendChild(elem);
 			elem.querySelector(".del").addEventListener("click", () -> {
 				trace(Api.delEvent(fiche_id, i.id).then((_) -> {

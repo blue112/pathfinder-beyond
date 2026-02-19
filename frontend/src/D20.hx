@@ -4,7 +4,7 @@ import js.Browser;
 
 @:expose("Dice")
 class D20 {
-	static public function roll(mod:Int, result:Int, numFaces:Int = 20) {
+	static public function roll(mods:Array<Int>, result:Int, numFaces:Int = 20) {
 		var initialNumFaces = numFaces;
 		var resultOnDice = result;
 
@@ -52,9 +52,11 @@ class D20 {
 
 		dice.dataset.face = resultOnDice.string();
 		Timer.delay(() -> {
-			d20Tray.querySelector("h3").innerText = 'Résultat: ${result + mod}';
-			if (mod != null) {
-				d20Tray.querySelector("h3").innerText += ' ($result + $mod)';
+			var totalMod = mods.fold((m, r) -> m + r, 0);
+			d20Tray.querySelector("h3").innerText = 'Résultat: ${result + totalMod}';
+			if (mods.length > 0) {
+				var modsStr = mods.map(i -> i.asMod(true)).join(" ");
+				d20Tray.querySelector("h3").innerText += ' ($result $modsStr)';
 			}
 			d20Tray.classList.add("reveal");
 

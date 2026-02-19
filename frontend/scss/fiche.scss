@@ -22,7 +22,7 @@ h3 {
 }
 
 section > h2 {
-    background: #95493b;
+    background: variables.$redColor;
     color: #d6c086;
     border: 3px solid #d6c086;
     margin-bottom: 5px;
@@ -48,6 +48,9 @@ h3 {
     padding-top: 20px;
 
     position: relative;
+
+    display: flex;
+    flex-direction: column;
 
     section.actions {
         position: absolute;
@@ -128,7 +131,7 @@ h3 {
             justify-content: center;
 
             &.mod {
-                color: #95493b;
+                color: variables.$redColor;
                 cursor: pointer;
             }
         }
@@ -232,6 +235,7 @@ h3 {
         .label {
             @include mixins.red-label();
             flex: 1 1 0;
+            text-align: center;
         }
 
         .value {
@@ -245,6 +249,7 @@ h3 {
 
             div.max {
                 margin-left: 5px;
+                font-family: sans;
                 flex: 1;
                 @include mixins.box(25px);
             }
@@ -257,6 +262,20 @@ h3 {
                 display: flex;
                 align-items: center;
             }
+        }
+    }
+
+    section.armorlist > div {
+        display: grid;
+        grid-template-columns: 1fr 100px;
+        gap: 5px;
+
+        .name {
+            @include mixins.box;
+        }
+        .ca {
+            @include mixins.mod-box;
+            font-size: 0.9em;
         }
     }
 
@@ -336,7 +355,7 @@ h3 {
 
     div.skill:hover,
     div.skill.active,
-    div.label:hover,
+    div.label:has(.actions-hover):hover,
     div.label.active,
     div.value:has(.actions-hover):hover,
     div.value.active {
@@ -417,5 +436,63 @@ h3 {
 
     .actions-hover {
         display: none;
+    }
+
+    section.notes {
+        h2 {
+            position: relative;
+
+            a {
+                position: absolute;
+                right: 5px;
+                top: 5px;
+                color: #c0aa78;
+                font-size: 0.8rem;
+                cursor: pointer;
+            }
+        }
+
+        padding-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        ul li,
+        .add-note {
+            border: 3px solid variables.$redColor;
+            background: color.adjust($color: variables.$backgroundColor, $lightness: -10%);
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .add-note {
+            margin-top: 15px;
+            text-align: center;
+
+            &:hover {
+                background: color.adjust($color: variables.$backgroundColor, $lightness: -5%);
+            }
+        }
+
+        ul li {
+            background: color.adjust($color: variables.$backgroundColor, $lightness: 5%);
+            margin-bottom: 5px;
+            position: relative;
+
+            .date {
+                font-family: sans-serif;
+                position: absolute;
+                font-size: 0.8em;
+                color: #555555;
+                font-weight: normal;
+                font-style: italic;
+                right: 5px;
+                bottom: 5px;
+            }
+        }
     }
 }

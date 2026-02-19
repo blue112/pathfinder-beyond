@@ -1,3 +1,6 @@
+import jsasync.Nothing;
+import js.lib.Promise;
+import haxe.Resource;
 import js.html.MouseEvent;
 import RulesSkills.SkillType;
 import js.html.DivElement;
@@ -8,6 +11,7 @@ import jsasync.IJSAsync;
 import js.Browser;
 import elems.*;
 
+using DateTools;
 using Rules;
 
 class Fiche implements IJSAsync {
@@ -35,213 +39,11 @@ class Fiche implements IJSAsync {
 			max_hp_modifier: 0,
 			additionalClassSkills: [],
 			skillModifiers: new Map(),
+			exceptionalSkillModifiers: [],
+			protections: [],
 		};
 
-		mainElem.innerHTML = "
-		<section class='actions'>
-			<a class='see-dice-rolls'>Voir les lancés de dés</a>
-			<a class='history'>Historique</a>
-		</section>
-        <section class='meta'>
-            <div class='left'>
-                <div class='logo'><span>Feuille de personnage</span></div>
-            </div>
-            <div class='right'>
-                <div class='field-line'>
-                    <div class='field' data-id='character-name'>
-                        <div class='label'>Nom du personnage</div>
-                        <div class='value'></div>
-                    </div>
-                    <div class='field' data-id='alignement'>
-                        <div class='label'>Alignement</div>
-                        <div class='value'></div>
-                    </div>
-                    <div class='field' data-id='player-name'>
-                        <div class='label'>Joueur/Joueuse</div>
-                        <div class='value'></div>
-                    </div>
-                </div>
-                <div class='field-line'>
-                    <div class='field l' data-id='character-class'>
-                        <div class='label'>Classe</div>
-                        <div class='value'></div>
-                    </div>
-                    <div class='field xxs m-s' data-id='level'>
-                        <div class='label'>Niveau</div>
-                        <div class='value'>
-							<span class='text'></span>
-							<div class='actions-hover'><a class='plus'>+</a></div>
-						</div>
-                    </div>
-                    <div class='field' data-id='divinity-name'>
-                        <div class='label'>Divinité</div>
-                        <div class='value'></div>
-                    </div>
-                    <div class='field' data-id='origin'>
-                        <div class='label'>Origine</div>
-                        <div class='value'></div>
-                    </div>
-                </div>
-                <div class='field-line'>
-                    <div class='field' data-id='race'>
-                        <div class='label'>Race</div>
-                        <div class='value'></div>
-                    </div>
-                    <div class='field xs' data-id='size-category'>
-                        <div class='label'>Catégorie de taille</div>
-                        <div class='value'></div>
-                    </div>
-                    <div class='field xs m-s' data-id='gender'>
-                        <div class='label'>Genre</div>
-                        <div class='value'></div>
-                    </div>
-                    <div class='field xs m-s' data-id='age'>
-                        <div class='label'>Age</div>
-                        <div class='value num'></div>
-                    </div>
-                    <div class='field xs  m-s' data-id='height-cm'>
-                        <div class='label'>Taille</div>
-                        <div class='value num'></div>
-                    </div>
-                    <div class='field xs  m-s' data-id='weight-kg'>
-                        <div class='label'>Poids</div>
-                        <div class='value num'></div>
-                    </div>
-                    <div class='field s' data-id='hair'>
-                        <div class='label'>Cheveux</div>
-                        <div class='value'></div>
-                    </div>
-                    <div class='field s' data-id='eyes'>
-                        <div class='label'>Yeux</div>
-                        <div class='value'></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class='caracteristics'>
-            <h2>Caractéristiques</h2>
-            <div class='carac' data-id='str'>
-                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Force</span></div>
-                <div class='value'></div>
-                <div class='mod'></div>
-            </div>
-            <div class='carac' data-id='dex'>
-                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Dextérité</span></div>
-                <div class='value'></div>
-                <div class='mod'></div>
-            </div>
-            <div class='carac' data-id='con'>
-                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Constitution</span></div>
-                <div class='value'></div>
-                <div class='mod'></div>
-            </div>
-            <div class='carac' data-id='int'>
-                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Intelligence</span></div>
-                <div class='value'></div>
-                <div class='mod'></div>
-            </div>
-            <div class='carac' data-id='wis'>
-                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Sagesse</span></div>
-                <div class='value'></div>
-                <div class='mod'></div>
-            </div>
-            <div class='carac' data-id='cha'>
-                <div class='label'><div class='actions-hover'><a class='plus'>+</a></div><span class='text'>Charisme</span></div>
-                <div class='value'></div>
-                <div class='mod'></div>
-            </div>
-        </section>
-        <section class='hp'>
-            <h2>Points de vie</h2>
-            <div class='lethal'>
-                <div class='label'>
-					<div class='actions-hover'>
-						<a class='plus'>+</a>
-					</div>
-					<span class='text'>Points de Vie</span>
-				</div>
-                <div class='value'>
-                    <div class='current' data-id='hp'>
-						<span class='value'></span>
-					</div>
-                    <div class='separator'>/</div>
-                    <div class='max' data-id='hp-max'></div>
-                </div>
-            </div>
-            <div class='non-lethal'>
-                <div class='label'>Blessures non léthales</div>
-                <div class='value'>
-                    <div class='current' data-id='non-lethal-damages'></div>
-                    <div class='separator'>/</div>
-                    <div class='max' data-id='non-lethal-max'></div>
-                </div>
-            </div>
-        </section>
-        <section class='speed'>
-            <h2>Déplacement</h2>
-            <section data-id='speed'>
-                <div class='label'>Déplacement</div>
-                <div class='value'></div>
-            </section>
-        </section>
-        <section class='initiative'>
-            <h2>Initiative</h2>
-            <section data-id='initiative'>
-                <div class='label'>Initiative</div>
-                <div class='value'><span class='d20'></span><span class='mod'></span></div>
-            </section>
-        </section>
-        <section class='armor'>
-            <h2>Défense</h2>
-            <section class='ac' data-id='ac'>
-                <div class='label'>CA</div>
-                <div class='value'></div>
-            </section>
-            <section class='contact' data-id='ac-contact'>
-                <div class='label'>Contact</div>
-                <div class='value'></div>
-            </section>
-            <section class='surprise' data-id='ac-surprise'>
-                <div class='label'>Pris au dépourvu</div>
-                <div class='value'></div>
-            </section>
-        </section>
-        <section class='saving'>
-            <h2>Jets de sauvegarde</h2>
-            <div class='reflexes' data-id='saving-reflexes'>
-                <div class='label'>Reflexes</div>
-                <div class='value'><span class='d20'></span><span class='mod'></span></div>
-            </div>
-            <div class='vigor' data-id='saving-vigor'>
-                <div class='label'>Vigueur</div>
-                <div class='value'><span class='d20'></span><span class='mod'></span></div>
-            </div>
-            <div class='will' data-id='saving-will'>
-                <div class='label'>Volonté</div>
-                <div class='value'><span class='d20'></span><span class='mod'></span></div>
-            </div>
-        </section>
-        <section class='fight'>
-            <h2>Combat</h2>
-            <div class='bba' data-id='bba'>
-                <div class='label'>Bonus de Base à l'Attaque</div>
-                <div class='value'></div>
-            </div>
-            <div class='bmo' data-id='bmo'>
-                <div class='label'>Manoeuvre Offensive</div>
-                <div class='value'><span class='d20'></span> <span class='mod'></span></div>
-            </div>
-            <div class='dmd' data-id='dmd'>
-                <div class='label'>Manoeuvre Défensive</div>
-                <div class='value'></div>
-            </div>
-            <section class='weapons'>
-                <h2>Armes</h2>
-            </section>
-        </section>
-        <section class='skills'>
-        </section>
-        ";
+		mainElem.innerHTML = Resource.getString("fiche.html");
 
 		Browser.document.body.appendChild(mainElem);
 
@@ -374,7 +176,7 @@ class Fiche implements IJSAsync {
 		return e;
 	}
 
-	@:jsasync function rollD20(elem:Element) {
+	@:jsasync function rollD20(elem:Element, ?additionalMod:Int) {
 		var parent = elem.parentElement;
 		var modInt = null;
 		if (parent.querySelector(".mod") != null) {
@@ -392,7 +194,7 @@ class Fiche implements IJSAsync {
 				}
 
 				var apiResult = Api.rollDice(fiche_id, diceType, parent.dataset.id).jsawait();
-				D20.roll(mod, apiResult.result, diceType);
+				D20.roll([mod], apiResult.result, diceType);
 				return apiResult.result + mod;
 			}
 			modInt = Std.parseInt(mod);
@@ -405,7 +207,10 @@ class Fiche implements IJSAsync {
 		}
 
 		var apiResult = Api.rollDice(fiche_id, 20, parent.dataset.id).jsawait();
-		D20.roll(modInt, apiResult.result);
+		var mods = [modInt];
+		if (additionalMod != null && additionalMod != 0)
+			mods.push(additionalMod);
+		D20.roll(mods, apiResult.result);
 		return apiResult.result;
 	}
 
@@ -501,7 +306,7 @@ class Fiche implements IJSAsync {
 		character.current_hp = Rules.getMaxHitPoints(character);
 	}
 
-	private function calculateFields() {
+	private function updateFiche() {
 		if (character.characteristics == null)
 			return;
 
@@ -529,6 +334,18 @@ class Fiche implements IJSAsync {
 		availableFields.get("level").innerText = character.level.string();
 
 		addSkills();
+		addArmor();
+	}
+
+	function addArmor() {
+		var armorsDiv = mainElem.querySelector(".armorlist");
+		armorsDiv.innerHTML = "<h2>Protections</h2>";
+		for (p in character.protections) {
+			var armorDiv = Browser.document.createDivElement();
+			armorDiv.classList.add("armor");
+			armorDiv.innerHTML = '<span class="name">${p.name.htmlEscape()}</span><span class="ca">${p.armor.asMod()} CA</span>';
+			armorsDiv.appendChild(armorDiv);
+		}
 	}
 
 	function addSkills() {
@@ -562,6 +379,24 @@ class Fiche implements IJSAsync {
 
 			skillDiv.classList.add("class-skill");
 
+			skillDiv.querySelector(".mod").addEventListener("click", (e:MouseEvent) -> {
+				e.stopPropagation();
+				var expMods = character.exceptionalSkillModifiers.filter(s -> s.skill == skill.name);
+				if (expMods.length > 0) {
+					new ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})')), (choice) -> {
+						if (choice == 0)
+							rollD20(skillDiv.querySelector(".mod"));
+						else {
+							var mod = expMods[choice - 1];
+							rollD20(skillDiv.querySelector(".mod"), mod.mod);
+						}
+					});
+					return;
+				}
+
+				rollD20(skillDiv.querySelector(".mod"));
+			});
+
 			skillDiv.querySelector(".actions-hover .plus").addEventListener("click", () -> {
 				var choicesText = [
 					"Ajouter un rang",
@@ -569,7 +404,7 @@ class Fiche implements IJSAsync {
 					"(Ajouter un modificateur permanent)",
 					"(Ajouter un modificateur temporaire)",
 				];
-				var menu = new ContextMenu(skillDiv, choicesText, (choice:Int) -> {
+				new ContextMenu(skillDiv, choicesText, (choice:Int) -> {
 					if (choice == 0 || choice == 1) {
 						if (choice == 1 && skill.ranks == 0) {
 							new Alert("Action impossible", "Aucun rang à retirer sur " + skill.label);
@@ -609,7 +444,7 @@ class Fiche implements IJSAsync {
 			processEvent(i.type);
 		}
 
-		calculateFields();
+		updateFiche();
 		var elapsed = Date.now().getTime() - startTime;
 		trace('Fiche processed in ${elapsed}ms');
 
@@ -620,9 +455,49 @@ class Fiche implements IJSAsync {
 			if (fiche_id == this.fiche_id) {
 				ficheEvents.push(event);
 				processEvent(event.type);
-				calculateFields();
+				updateFiche();
 			}
 		};
+
+		loadNotes();
+	}
+
+	@:jsasync function loadNotes():Promise<Nothing> {
+		var notes:Array<FicheNote> = Api.load('/fiche/$fiche_id/notes').jsawait();
+		mainElem.querySelector(".notes")
+			.innerHTML = "
+	<h2>Notes<a class='refresh'>Recharger</a></h2>
+    <ul></ul>
+    <a class='add-note'>Ajouter une note</a>";
+		var noteUl = mainElem.querySelector(".notes ul");
+		for (n in notes) {
+			var li = Browser.document.createLIElement();
+			li.innerHTML = "<span class='text'></span><span class='date'></span>";
+			li.querySelector(".text").innerText = n.content;
+			li.querySelector(".date").innerText = "- " + Date.fromTime(n.last_edit).format("%d/%m/%Y %H:%M");
+			noteUl.appendChild(li);
+
+			li.addEventListener("click", () -> {
+				new NoteDialog(n.content, (content) -> {
+					Api.saveNote(fiche_id, n.id, content).then((_) -> {
+						li.querySelector(".text").innerText = content;
+						li.querySelector(".date").innerText = "- " + Date.now().format("%d/%m/%Y %H:%M");
+						n.content = content;
+						n.last_edit = Date.now().getTime();
+					});
+				});
+			});
+		}
+
+		mainElem.querySelector(".notes a.add-note").addEventListener("click", () -> {
+			new NoteDialog(null, (value) -> {
+				Api.saveNote(fiche_id, null, value);
+			});
+		});
+		mainElem.querySelector(".notes a.refresh").addEventListener("click", () -> {
+			mainElem.querySelector(".notes").innerHTML = "<h2>Chargement...</h2>";
+			haxe.Timer.delay(loadNotes, 300);
+		});
 	}
 
 	function processEvent(type:FicheEventType) {
@@ -645,7 +520,7 @@ class Fiche implements IJSAsync {
 						} else {
 							trace('Invalid value for $fieldName: $value');
 						}
-					} else {
+					} else if (fieldName != "use-predilection-h-p") {
 						Browser.console.warn('[PFB] Field does not exist: $fieldName');
 					}
 				}
@@ -689,6 +564,14 @@ class Fiche implements IJSAsync {
 				character.max_hp_modifier += amount;
 			case SET_SKILL_MODIFIER(skill, mod):
 				character.skillModifiers.set(skill, mod);
+			case ADD_EXCEPTIONAL_SKILL_MODIFIER(skill, mod, why):
+				character.exceptionalSkillModifiers.push({
+					skill: skill,
+					mod: mod,
+					why: why
+				});
+			case ADD_PROTECTION(armor):
+				character.protections.push(armor);
 		}
 	}
 
@@ -704,12 +587,27 @@ class Fiche implements IJSAsync {
 		} else if (what == "levelup") {
 			Api.pushEvent(ficheId, LEVEL_UP(param1.parseInt()));
 			return "Ok";
+		} else if (what == "expskillmod") {
+			var skill = SkillType.createByName(param1.toUpperCase());
+			if (skill == null) {
+				return "Skill type not found";
+			}
+			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_SKILL_MODIFIER(skill, param2.parseInt(), param3));
+			return "Ok";
 		} else if (what == "skillmod") {
 			var skill = SkillType.createByName(param1.toUpperCase());
 			if (skill == null) {
 				return "Skill type not found";
 			}
 			Api.pushEvent(ficheId, SET_SKILL_MODIFIER(skill, param2.parseInt()));
+			return "Ok";
+		} else if (what == "protection") {
+			Api.pushEvent(ficheId, ADD_PROTECTION({
+				name: param1,
+				armor: param2.parseInt(),
+				type: ProtectionType.createByName(param3.toUpperCase()),
+				max_dex: param4.parseInt(),
+			}));
 			return "Ok";
 		} else if (what == "caracset") {
 			Api.pushEvent(ficheId, SET_CHARACTERISTICS({

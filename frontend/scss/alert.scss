@@ -83,4 +83,22 @@
             }
         }
     }
+
+    &.notes .content {
+        display: flex;
+        flex-direction: column;
+        padding: 0 20px;
+
+        textarea {
+            height: 300px;
+            font-family: "medieval", serif;
+            font-size: 1.2em;
+            background-color: variables.$backgroundColor;
+            border: 1px solid black;
+        }
+
+        .actions {
+            margin-top: 10px;
+        }
+    }
 }

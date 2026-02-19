@@ -37,6 +37,29 @@ class Api implements IJSAsync {
 		return j;
 	}
 
+	@:jsasync static public function saveNote(ficheId:String, note_id:Null<Int>, content:String):Promise<Dynamic> {
+		if (note_id == null) {
+			var r = Browser.window.fetch('/api/fiche/$ficheId/notes', {
+				method: "post",
+				headers: {
+					"Content-type": "application/json",
+				},
+				body: Json.stringify({content: content})
+			}).jsawait();
+			return r.json().jsawait();
+		} else {
+			var r = Browser.window.fetch('/api/fiche/$ficheId/notes/$note_id', {
+				method: "put",
+				headers: {
+					"Content-type": "application/json",
+				},
+				body: Json.stringify({content: content})
+			}).jsawait();
+			return r.json().jsawait();
+		}
+		return null;
+	}
+
 	@:jsasync static public function delEvent(ficheId:String, eventId:Int):Promise<Dynamic> {
 		var r = Browser.window.fetch('/api/fiche/$ficheId/$eventId', {
 			method: "delete",
