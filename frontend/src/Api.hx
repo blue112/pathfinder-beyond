@@ -46,7 +46,7 @@ class Api implements IJSAsync {
 				},
 				body: Json.stringify({content: content})
 			}).jsawait();
-			return r.json().jsawait();
+			return r.json().jsawait().id;
 		} else {
 			var r = Browser.window.fetch('/api/fiche/$ficheId/notes/$note_id', {
 				method: "put",

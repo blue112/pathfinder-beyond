@@ -37,14 +37,18 @@ class FicheRouter implements IJSAsync {
 		var fiche_id = req.fiche.fiche_id;
 		var note_id = (req.params : Dynamic).noteId;
 		var content = (req.body : Dynamic).content;
-		if (content == null || content.length > 50000 || content.length == 0) {
+		if (content == null || content.length > 50000) {
 			res.status(400).json({error: "Invalid content"});
 			return;
 		}
-
-		DatabaseHandler.execInsert("UPDATE fiche_notes SET last_edit_ts_ms = ?, content = ? WHERE fiche_id = ? AND note_id = ?",
-			[Date.now().getTime(), content, fiche_id, note_id])
-			.jsawait();
+		if (content.length == 0) {
+			// Delete instead
+			DatabaseHandler.execInsert("DELETE FROM fiche_notes WHERE fiche_id = ? AND note_id = ?", [fiche_id, note_id]).jsawait();
+		} else {
+			DatabaseHandler.execInsert("UPDATE fiche_notes SET last_edit_ts_ms = ?, content = ? WHERE fiche_id = ? AND note_id = ?",
+				[Date.now().getTime(), content, fiche_id, note_id])
+				.jsawait();
+		}
 
 		res.json({success: true});
 	}
@@ -57,9 +61,10 @@ class FicheRouter implements IJSAsync {
 			return;
 		}
 
-		DatabaseHandler.execInsert("INSERT INTO fiche_notes(fiche_id, last_edit_ts_ms, content) VALUES(?, ?, ?)", [fiche_id, Date.now().getTime(), content])
+		var id = DatabaseHandler.execInsert("INSERT INTO fiche_notes(fiche_id, last_edit_ts_ms, content) VALUES(?, ?, ?)",
+			[fiche_id, Date.now().getTime(), content])
 			.jsawait();
-		res.json({success: true});
+		res.json({success: true, id: id});
 	}
 
 	@:jsasync static public function fetchNotes(req:Request, res:Response, next:Next) {

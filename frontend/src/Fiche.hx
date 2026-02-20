@@ -1,3 +1,4 @@
+import jsasync.JSAsync;
 import jsasync.Nothing;
 import js.lib.Promise;
 import haxe.Resource;
@@ -480,6 +481,10 @@ class Fiche implements IJSAsync {
 			li.addEventListener("click", () -> {
 				new NoteDialog(n.content, (content) -> {
 					Api.saveNote(fiche_id, n.id, content).then((_) -> {
+						if (content.length == 0) {
+							noteUl.removeChild(li);
+							return;
+						}
 						li.querySelector(".text").innerText = content;
 						li.querySelector(".date").innerText = "- " + Date.now().format("%d/%m/%Y %H:%M");
 						n.content = content;
@@ -490,9 +495,14 @@ class Fiche implements IJSAsync {
 		}
 
 		mainElem.querySelector(".notes a.add-note").addEventListener("click", () -> {
-			new NoteDialog(null, (value) -> {
-				Api.saveNote(fiche_id, null, value);
-			});
+			new NoteDialog(null, JSAsync.jsasync((value) -> {
+				var id = Api.saveNote(fiche_id, null, value).jsawait();
+				var li = Browser.document.createLIElement();
+				li.innerHTML = "<span class='text'></span><span class='date'></span>";
+				li.querySelector(".text").innerText = value;
+				li.querySelector(".date").innerText = "- " + Date.now().format("%d/%m/%Y %H:%M");
+				noteUl.appendChild(li);
+			}));
 		});
 		mainElem.querySelector(".notes a.refresh").addEventListener("click", () -> {
 			mainElem.querySelector(".notes").innerHTML = "<h2>Chargement...</h2>";
