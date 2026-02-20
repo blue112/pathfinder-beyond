@@ -7,13 +7,16 @@ import js.Browser;
 typedef AmountChoiceOptions = {
 	?defaultValue:Int,
 	?canBeNegative:Bool,
+	?askReason:Bool,
 }
 
 class AmountChoice extends Popup {
 	var input:InputElement;
 	var options:AmountChoiceOptions;
 
-	public function new(title:String, message:String, ?options:AmountChoiceOptions, onChoice:Int->Void) {
+	public var reasonInput:InputElement;
+
+	public function new(title:String, message:String, ?options:AmountChoiceOptions, onChoice:Int->String->Void) {
 		super(title);
 		if (options == null)
 			options = {};
@@ -21,11 +24,15 @@ class AmountChoice extends Popup {
 			options.defaultValue = 0;
 		if (options.canBeNegative == null)
 			options.canBeNegative = false;
+		if (options.askReason == null)
+			options.askReason = false;
 
 		this.options = options;
 
 		mainElem.classList.add("amount");
 		mainElem.classList.add("alert");
+		if (options.askReason)
+			mainElem.classList.add("ask-reason");
 
 		getContent().innerHTML = "<p></p>
         <div class='input'>
@@ -33,17 +40,22 @@ class AmountChoice extends Popup {
             <input type='text' inputmode='numeric' pattern='\\d*' value='0' min='0' />
             <a class='increase'>+</a>
         </div>
+		<div class='reason'>
+			<label>Raison</label>
+			<input type='text' />
+		</div>
         <div class='actions'>
             <a class='validate'>Valider</a>
         </div>";
 
 		mainElem.querySelector("p").innerText = message;
-		input = cast mainElem.querySelector("input");
+		input = cast mainElem.querySelector(".input input");
 		input.value = options.defaultValue.string();
+		reasonInput = cast mainElem.querySelector(".reason input");
 		mainElem.querySelector("a.decrease").addEventListener("click", changeAmount.bind(false));
 		mainElem.querySelector("a.increase").addEventListener("click", changeAmount.bind(true));
 		mainElem.querySelector("a.validate").addEventListener("click", () -> {
-			onChoice(input.value.parseInt());
+			onChoice(input.value.parseInt(), reasonInput.value);
 			close();
 		});
 

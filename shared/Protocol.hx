@@ -14,6 +14,8 @@ enum FicheEventType {
 	SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
 	ADD_EXCEPTIONAL_SKILL_MODIFIER(skill:SkillType, mod:Int, why:String);
 	ADD_PROTECTION(armor:Protection);
+	ADD_TEMPORARY_MODIFIER(mod:TemporaryModifier);
+	REMOVE_TEMPORARY_MODIFIER(index:Int);
 }
 
 typedef FicheEventTs = {
@@ -81,6 +83,25 @@ typedef FullCharacter = {
 	var skillModifiers:Map<SkillType, Int>;
 	var exceptionalSkillModifiers:Array<ExceptionalSkillModifier>;
 	var protections:Array<Protection>;
+	var weapons:Array<Weapon>;
+	var tempMods:Array<TemporaryModifier>;
+}
+
+typedef TemporaryModifier = {
+	var on:Field;
+	var mod:Int;
+	var why:String;
+}
+
+enum Field {
+	SKILL(type:SkillType);
+	CHARACTERISTIC(carac:Characteristic);
+	AC;
+	INITIATIVE;
+	SAVING_THROW(st:SavingThrow);
+	MAX_HP;
+	WEAPON_ATTACK;
+	WEAPON_DAMAGE;
 }
 
 typedef ExceptionalSkillModifier = {

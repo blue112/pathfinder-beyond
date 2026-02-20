@@ -58,6 +58,26 @@
         .actions {
             margin-top: 20px;
         }
+        .reason {
+            display: none;
+            flex-direction: column;
+            padding: 0 15px;
+            margin-top: 20px;
+
+            label {
+                font-weight: bold;
+                margin-bottom: 5px;
+                text-align: center;
+            }
+            input {
+                font-size: 1.2em;
+                text-align: center;
+            }
+        }
+        &.ask-reason .reason {
+            display: flex;
+        }
+
         .input {
             display: flex;
             height: 80px;

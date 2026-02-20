@@ -27,11 +27,19 @@ class ProtocolUtil {
 			CHARISMA else if (c == "con") CONSTITUTION else null;
 	}
 
+	static public function savingThrowToString(st:SavingThrow) {
+		return switch (st) {
+			case REFLEXES: "Réflexes";
+			case WILL: "Volonté";
+			case VIGOR: "Vigueur";
+		}
+	}
+
 	static public function caracToString(c:Characteristic, withPrefix:Bool) {
 		return switch (c) {
 			case STRENGTH: if (withPrefix) "de la force" else "force";
 			case DEXTERITY: if (withPrefix) "de la dextérité" else "dextérité";
-			case WISDOM: if (withPrefix) "de la sagesse" else "force";
+			case WISDOM: if (withPrefix) "de la sagesse" else "sagesse";
 			case INTELLIGENCE: if (withPrefix) "de l'intelligence" else "intelligence";
 			case CHARISMA: if (withPrefix) "du charisme" else "charisme";
 			case CONSTITUTION: if (withPrefix) "de la constitution" else "constitution";

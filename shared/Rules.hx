@@ -59,6 +59,7 @@ class Rules {
 				name: n.name,
 				label: n.label,
 				classSkill: classSkill,
+				characteristic: n.modifier,
 				ranks: ranks,
 				canUse: canUse,
 				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod
@@ -78,13 +79,17 @@ class Rules {
 		return bbaTables.get(char.basics.characterClass)[char.level - 1];
 	}
 
+	static public function getSavingThrowCarac(st:SavingThrow) {
+		return switch (st) {
+			case REFLEXES: DEXTERITY;
+			case VIGOR: CONSTITUTION;
+			case WILL: WISDOM;
+		}
+	}
+
 	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
 		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
-		return switch (st) {
-			case REFLEXES: char.characteristicsMod.dex + baseBonus;
-			case VIGOR: char.characteristicsMod.con + baseBonus;
-			case WILL: char.characteristicsMod.wis + baseBonus;
-		}
+		return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus;
 	}
 
 	static public function getSizeMod(char:FullCharacter, forBMOOrDMD:Bool) {

@@ -42,6 +42,8 @@ class Fiche implements IJSAsync {
 			skillModifiers: new Map(),
 			exceptionalSkillModifiers: [],
 			protections: [],
+			tempMods: [],
+			weapons: [],
 		};
 
 		mainElem.innerHTML = Resource.getString("fiche.html");
@@ -77,6 +79,7 @@ class Fiche implements IJSAsync {
 		bindHPActions();
 		bindCaracActions();
 		bindLevelActions();
+		bindACActions();
 
 		load(fiche_id);
 	}
@@ -103,15 +106,19 @@ class Fiche implements IJSAsync {
 	}
 
 	function bindCaracActions() {
-		var menuLabels = ["Ajouter un modificateur temporaire", "Ajouter un modificateur permanent"];
+		var menuLabels = ["Ajouter un modificateur temporaire", "Modifier la valeur"];
 		var actions = mainElem.querySelectorAll(".carac .plus");
 		for (p in actions) {
 			var main = p.parentElement.parentElement;
 			var id = main.parentElement.dataset.id;
 			p.addEventListener("click", () -> {
 				new ContextMenu(main, menuLabels, (choice) -> {
-					if (choice == 1) {
-						new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true}, (result) -> {
+					if (choice == 0) {
+						new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
+							Api.pushEvent(fiche_id, ADD_TEMPORARY_MODIFIER({mod: result, why: reason, on: CHARACTERISTIC(id.parseCarac())}));
+						});
+					} else if (choice == 1) {
+						new AmountChoice(menuLabels[choice], "Quel modification de valeur appliquer ?", {canBeNegative: true}, (result, _) -> {
 							if (result == 0)
 								return;
 
@@ -124,12 +131,33 @@ class Fiche implements IJSAsync {
 		}
 	}
 
+	function bindACActions() {
+		var menuLabels = ["Ajouter un modificateur temporaire", "Ajouter une protection"];
+		var actions = mainElem.querySelectorAll(".ac .plus");
+		for (p in actions) {
+			var main = p.parentElement.parentElement;
+			var id = main.parentElement.dataset.id;
+			p.addEventListener("click", () -> {
+				new ContextMenu(main, menuLabels, (choice) -> {
+					if (choice == 0) {
+						new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
+							Api.pushEvent(fiche_id, ADD_TEMPORARY_MODIFIER({mod: result, why: reason, on: AC}));
+						});
+					} else if (choice == 1) {
+						new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée.");
+					}
+					return true;
+				});
+			});
+		}
+	}
+
 	function bindHPActions() {
 		var p = mainElem.querySelector(".hp .plus");
 		p.addEventListener("click", () -> {
 			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)"];
 			new ContextMenu(p.parentElement.parentElement, menuLabels, (choice) -> {
-				new AmountChoice(menuLabels[choice], if (choice == 0) "Combien de PV retirer ?" else "Combien de PV ajouter ?", (result) -> {
+				new AmountChoice(menuLabels[choice], if (choice == 0) "Combien de PV retirer ?" else "Combien de PV ajouter ?", (result, _) -> {
 					if (result == 0)
 						return;
 
@@ -149,6 +177,9 @@ class Fiche implements IJSAsync {
 		});
 		mainElem.querySelector("a.history").addEventListener("click", () -> {
 			new FicheEventHistory(fiche_id, ficheEvents);
+		});
+		mainElem.querySelector("a.see-temp-mods").addEventListener("click", () -> {
+			new TemporaryModifiersList(fiche_id, character.tempMods);
 		});
 	}
 
@@ -228,6 +259,14 @@ class Fiche implements IJSAsync {
 		return kCase;
 	}
 
+	private function updateWeapons(weapon:Weapon) {
+		var weapons = mainElem.querySelector(".weapons");
+		weapons.innerHTML = "";
+		for (i in character.weapons) {
+			addWeapon(i);
+		}
+	}
+
 	private function addWeapon(weapon:Weapon) {
 		var divWeapon = Browser.document.createDivElement();
 		divWeapon.classList.add("weapon");
@@ -296,15 +335,84 @@ class Fiche implements IJSAsync {
 		for (i in Reflect.fields(character.characteristics)) {
 			var value:Int = Reflect.getProperty(character.characteristics, i);
 			var mod:Int = Std.int(value / 2) - 5;
-			Reflect.setProperty(character.characteristicsMod, i, mod);
 			availableFields.get(i).innerText = Std.string(value);
 			var modField = availableFields.get(i).parentElement.querySelector(".mod");
+
+			var tempMods = character.tempMods.filter(t -> Type.enumEq(t.on, CHARACTERISTIC(i.parseCarac())));
+			var totalTempMod = tempMods.fold((n, r) -> r + n.mod, 0);
+			if (tempMods.length > 0 && totalTempMod != 0) {
+				if (totalTempMod < 0)
+					modField.classList.add("negative");
+				else
+					modField.classList.remove("negative");
+
+				modField.classList.add("temp-mod");
+				mod += totalTempMod;
+			} else {
+				modField.classList.remove("temp-mod");
+			}
+
+			Reflect.setProperty(character.characteristicsMod, i, mod);
 			modField.innerText = mod.asMod(false);
 		}
 	}
 
 	private function updateHP() {
 		character.current_hp = Rules.getMaxHitPoints(character);
+	}
+
+	private function updateAC(field:String, includeArmor:Bool, includeDex:Bool) {
+		var acDiv = availableFields.get(field);
+
+		var mod = character.getAC(includeArmor, includeDex);
+
+		// Check if we have a temp modifier on that or on related characteristic
+		var availableMods = character.tempMods.filter(tempMod -> {
+			if (includeArmor && Type.enumEq(tempMod.on, AC))
+				return true;
+
+			if (includeDex && Type.enumEq(tempMod.on, CHARACTERISTIC(DEXTERITY)))
+				return true;
+
+			return false;
+		});
+		var totalTempMod = availableMods.fold((n, r) -> n.mod + r, 0);
+		if (totalTempMod != 0) {
+			acDiv.classList.add("temp-mod");
+			if (totalTempMod < 0)
+				acDiv.classList.add("negative");
+		} else {
+			acDiv.classList.remove("temp-mod");
+		}
+
+		acDiv.innerText = mod.string();
+	}
+
+	private function updateSavingThrow(fieldId:String, st:SavingThrow) {
+		var stDiv = availableFields.get(fieldId);
+
+		var mod = Rules.getSavingThrowMod(character, st);
+
+		// Check if we have a temp modifier on that or on related characteristic
+		var availableMods = character.tempMods.filter(tempMod -> {
+			if (Type.enumEq(tempMod.on, SAVING_THROW(st)))
+				return true;
+
+			if (Type.enumEq(tempMod.on, CHARACTERISTIC(Rules.getSavingThrowCarac(st))))
+				return true;
+
+			return false;
+		});
+		var totalTempMod = availableMods.fold((n, r) -> n.mod + r, 0);
+		if (totalTempMod != 0) {
+			stDiv.parentElement.classList.add("temp-mod");
+			if (totalTempMod < 0)
+				stDiv.parentElement.classList.add("negative");
+		} else {
+			stDiv.parentElement.classList.remove("temp-mod");
+		}
+
+		stDiv.innerText = mod.asMod(true);
 	}
 
 	private function updateFiche() {
@@ -322,13 +430,13 @@ class Fiche implements IJSAsync {
 		availableFields.get("non-lethal-max").innerText = maxHP;
 		availableFields.get("non-lethal-damages").innerText = 0.string();
 
-		availableFields.get("ac").innerText = Rules.getAC(character).string();
-		availableFields.get("ac-contact").innerText = Rules.getACContact(character).string();
-		availableFields.get("ac-surprise").innerText = Rules.getACSurprise(character).string();
+		updateAC("ac", true, true);
+		updateAC("ac-contact", false, true);
+		updateAC("ac-surprise", true, false);
 
-		availableFields.get("saving-reflexes").innerText = Rules.getSavingThrowMod(character, REFLEXES).asMod(true);
-		availableFields.get("saving-vigor").innerText = Rules.getSavingThrowMod(character, VIGOR).asMod(true);
-		availableFields.get("saving-will").innerText = Rules.getSavingThrowMod(character, WILL).asMod(true);
+		updateSavingThrow("saving-reflexes", REFLEXES);
+		updateSavingThrow("saving-vigor", VIGOR);
+		updateSavingThrow("saving-will", WILL);
 		availableFields.get("bba").innerText = Rules.getBBA(character).asMod(true);
 		availableFields.get("bmo").innerText = Rules.getBMO(character).asMod(true);
 		availableFields.get("dmd").innerText = Rules.getDMD(character).string();
@@ -336,6 +444,12 @@ class Fiche implements IJSAsync {
 
 		addSkills();
 		addArmor();
+
+		if (character.tempMods.length > 0) {
+			mainElem.querySelector(".see-temp-mods .count").innerText = character.tempMods.length.string();
+		} else {
+			mainElem.querySelector(".see-temp-mods .count").innerText = '';
+		}
 	}
 
 	function addArmor() {
@@ -376,6 +490,22 @@ class Fiche implements IJSAsync {
 				skillDiv.classList.add("has-skill-mod");
 			}
 
+			// Check if we have a temp modifier on that or on related characteristic
+			var availableMods = character.tempMods.filter(tempMod -> {
+				if (Type.enumEq(tempMod.on, SKILL(skill.name)))
+					return true;
+
+				if (Type.enumEq(tempMod.on, CHARACTERISTIC(skill.characteristic)))
+					return true;
+
+				return false;
+			});
+			var totalTempMod = availableMods.fold((n, r) -> n.mod + r, 0);
+			if (totalTempMod != 0) {
+				skillDiv.querySelector(".mod").classList.add("temp-mod");
+				if (totalTempMod < 0)
+					skillDiv.querySelector(".mod").classList.add("negative");
+			}
 			skillDiv.querySelector(".ranks").innerText = skill.ranks.string();
 
 			skillDiv.classList.add("class-skill");
@@ -582,6 +712,12 @@ class Fiche implements IJSAsync {
 				});
 			case ADD_PROTECTION(armor):
 				character.protections.push(armor);
+			case ADD_TEMPORARY_MODIFIER(mod):
+				character.tempMods.push(mod);
+				updateCharacts();
+			case REMOVE_TEMPORARY_MODIFIER(index):
+				character.tempMods.splice(index, 1);
+				updateCharacts();
 		}
 	}
 

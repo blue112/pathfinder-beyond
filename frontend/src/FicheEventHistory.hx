@@ -10,17 +10,24 @@ class FicheEventHistory extends Popup implements IJSAsync {
 	public function new(fiche_id:String, events:Array<FicheEventTs>) {
 		super("Historique de la fiche");
 
+		getContent().classList.add("event-history");
+
+		var currentMods = [];
 		this.fiche_id = fiche_id;
 
 		var list = Browser.document.createUListElement();
 
-		events = events.copy(); // So we can reverse
-		events.reverse();
 		for (i in events) {
 			var elem = Browser.document.createLIElement();
 			var event = switch (i.type) {
 				case CREATE(_): "Création du personnage";
 				case SET_CHARACTERISTICS(_): "Lancer de caractéristiques initial";
+				case ADD_TEMPORARY_MODIFIER(mod):
+					currentMods.push(mod);
+					'Ajout d\'un modificateur temporaire (${mod.mod.asMod()}, ${mod.why})';
+				case REMOVE_TEMPORARY_MODIFIER(n):
+					var mod = currentMods.splice(n, 1)[0];
+					'Retrait d\'un modificateur temporaire (${mod.why})';
 				case ADD_CLASS_SKILL(skill): 'Ajout d\'une compétence de classe (${RulesSkills.getSkillLabel(skill)})';
 				case SET_SKILL_MODIFIER(skill, mod): 'Ajout d\'un modificateur de compétence (${RulesSkills.getSkillLabel(skill)}): ${mod.asMod()}';
 				case CHANGE_CARAC(c, amount): 'Modification ${c.caracToString(true)} : ${amount.asMod()}';

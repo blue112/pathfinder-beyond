@@ -41,6 +41,16 @@
             .del {
                 cursor: pointer;
             }
+
+            &.temp-modifiers .del {
+                font-size: 0.8em;
+                font-style: italic;
+            }
+
+            &.event-history ul {
+                display: flex;
+                flex-direction: column-reverse;
+            }
         }
     }
 
