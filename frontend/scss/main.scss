@@ -1,20 +1,20 @@
 @use "fiche";
 @use "fonts";
-@use "dice/d20";
+@use "dice/dice";
 @use "popup";
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body,
 html {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 body {
-  background-color: #e1d5bb;
-  font-family: "medieval", serif;
+    background-color: #e1d5bb;
+    font-family: "medieval", serif;
 }

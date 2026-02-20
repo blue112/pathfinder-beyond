@@ -1,3 +1,4 @@
+import js.html.Element;
 import RulesSkills.SkillType;
 import Protocol;
 
@@ -85,6 +86,31 @@ class Rules {
 			case VIGOR: CONSTITUTION;
 			case WILL: WISDOM;
 		}
+	}
+
+	static public function sum(tempMod:Array<TemporaryModifier>) {
+		return tempMod.fold((t, r) -> t.mod + r, 0);
+	}
+
+	static public function applyTempModsClass(character:FullCharacter, div:Element, matching:Array<Field>) {
+		var tempMod = character.getTempMods(matching).sum();
+		if (tempMod != 0)
+			div.classList.add("temp-mod");
+		else
+			div.classList.remove("temp-mod");
+		if (tempMod < 0)
+			div.classList.add("negative");
+		else
+			div.classList.remove("negative");
+	}
+
+	static public function getTempMods(character:FullCharacter, matching:Array<Field>) {
+		return character.tempMods.filter(t -> {
+			for (i in matching)
+				if (Type.enumEq(t.on, i))
+					return true;
+			return false;
+		});
 	}
 
 	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
