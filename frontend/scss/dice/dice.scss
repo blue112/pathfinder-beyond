@@ -74,6 +74,15 @@ body.rolling {
         opacity: 1;
     }
 
+    p.d3 {
+        display: none;
+        color: #bbb;
+        font-style: italic;
+    }
+    &.reveal.d3 p.d3 {
+        display: block;
+    }
+
     h3.critical {
         display: none;
     }

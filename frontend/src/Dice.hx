@@ -3,7 +3,7 @@ import js.html.DivElement;
 import js.Browser;
 
 @:expose("Dice")
-class D20 {
+class Dice {
 	static public function roll(mods:Array<Int>, result:Int, numFaces:Int = 20) {
 		var initialNumFaces = numFaces;
 		var resultOnDice = result;
@@ -24,19 +24,22 @@ class D20 {
 
 		Browser.document.body.classList.add("rolling");
 
+		var d20Tray = Browser.document.createDivElement();
+		d20Tray.classList.add("dice-tray");
+
 		if (numFaces == 3) {
 			numFaces = 6;
 			resultOnDice = (result * 2) - 1 + Std.random(2);
+			d20Tray.classList.add("d3");
 		}
 
-		var d20Tray = Browser.document.createDivElement();
-		d20Tray.classList.add("dice-tray");
 		d20Tray.innerHTML = '
         <div class="dice-container">
             <div class="die-d$numFaces rolling">
 			</div>
 		</div>
 		<h3>-</h3>
+		<p class="d3">(pour un dé 3, un dé 6 est lancé et la valeur est divisée par deux)</p>
 		<h3 class="critical critical-fail">Échec critique !</h3>
 		<h3 class="critical critical-success">Réussite critique !</h3>
             ';
