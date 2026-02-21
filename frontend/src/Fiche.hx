@@ -45,6 +45,7 @@ class Fiche implements IJSAsync {
 			protections: [],
 			tempMods: [],
 			weapons: [],
+			money_po: 0,
 		};
 
 		mainElem.innerHTML = Resource.getString("fiche.html");
@@ -80,11 +81,25 @@ class Fiche implements IJSAsync {
 		bindHPActions();
 		bindCaracActions();
 		bindLevelActions();
+		bindMoneyActions();
 		bindACActions();
 		bindSavingThrowActions();
 		bindInitiativeActions();
 
 		load(fiche_id);
+	}
+
+	function bindMoneyActions() {
+		var menuLabels = ["Ajouter/retirer des PO"];
+		var action = mainElem.querySelector("[data-id=po] .plus");
+		action.addEventListener("click", () -> {
+			new ContextMenu(cast action, menuLabels, (choice) -> {
+				new AmountChoice('Ajouter/retirer des PO', "Combien de PO ajouter ou retirer ?", (value, _) -> {
+					Api.pushEvent(fiche_id, CHANGE_MONEY(value));
+				});
+				return true;
+			});
+		});
 	}
 
 	function bindLevelActions() {
@@ -436,6 +451,8 @@ class Fiche implements IJSAsync {
 		addArmor();
 		updateWeapons();
 
+		availableFields.get("po").innerText = character.money_po.string();
+
 		if (character.tempMods.length > 0) {
 			mainElem.querySelector(".see-temp-mods .count").innerText = character.tempMods.length.string();
 		} else {
@@ -597,12 +614,8 @@ class Fiche implements IJSAsync {
 
 		mainElem.querySelector(".notes a.add-note").addEventListener("click", () -> {
 			new NoteDialog(null, JSAsync.jsasync((value) -> {
-				var id = Api.saveNote(fiche_id, null, value).jsawait();
-				var li = Browser.document.createLIElement();
-				li.innerHTML = "<span class='text'></span><span class='date'></span>";
-				li.querySelector(".text").innerText = value;
-				li.querySelector(".date").innerText = "- " + Date.now().format("%d/%m/%Y %H:%M");
-				noteUl.appendChild(li);
+				Api.saveNote(fiche_id, null, value).jsawait();
+				loadNotes();
 			}));
 		});
 		mainElem.querySelector(".notes a.refresh").addEventListener("click", () -> {
@@ -689,6 +702,8 @@ class Fiche implements IJSAsync {
 			case REMOVE_TEMPORARY_MODIFIER(index):
 				character.tempMods.splice(index, 1);
 				updateCharacts();
+			case CHANGE_MONEY(amount):
+				character.money_po += amount;
 		}
 	}
 

@@ -16,6 +16,7 @@ enum FicheEventType {
 	ADD_PROTECTION(armor:Protection);
 	ADD_TEMPORARY_MODIFIER(mod:TemporaryModifier);
 	REMOVE_TEMPORARY_MODIFIER(index:Int);
+	CHANGE_MONEY(amount_po:Float);
 }
 
 typedef FicheEventTs = {
@@ -85,6 +86,7 @@ typedef FullCharacter = {
 	var protections:Array<Protection>;
 	var weapons:Array<Weapon>;
 	var tempMods:Array<TemporaryModifier>;
+	var money_po:Float;
 }
 
 typedef TemporaryModifier = {

@@ -34,8 +34,10 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case ADD_WEAPON(weapon): 'Ajout d\'une arme (${weapon.name.htmlEscape()})';
 				case TRAIN_SKILL(skill): 'Ajout d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
 				case DECREASE_SKILL(skill): 'Retrait d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
-				case CHANGE_HP(amount) if (amount > 0): 'Soins (${amount} pv)';
+				case CHANGE_HP(amount) if (amount > 0): 'Récupération de points de vie (${amount} pv)';
 				case CHANGE_HP(amount): 'Dégats subis (${- amount} pv)';
+				case CHANGE_MONEY(amount) if (amount > 0): 'Gain d\'argent (${amount} PO)';
+				case CHANGE_MONEY(amount): 'Perte d\'argent (${- amount} po)';
 				case CHANGE_MAX_HP(amount): 'Changement des PV max (${amount.asMod()} pv)';
 				case LEVEL_UP(dice): 'Montée d\'un niveau ! Dé de vie = + $dice pv';
 				case ADD_PROTECTION(armor): 'Ajout ${switch (armor.type) {

@@ -392,6 +392,8 @@ h3 {
 
     div.skill:hover,
     div.skill.active,
+    section.money > div:hover,
+    section.money > div.active,
     div.label:has(.actions-hover):hover,
     div.label.active,
     div.value:has(.actions-hover):hover,
@@ -454,6 +456,31 @@ h3 {
 
                 position: relative;
             }
+        }
+    }
+
+    section.money > div {
+        @include mixins.box;
+        font-size: 1.1em;
+        font-weight: bold;
+        margin: 0;
+        display: grid;
+
+        &:hover,
+        &.active {
+            padding: 1px;
+            grid-template-columns: 27px 1fr;
+        }
+
+        .text {
+            grid-column: 2;
+            display: flex;
+            justify-content: center;
+        }
+        .value {
+            margin-right: 5px;
+            font-family: sans-serif;
+            font-size: 1.1em;
         }
     }
 
