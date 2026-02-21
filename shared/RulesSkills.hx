@@ -70,14 +70,14 @@ class RulesSkills {
 			label: "Artisanat",
 			modifier: INTELLIGENCE,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR],
+			classSkillFor: [ROUBLARD, CONJURATEUR, CONJURATEUR_EIDOLON_BIPED],
 		},
 		{
 			name: BLUFF,
 			label: "Bluff",
 			modifier: CHARISMA,
 			needTraining: false,
-			classSkillFor: [ROUBLARD],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED],
 		},
 		{
 			name: CONNAISSANCE_EXPLORATION,
@@ -140,7 +140,7 @@ class RulesSkills {
 			label: "Connaissance (Plans)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR],
+			classSkillFor: [CONJURATEUR, CONJURATEUR_EIDOLON_BIPED],
 		},
 		{
 			name: CONNAISSANCE_RELIGION,
@@ -168,7 +168,7 @@ class RulesSkills {
 			label: "Discrétion",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [ROUBLARD],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED],
 		},
 		{
 			name: DRESSAGE,
@@ -238,7 +238,7 @@ class RulesSkills {
 			label: "Perception",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [ROUBLARD],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED],
 		},
 		{
 			name: PREMIERS_SECOURS,
@@ -259,7 +259,7 @@ class RulesSkills {
 			label: "Psychologie",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [ROUBLARD],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED],
 		},
 		{
 			name: REPRESENTATION,

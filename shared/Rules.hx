@@ -9,17 +9,23 @@ class Rules {
 	static var bbaTables = [
 		ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		CONJURATEUR => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+		CONJURATEUR_EIDOLON_BIPED => [1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15, 15],
 	];
 	static var savingThrowTables = [
 		ROUBLARD => [
-			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6],
+			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 1, 1, 12],
+			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 		],
 		CONJURATEUR => [
-			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 1, 1, 12],
-			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6],
+			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+		],
+		CONJURATEUR_EIDOLON_BIPED => [
+			WILL => [2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9],
+			REFLEXES => [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5],
+			VIGOR => [2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9],
 		]
 	];
 
@@ -172,10 +178,20 @@ class Rules {
 		}
 	}
 
+	static public function getNumberHitDice(char:FullCharacter) {
+		if (char.basics.characterClass.match(CONJURATEUR_EIDOLON_BIPED)) {
+			return [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15, 15][char.level];
+		}
+
+		return char.level;
+	}
+
 	static public function getHitDice(cls:CharacterClass) {
 		return switch (cls) {
 			case CONJURATEUR, ROUBLARD:
 				8;
+			case CONJURATEUR_EIDOLON_BIPED:
+				10;
 		}
 	}
 
@@ -185,7 +201,7 @@ class Rules {
 		var total = hd + predilectionClassBonus + char.characteristicsMod.con;
 
 		// Add predilection bonus and cons
-		for (i in 1...char.level) {
+		for (i in 1...getNumberHitDice(char)) {
 			total += predilectionClassBonus + char.characteristicsMod.con;
 		}
 		for (dice in char.levelUpDices) {
