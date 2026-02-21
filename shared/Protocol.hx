@@ -52,6 +52,7 @@ typedef Weapon = {
 	var damage_dices:Array<Int>;
 	var attack_modifier:Int;
 	var weaponAttackCharacteristic:Characteristic;
+	var weaponHasPlus50PercentDamage:Bool;
 	var weaponDamageCharacteristic:Characteristic;
 	var damage_modifier:Int;
 	var critical_text:WeaponCriticalStat;
