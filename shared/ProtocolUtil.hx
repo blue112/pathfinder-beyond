@@ -52,11 +52,23 @@ class ProtocolUtil {
 				"Roublard(e)";
 			case CONJURATEUR:
 				"Conjurateur";
+			case CONJURATEUR_EIDOLON_BIPED:
+				"Eidolon du Conjurateur";
 		}
 	}
 
 	static public function sizeCategoryToString(size:SizeCategory) {
-		return size.getName().split("_")[1];
+		return switch (size) {
+			case SIZE_I: "I (Infime)";
+			case SIZE_MIN: "M (Minuscule)";
+			case SIZE_TP: "TP (Très petit)";
+			case SIZE_P: "P (Petit)";
+			case SIZE_M: "M (Moyen)";
+			case SIZE_G: "G (Grand)";
+			case SIZE_TG: "TG (Très grand)";
+			case SIZE_GIG: "Gig (Giganteste)";
+			case SIZE_C: "C (Colossal)";
+		};
 	}
 
 	static public function alignementToString(alignement:CharacterAlignement) {
