@@ -427,6 +427,8 @@ class Fiche implements IJSAsync {
 		if (character.characteristics == null)
 			return;
 
+		Browser.document.title = character.basics.characterName + " - Pathfinder Beyond 1e";
+
 		var vd = Rules.getVD(character);
 		availableFields.get("speed").innerText = '${vd}c par tour';
 		var dexMod = character.characteristicsMod.dex;
