@@ -9,7 +9,7 @@ class Popup {
 		popup.classList.add("popup");
 		popup.innerHTML = '<div class="backdrop"></div>
         <div class="main">
-            <h2>$title</h2>
+            <h2>${title.htmlEscape()}</h2>
             <a class="close">X</a>
             <div class="content"></div>
         </div>';

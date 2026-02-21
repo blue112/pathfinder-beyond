@@ -504,7 +504,8 @@ h3 {
         display: none;
     }
 
-    section.notes {
+    section.notes,
+    section.inventory {
         h2 {
             position: relative;
 
@@ -527,7 +528,7 @@ h3 {
             margin: 0;
         }
         ul li,
-        .add-note {
+        .add-new {
             border: 3px solid variables.$redColor;
             background: color.adjust($color: variables.$backgroundColor, $lightness: -10%);
             padding: 10px;
@@ -535,7 +536,7 @@ h3 {
             cursor: pointer;
         }
 
-        .add-note {
+        .add-new {
             margin-top: 15px;
             text-align: center;
 
@@ -558,6 +559,40 @@ h3 {
                 font-style: italic;
                 right: 5px;
                 top: 5px;
+            }
+        }
+    }
+
+    section.inventory {
+        ul li {
+            display: grid;
+            background: none;
+            border: none;
+            grid-template-columns: 50px 1fr 30px;
+            gap: 5px;
+            cursor: auto;
+            padding: 0;
+
+            > div,
+            > a {
+                background: color.adjust($color: variables.$backgroundColor, $lightness: 5%);
+                border: 3px solid #b8ae98;
+                padding: 5px 10px;
+                &.qty {
+                    text-align: center;
+
+                    a {
+                        margin-left: 5px;
+                        cursor: pointer;
+                    }
+                }
+            }
+            a.delete {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #909090;
+                cursor: pointer;
             }
         }
     }

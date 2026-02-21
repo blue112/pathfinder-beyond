@@ -45,6 +45,7 @@ class Fiche implements IJSAsync {
 			protections: [],
 			tempMods: [],
 			weapons: [],
+			inventory: [],
 			money_po: 0,
 		};
 
@@ -95,7 +96,8 @@ class Fiche implements IJSAsync {
 		action.addEventListener("click", () -> {
 			new ContextMenu(cast action, menuLabels, (choice) -> {
 				new AmountChoice('Ajouter/retirer des PO', "Combien de PO ajouter ou retirer ?", (value, _) -> {
-					Api.pushEvent(fiche_id, CHANGE_MONEY(value));
+					if (value != 0)
+						Api.pushEvent(fiche_id, CHANGE_MONEY(value));
 				});
 				return true;
 			});
@@ -450,6 +452,7 @@ class Fiche implements IJSAsync {
 		addSkills();
 		addArmor();
 		updateWeapons();
+		updateInventory();
 
 		availableFields.get("po").innerText = character.money_po.string();
 
@@ -581,13 +584,49 @@ class Fiche implements IJSAsync {
 		loadNotes();
 	}
 
+	function updateInventory() {
+		var inventory = mainElem.querySelector("section.inventory");
+		inventory.innerHTML = "<h2>Inventaire</h2>
+		<ul></ul>
+    <a class='add-new'>Ajouter un nouvel objet</a>";
+
+		for (item in character.inventory) {
+			var li = Browser.document.createLIElement();
+			li.innerHTML = "<div class='qty'><span class='text'></span><a class='change'>✎</a></div><div class='name'></div><a class='delete' title='Supprimer'>X</a>";
+			li.querySelector(".qty .text").innerText = item.quantity.string();
+			li.querySelector(".name").innerText = item.name;
+			li.querySelector(".delete").addEventListener('click', () -> {
+				new YesNoAlert("Effacer un objet", 'Supprimer l\'objet ${item.name} de l\'inventaire ?', () -> {
+					Api.pushEvent(fiche_id, REMOVE_INVENTORY_ITEM(character.inventory.indexOf(item)));
+				});
+			});
+			li.querySelector(".change").addEventListener('click', () -> {
+				new AmountChoice('Changer la quantité de l\'objet ${item.name}', "Nouvelle quantité ?", {defaultValue: item.quantity}, (newQty, _) -> {
+					if (newQty > 0) {
+						Api.pushEvent(fiche_id, CHANGE_ITEM_QUANTITY(character.inventory.indexOf(item), newQty));
+					}
+				});
+			});
+			inventory.querySelector("ul").appendChild(li);
+		}
+
+		inventory.querySelector("a.add-new").addEventListener("click", () -> {
+			new ItemDialog((quantity, name) -> {
+				Api.pushEvent(fiche_id, ADD_INVENTORY_ITEM({
+					name: name,
+					quantity: quantity
+				}));
+			});
+		});
+	}
+
 	@:jsasync function loadNotes():Promise<Nothing> {
 		var notes:Array<FicheNote> = Api.load('/fiche/$fiche_id/notes').jsawait();
 		mainElem.querySelector(".notes")
 			.innerHTML = "
 	<h2>Notes<a class='refresh'>Recharger</a></h2>
     <ul></ul>
-    <a class='add-note'>Ajouter une note</a>";
+    <a class='add-new'>Ajouter une note</a>";
 		var noteUl = mainElem.querySelector(".notes ul");
 		for (n in notes) {
 			var li = Browser.document.createLIElement();
@@ -612,7 +651,7 @@ class Fiche implements IJSAsync {
 			});
 		}
 
-		mainElem.querySelector(".notes a.add-note").addEventListener("click", () -> {
+		mainElem.querySelector(".notes a.add-new").addEventListener("click", () -> {
 			new NoteDialog(null, JSAsync.jsasync((value) -> {
 				Api.saveNote(fiche_id, null, value).jsawait();
 				loadNotes();
@@ -704,6 +743,12 @@ class Fiche implements IJSAsync {
 				updateCharacts();
 			case CHANGE_MONEY(amount):
 				character.money_po += amount;
+			case ADD_INVENTORY_ITEM(item):
+				character.inventory.push(item);
+			case CHANGE_ITEM_QUANTITY(item, new_quantity):
+				character.inventory[item].quantity = new_quantity;
+			case REMOVE_INVENTORY_ITEM(item):
+				character.inventory.splice(item, 1);
 		}
 	}
 

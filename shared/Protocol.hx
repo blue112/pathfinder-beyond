@@ -17,6 +17,9 @@ enum FicheEventType {
 	ADD_TEMPORARY_MODIFIER(mod:TemporaryModifier);
 	REMOVE_TEMPORARY_MODIFIER(index:Int);
 	CHANGE_MONEY(amount_po:Float);
+	ADD_INVENTORY_ITEM(item:InventoryItem);
+	CHANGE_ITEM_QUANTITY(item:Int, new_quantity:Int);
+	REMOVE_INVENTORY_ITEM(item:Int);
 }
 
 typedef FicheEventTs = {
@@ -24,6 +27,11 @@ typedef FicheEventTs = {
 	var ts:Float;
 	var id:Int;
 };
+
+typedef InventoryItem = {
+	var name:String;
+	var quantity:Int;
+}
 
 enum ProtectionType {
 	ARMOR;
@@ -87,6 +95,7 @@ typedef FullCharacter = {
 	var weapons:Array<Weapon>;
 	var tempMods:Array<TemporaryModifier>;
 	var money_po:Float;
+	var inventory:Array<InventoryItem>;
 }
 
 typedef TemporaryModifier = {
