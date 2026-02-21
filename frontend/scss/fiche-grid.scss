@@ -31,7 +31,7 @@ section.saving {
 }
 section.armor {
     grid-column: 1;
-    grid-row: 12;
+    grid-row: 12/16;
 }
 section.armorlist {
     grid-column: 1;
@@ -39,7 +39,7 @@ section.armorlist {
 }
 section.fight {
     grid-column: 1/3;
-    grid-row: 18/25;
+    grid-row: 19/25;
 }
 section.money {
     grid-column: 1;

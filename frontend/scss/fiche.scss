@@ -134,8 +134,8 @@ h3 {
     }
 
     .field {
-        margin-right: 15px;
-        margin-left: 15px;
+        margin-right: 10px;
+        margin-left: 10px;
         min-width: 0;
         display: flex;
         flex-direction: column-reverse;
@@ -174,6 +174,7 @@ h3 {
             flex: 2;
             .label {
                 text-align: center;
+                font-size: 0.6em;
             }
         }
         &.xxs {
@@ -215,7 +216,7 @@ h3 {
                     font-size: 1em;
 
                     display: grid;
-                    grid-template-columns: 25px 1fr;
+                    grid-template-columns: auto 1fr;
                     gap: 5px;
 
                     .text {
@@ -330,10 +331,10 @@ h3 {
     section.fight {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto auto 1fr;
         gap: 10px;
 
         h2 {
-            margin-top: 20px;
             margin-bottom: 0;
             grid-row: 1;
             grid-column: 1/4;
@@ -351,8 +352,9 @@ h3 {
         section.weapons {
             grid-column: 1/4;
             grid-row: 3;
-            display: grid;
-            grid-template-columns: 1fr;
+
+            display: flex;
+            flex-direction: column;
             h2 {
                 margin-bottom: 10px;
             }
@@ -444,7 +446,7 @@ h3 {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            padding: 5px;
+            padding: 3px;
 
             a {
                 display: block;
@@ -569,7 +571,7 @@ h3 {
             display: grid;
             background: none;
             border: none;
-            grid-template-columns: 50px 1fr 30px;
+            grid-template-columns: 75px 1fr 30px;
             gap: 5px;
             cursor: auto;
             padding: 0;
