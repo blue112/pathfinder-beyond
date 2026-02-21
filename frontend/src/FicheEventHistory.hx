@@ -46,6 +46,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 					case ARMOR: "d'une armure";
 					case SHIELD: "d'un bouclier";
 					case NATURAL_ARMOR: "d'une armure naturelle";
+					case EVADE: "d'un bonus d'esquive";
 				}}: ${armor.name} (+${armor.armor} CA)';
 				case ADD_INVENTORY_ITEM(item):
 					currentItems.push(item);

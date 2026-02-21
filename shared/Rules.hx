@@ -142,10 +142,11 @@ class Rules {
 		total += sizeMod; // Always
 		if (includeDex) {
 			total += char.characteristicsMod.dex;
+			total += char.protections.filter(f -> f.type == EVADE).fold((i, r) -> r + i.armor, 0);
 		}
 
 		if (includeArmor) {
-			total += char.protections.fold((i, r) -> r + i.armor, 0); // For now, just sum it all up
+			total += char.protections.filter(f -> f.type == ARMOR || f.type == SHIELD || f.type == NATURAL_ARMOR).fold((i, r) -> r + i.armor, 0);
 		}
 
 		return total;

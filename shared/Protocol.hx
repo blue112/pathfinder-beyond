@@ -37,6 +37,7 @@ enum ProtectionType {
 	ARMOR;
 	SHIELD;
 	NATURAL_ARMOR;
+	EVADE; // Mod dex
 }
 
 typedef Protection = {
