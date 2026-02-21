@@ -29,6 +29,11 @@ class TemporaryModifiersList extends Popup implements IJSAsync {
 	function refresh() {
 		list.innerHTML = "";
 
+		if (mods.length == 0) {
+			list.innerHTML = "<h2>Aucun modificateur temporaire actif</h2>";
+			list.classList.add("empty");
+		}
+
 		for (n in 0...mods.length) {
 			var mod = mods[n];
 			var elem = Browser.document.createLIElement();

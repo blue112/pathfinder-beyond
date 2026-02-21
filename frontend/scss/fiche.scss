@@ -26,6 +26,10 @@ section > h2 {
     color: #d6c086;
     border: 3px solid #d6c086;
     margin-bottom: 5px;
+
+    small {
+        font-size: 0.6em;
+    }
 }
 
 h3 {
@@ -361,6 +365,23 @@ h3 {
                 h3 {
                     border-color: color.adjust($color: #b8ae98, $lightness: -20%);
                 }
+
+                .field .value.mod.num {
+                    display: grid;
+                    grid-template-columns: 30px 1fr;
+
+                    .roll,
+                    .mod {
+                        display: flex;
+                        justify-content: center;
+                        grid-column: 2;
+                    }
+
+                    .actions-hover {
+                        grid-column: 1;
+                        color: black;
+                    }
+                }
             }
         }
     }
@@ -436,7 +457,8 @@ h3 {
         }
     }
 
-    .field div.value:hover {
+    .field div.value:hover,
+    .field div.value.active {
         overflow: visible;
         grid-template-columns: 1fr auto;
         .actions-hover {
@@ -508,7 +530,7 @@ h3 {
                 font-weight: normal;
                 font-style: italic;
                 right: 5px;
-                bottom: 5px;
+                top: 5px;
             }
         }
     }

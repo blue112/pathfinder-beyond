@@ -1,3 +1,4 @@
+import js.html.AnchorElement;
 import jsasync.JSAsync;
 import jsasync.Nothing;
 import js.lib.Promise;
@@ -81,6 +82,7 @@ class Fiche implements IJSAsync {
 		bindLevelActions();
 		bindACActions();
 		bindSavingThrowActions();
+		bindInitiativeActions();
 
 		load(fiche_id);
 	}
@@ -106,27 +108,22 @@ class Fiche implements IJSAsync {
 		Api.pushEvent(fiche_id, LEVEL_UP(result));
 	}
 
+	function bindInitiativeActions() {
+		var plus = mainElem.querySelector(".initiative .plus");
+		makeTempModMenu(plus, plus.parentElement.parentElement, INITIATIVE);
+	}
+
 	function bindCaracActions() {
-		var menuLabels = ["Ajouter un modificateur temporaire", "Modifier la valeur"];
 		var actions = mainElem.querySelectorAll(".carac .plus");
 		for (p in actions) {
 			var main = p.parentElement.parentElement;
 			var id = main.parentElement.dataset.id;
-			p.addEventListener("click", () -> {
-				new ContextMenu(main, menuLabels, (choice) -> {
-					if (choice == 0) {
-						new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
-							Api.pushEvent(fiche_id, ADD_TEMPORARY_MODIFIER({mod: result, why: reason, on: CHARACTERISTIC(id.parseCarac())}));
-						});
-					} else if (choice == 1) {
-						new AmountChoice(menuLabels[choice], "Quel modification de valeur appliquer ?", {canBeNegative: true}, (result, _) -> {
-							if (result == 0)
-								return;
+			makeTempModMenu(cast p, main, CHARACTERISTIC(id.parseCarac()), ["Modifier la valeur"], (_) -> {
+				new AmountChoice("Modifier la valeur", "Quel modification de valeur appliquer ?", {canBeNegative: true}, (result, _) -> {
+					if (result == 0)
+						return;
 
-							Api.pushEvent(fiche_id, CHANGE_CARAC(id.parseCarac(), result));
-						});
-					}
-					return true;
+					Api.pushEvent(fiche_id, CHANGE_CARAC(id.parseCarac(), result));
 				});
 			});
 		}
@@ -138,48 +135,21 @@ class Fiche implements IJSAsync {
 		for (p in actions) {
 			var main = p.parentElement.parentElement;
 			var id = main.parentElement.dataset.id;
-			p.addEventListener("click", () -> {
-				new ContextMenu(main, menuLabels, (choice) -> {
-					if (choice == 0) {
-						new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
-							Api.pushEvent(fiche_id, ADD_TEMPORARY_MODIFIER({
-								mod: result,
-								why: reason,
-								on: SAVING_THROW(switch (id) {
-									case "saving-will": WILL;
-									case "saving-reflexes": REFLEXES;
-									case "saving-vigor": VIGOR;
-									default: throw "Unknown saving throw " + id;
-								})
-							}));
-						});
-					} else if (choice == 1) {
-						new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée.");
-					}
-					return true;
-				});
-			});
+			makeTempModMenu(cast p, main, SAVING_THROW(switch (id) {
+				case "saving-will": WILL;
+				case "saving-reflexes": REFLEXES;
+				case "saving-vigor": VIGOR;
+				default: throw "Unknown saving throw " + id;
+			}));
 		}
 	}
 
 	function bindACActions() {
 		var menuLabels = ["Ajouter un modificateur temporaire", "Ajouter une protection"];
-		var actions = mainElem.querySelectorAll(".ac .plus");
-		for (p in actions) {
-			var main = p.parentElement.parentElement;
-			p.addEventListener("click", () -> {
-				new ContextMenu(main, menuLabels, (choice) -> {
-					if (choice == 0) {
-						new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
-							Api.pushEvent(fiche_id, ADD_TEMPORARY_MODIFIER({mod: result, why: reason, on: AC}));
-						});
-					} else if (choice == 1) {
-						new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée.");
-					}
-					return true;
-				});
-			});
-		}
+		var action = mainElem.querySelector(".ac .plus");
+		makeTempModMenu(action, action.parentElement.parentElement, AC, ["Ajouter une protection"], (_) -> {
+			new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée.");
+		});
 	}
 
 	function bindHPActions() {
@@ -300,36 +270,7 @@ class Fiche implements IJSAsync {
 	private function addWeapon(weapon:Weapon) {
 		var divWeapon = Browser.document.createDivElement();
 		divWeapon.classList.add("weapon");
-		divWeapon.innerHTML = "
-            <h3></h3>
-            <div class='field-line'>
-                <div class='field s' data-id='attack'>
-                    <div class='label'>Pour toucher</div>
-                    <div class='value mod num'><span class='d20'></span><span class='mod'></span></div>
-                </div>
-                <div class='field s' data-id='critical'>
-                    <div class='label'>Critique</div>
-                    <div class='value num'></div>
-                </div>
-                <div class='field s' data-id='damage'>
-                    <div class='label'>Dégats</div>
-                    <div class='value mod num'></div>
-                </div>
-            </div>
-            <div class='field-line'>
-                <div class='field s' data-id='type'>
-                    <div class='label'>Type</div>
-                    <div class='value'></div>
-                </div>
-                <div class='field xs' data-id='range'>
-                    <div class='label'>Portée</div>
-                    <div class='value num'></div>
-                </div>
-                <div class='field s' data-id='ammo'>
-                    <div class='label'>Munitions</div>
-                    <div class='value'></div>
-                </div>
-            </div>";
+		divWeapon.innerHTML = Resource.getString("weapon.html");
 
 		divWeapon.querySelector("h3").innerText = weapon.name;
 		getField(divWeapon, "ammo").innerText = weapon.munitions;
@@ -349,7 +290,8 @@ class Fiche implements IJSAsync {
 		var attackMod = character.getCaracMod(weapon.weaponAttackCharacteristic) + Rules.getSizeMod(character, false) + Rules.getBBA(character)
 			+ weapon.attack_modifier + character.getTempMods([WEAPON_ATTACK]).sum();
 
-		character.applyTempModsClass(getField(divWeapon, "attack").parentElement, [WEAPON_ATTACK, CHARACTERISTIC(weapon.weaponAttackCharacteristic)]);
+		character.applyTempModsClass(getField(divWeapon, "attack").parentElement.parentElement,
+			[WEAPON_ATTACK, CHARACTERISTIC(weapon.weaponAttackCharacteristic)]);
 		getField(divWeapon, "attack").innerText = attackMod.asMod();
 
 		getField(divWeapon,
@@ -358,8 +300,14 @@ class Fiche implements IJSAsync {
 				+ (weapon.damage_modifier + character.getCaracMod(weapon.weaponDamageCharacteristic) + character.getTempMods([WEAPON_DAMAGE])
 					.sum()).asMod(true);
 
-		character.applyTempModsClass(getField(divWeapon, "damage"), [WEAPON_DAMAGE, CHARACTERISTIC(weapon.weaponDamageCharacteristic)]);
+		character.applyTempModsClass(getField(divWeapon, "damage").parentElement, [WEAPON_DAMAGE, CHARACTERISTIC(weapon.weaponDamageCharacteristic)]);
 		getField(divWeapon, "critical").innerHTML = "Si " + weapon.critical_text.nums.join(",") + ": x" + weapon.critical_text.damageMultiplier;
+
+		var plusAttack = divWeapon.querySelector("[data-id='attack'] a.plus");
+		makeTempModMenu(plusAttack, plusAttack.parentElement.parentElement, WEAPON_ATTACK);
+		var plusDamage = divWeapon.querySelector("[data-id='damage'] a.plus");
+		makeTempModMenu(plusDamage, plusDamage.parentElement.parentElement, WEAPON_DAMAGE);
+
 		mainElem.querySelector(".weapons").appendChild(divWeapon);
 
 		fieldsNames.set("damage", "Dégats d'arme");
@@ -381,6 +329,28 @@ class Fiche implements IJSAsync {
 			Reflect.setProperty(character.characteristicsMod, i, mod);
 			modField.innerText = mod.asMod(false);
 		}
+	}
+
+	function makeTempModMenu(plusElem:Element, attachMenuOn:Element, on:Field, ?otherLabels:Array<String>, ?onOtherChoices:Int->Void) {
+		plusElem.addEventListener("click", () -> {
+			var menuLabels = ['Ajouter un modificateur temporaire'];
+			if (otherLabels != null)
+				menuLabels = menuLabels.concat(otherLabels);
+			new ContextMenu(attachMenuOn, menuLabels, (choice) -> {
+				if (choice == 0) {
+					new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
+						Api.pushEvent(fiche_id, ADD_TEMPORARY_MODIFIER({
+							mod: result,
+							why: reason,
+							on: on
+						}));
+					});
+				} else if (onOtherChoices != null) {
+					onOtherChoices(choice);
+				}
+				return true;
+			});
+		});
 	}
 
 	private function updateHP() {
@@ -439,7 +409,10 @@ class Fiche implements IJSAsync {
 		var vd = Rules.getVD(character);
 		availableFields.get("speed").innerText = '${vd}c par tour';
 		var dexMod = character.characteristicsMod.dex;
-		availableFields.get("initiative").innerText = dexMod.asMod(true);
+
+		var initField = availableFields.get("initiative");
+		character.applyTempModsClass(initField.parentElement, [CHARACTERISTIC(DEXTERITY), INITIATIVE]);
+		initField.innerText = (dexMod + character.getTempMods([INITIATIVE]).sum()).asMod(true);
 
 		var maxHP = Rules.getMaxHitPoints(character).string();
 		availableFields.get("hp-max").innerText = maxHP;
@@ -472,7 +445,7 @@ class Fiche implements IJSAsync {
 
 	function addArmor() {
 		var armorsDiv = mainElem.querySelector(".armorlist");
-		armorsDiv.innerHTML = "<h2>Protections</h2>";
+		armorsDiv.innerHTML = "<h2>Protections <small>(déjà appliquées à la CA)</small></h2>";
 		for (p in character.protections) {
 			var armorDiv = Browser.document.createDivElement();
 			armorDiv.classList.add("armor");
@@ -533,36 +506,25 @@ class Fiche implements IJSAsync {
 				rollDice(skillDiv.querySelector(".mod"));
 			});
 
-			skillDiv.querySelector(".actions-hover .plus").addEventListener("click", () -> {
-				var choicesText = [
-					"Ajouter un rang",
-					"Retirer un rang",
-					"(Ajouter un modificateur permanent)",
-					"Ajouter un modificateur temporaire",
-				];
-				new ContextMenu(skillDiv, choicesText, (choice:Int) -> {
-					if (choice == 0 || choice == 1) {
-						if (choice == 1 && skill.ranks == 0) {
-							new Alert("Action impossible", "Aucun rang à retirer sur " + skill.label);
-							return true;
-						}
-
-						var text = choicesText[choice];
-						new YesNoAlert("Confirmer ?", text + " à la compétence " + skill.label + " ?", () -> {
-							if (choice == 0)
-								Api.pushEvent(fiche_id, TRAIN_SKILL(skill.name));
-							else
-								Api.pushEvent(fiche_id, DECREASE_SKILL(skill.name));
-						});
-					} else if (choice == 3) {
-						new AmountChoice(choicesText[choice], "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
-							Api.pushEvent(fiche_id, ADD_TEMPORARY_MODIFIER({mod: result, why: reason, on: SKILL(skill.name)}));
-						});
-					} else {
-						new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée");
+			var plus = skillDiv.querySelector(".actions-hover .plus");
+			var choicesText = ["Ajouter un rang", "Retirer un rang", "Ajouter un modificateur permanent"];
+			makeTempModMenu(plus, skillDiv, SKILL(skill.name), choicesText, (choice) -> {
+				if (choice == 1 || choice == 2) {
+					if (choice == 2 && skill.ranks == 0) {
+						new Alert("Action impossible", "Aucun rang à retirer sur " + skill.label);
+						return;
 					}
-					return true;
-				});
+
+					var text = choicesText[choice - 1];
+					new YesNoAlert("Confirmer ?", text + " à la compétence " + skill.label + " ?", () -> {
+						if (choice == 1)
+							Api.pushEvent(fiche_id, TRAIN_SKILL(skill.name));
+						else
+							Api.pushEvent(fiche_id, DECREASE_SKILL(skill.name));
+					});
+				} else {
+					new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée");
+				}
 			});
 
 			skillsDiv.appendChild(skillDiv);

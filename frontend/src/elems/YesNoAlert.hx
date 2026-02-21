@@ -1,15 +1,20 @@
 package elems;
 
-import js.html.DivElement;
 import js.Browser;
 
 class YesNoAlert extends Popup {
 	var onNo:Void->Void;
 
+	static var currentlyOpen:YesNoAlert;
+
 	public function new(title:String, message:String, onYes:Void->Void, ?onNo:Void->Void) {
+		if (currentlyOpen != null)
+			return;
+
 		super(title);
 
 		this.onNo = onNo;
+		currentlyOpen = this;
 
 		mainElem.classList.add("yesno");
 		mainElem.classList.add("alert");
@@ -24,19 +29,20 @@ class YesNoAlert extends Popup {
 		mainElem.querySelector("p").innerText = message;
 		mainElem.querySelector(".actions a.yes").addEventListener("click", closeAnswer.bind(onYes));
 		mainElem.querySelector(".actions a.no").addEventListener("click", closeAnswer.bind(onNo));
-
-		Browser.document.body.appendChild(mainElem);
 	}
 
 	override public function close() {
 		if (onNo != null)
 			onNo();
 
+		currentlyOpen = null;
+
 		super.close();
 	}
 
 	function closeAnswer(thenCall:Null<Void->Void>) {
 		super.close();
+		currentlyOpen = null;
 
 		if (thenCall != null)
 			thenCall();
