@@ -532,13 +532,13 @@ h3 {
             border: 3px solid variables.$redColor;
             background: color.adjust($color: variables.$backgroundColor, $lightness: -10%);
             padding: 10px;
-            font-weight: bold;
             cursor: pointer;
         }
 
         .add-new {
             margin-top: 15px;
             text-align: center;
+            font-weight: bold;
 
             &:hover {
                 background: color.adjust($color: variables.$backgroundColor, $lightness: -5%);
@@ -549,6 +549,7 @@ h3 {
             background: color.adjust($color: variables.$backgroundColor, $lightness: 5%);
             margin-bottom: 5px;
             position: relative;
+            font-family: serif;
 
             .date {
                 font-family: sans-serif;
