@@ -1,4 +1,3 @@
-import js.html.AnchorElement;
 import jsasync.JSAsync;
 import jsasync.Nothing;
 import js.lib.Promise;
@@ -95,7 +94,7 @@ class Fiche implements IJSAsync {
 		var action = mainElem.querySelector("[data-id=po] .plus");
 		action.addEventListener("click", () -> {
 			new ContextMenu(cast action, menuLabels, (choice) -> {
-				new AmountChoice('Ajouter/retirer des PO', "Combien de PO ajouter ou retirer ?", (value, _) -> {
+				new AmountChoice('Ajouter/retirer des PO', "Combien de PO ajouter ou retirer ?", {canBeNegative: true}, (value, _) -> {
 					if (value != 0)
 						Api.pushEvent(fiche_id, CHANGE_MONEY(value));
 				});
