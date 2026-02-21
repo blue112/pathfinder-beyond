@@ -40,7 +40,7 @@ h3 {
 }
 
 .num {
-    font-family: sans;
+    font-family: "Roboto";
 }
 
 .fiche {
@@ -269,7 +269,7 @@ h3 {
 
             div.max {
                 margin-left: 5px;
-                font-family: sans;
+                font-family: "Roboto";
                 flex: 1;
                 @include mixins.box(25px);
             }
@@ -479,7 +479,7 @@ h3 {
         }
         .value {
             margin-right: 5px;
-            font-family: sans-serif;
+            font-family: "Roboto";
             font-size: 1.1em;
         }
     }
@@ -552,7 +552,7 @@ h3 {
             font-family: serif;
 
             .date {
-                font-family: sans-serif;
+                font-family: "Roboto";
                 position: absolute;
                 font-size: 0.8em;
                 color: #555555;
