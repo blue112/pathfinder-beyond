@@ -18,6 +18,7 @@ class Api implements IJSAsync {
 		result:Int,
 		ts:Int,
 		field_name:String,
+		mod:Int,
 		faces:Int
 	}>> {
 		var r = Browser.window.fetch('/api/fiche/$ficheId/rolls').jsawait();
@@ -25,13 +26,13 @@ class Api implements IJSAsync {
 		return j;
 	}
 
-	@:jsasync static public function rollDice(ficheId:String, faces:Int, field:String):Promise<{result:Int, roll_id:Int}> {
+	@:jsasync static public function rollDice(ficheId:String, faces:Int, mod:Int, field:String):Promise<{result:Int, roll_id:Int}> {
 		var r = Browser.window.fetch('/api/fiche/$ficheId/roll', {
 			method: "post",
 			headers: {
 				"Content-type": "application/json",
 			},
-			body: Json.stringify({faceCount: faces, fieldName: field})
+			body: Json.stringify({faceCount: faces, fieldName: field, mod: mod})
 		}).jsawait();
 		var j = r.json().jsawait();
 		return j;

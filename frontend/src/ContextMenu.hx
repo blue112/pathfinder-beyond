@@ -1,5 +1,4 @@
 import js.html.MenuElement;
-import js.html.DivElement;
 import js.html.MouseEvent;
 import js.Browser;
 import js.html.Element;

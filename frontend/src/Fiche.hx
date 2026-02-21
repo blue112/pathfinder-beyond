@@ -102,7 +102,7 @@ class Fiche implements IJSAsync {
 
 	@:jsasync function onActionLevelUp() {
 		var hd = Rules.getHitDice(character.basics.characterClass);
-		var diceRoll = Api.rollDice(fiche_id, hd, "level").jsawait();
+		var diceRoll = Api.rollDice(fiche_id, hd, 0, "level").jsawait();
 		var result = diceRoll.result;
 		new Alert("Montée de niveau", 'Résultat du lancer de dé de point de vie (d${hd}): $result');
 		Api.pushEvent(fiche_id, LEVEL_UP(result));
@@ -213,7 +213,7 @@ class Fiche implements IJSAsync {
 		var modInt = null;
 		if (parent.querySelector(".mod") != null) {
 			var mod = parent.querySelector(".mod").innerText.replace(" ", "");
-			if (mod.contains("d")) // It's not a d20?
+			if (mod.contains("d")) // It's not a d20
 			{
 				var diceRegex = ~/([1-9])d([1-9][0-9]*)((\+|-)[0-9]+)/;
 				diceRegex.match(mod);
@@ -225,7 +225,7 @@ class Fiche implements IJSAsync {
 					return 0;
 				}
 
-				var apiResult = Api.rollDice(fiche_id, diceType, parent.dataset.id).jsawait();
+				var apiResult = Api.rollDice(fiche_id, diceType, mod, parent.dataset.id).jsawait();
 				Dice.roll([mod], apiResult.result, diceType);
 				return apiResult.result + mod;
 			}
@@ -238,10 +238,10 @@ class Fiche implements IJSAsync {
 			throw "Cannot find parent id for this dice roll";
 		}
 
-		var apiResult = Api.rollDice(fiche_id, 20, parent.dataset.id).jsawait();
 		var mods = [modInt];
 		if (additionalMod != null && additionalMod != 0)
 			mods.push(additionalMod);
+		var apiResult = Api.rollDice(fiche_id, 20, mods.fold((m, r) -> m + r, 0), parent.dataset.id).jsawait();
 		Dice.roll(mods, apiResult.result);
 		return apiResult.result;
 	}

@@ -8,15 +8,17 @@ class DiceRoll implements IJSAsync {
 	var faces:Int;
 
 	public var result:Int;
+	public var mod:Int;
 
 	var field_name:String;
 
 	public var ts:Float;
 
-	public function new(fiche_id:String, field_name:String, faces:Int) {
+	public function new(fiche_id:String, field_name:String, faces:Int, mod:Int) {
 		this.fiche_id = fiche_id;
 		this.faces = faces;
 		this.field_name = field_name;
+		this.mod = mod;
 	}
 
 	public function roll() {
@@ -30,6 +32,7 @@ class DiceRoll implements IJSAsync {
 			faces: faces,
 			result: result,
 			ts: ts,
+			mod: mod,
 		};
 	}
 
@@ -38,7 +41,7 @@ class DiceRoll implements IJSAsync {
 
 		var out = [];
 		for (i in results) {
-			var r = new DiceRoll(i.fiche, i.field_name, i.faces_count);
+			var r = new DiceRoll(i.fiche, i.field_name, i.faces_count, i.modifier);
 			r.result = i.result;
 			r.ts = i.ts_ms;
 			out.push(r);
@@ -48,7 +51,7 @@ class DiceRoll implements IJSAsync {
 	}
 
 	public function insert() {
-		return DatabaseHandler.execInsert("INSERT INTO dice_rolls(fiche_id, field_name, ts_ms, faces_count, result) VALUES(?, ?, ?, ?, ?)",
-			[fiche_id, field_name, ts, faces, result]);
+		return DatabaseHandler.execInsert("INSERT INTO dice_rolls(fiche_id, field_name, ts_ms, faces_count, result, modifier) VALUES(?, ?, ?, ?, ?, ?)",
+			[fiche_id, field_name, ts, faces, result, mod]);
 	}
 }
