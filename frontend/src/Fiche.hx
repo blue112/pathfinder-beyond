@@ -241,7 +241,7 @@ class Fiche implements IJSAsync {
 					return 0;
 				}
 
-				var apiResult = Api.rollDice(fiche_id, diceType, mod, parent.dataset.id).jsawait();
+				var apiResult = Api.rollDice(fiche_id, diceType, mod, parent.parentElement.dataset.id).jsawait();
 				Dice.roll([mod], apiResult.result, diceType);
 				return apiResult.result + mod;
 			}
@@ -289,8 +289,12 @@ class Fiche implements IJSAsync {
 		divWeapon.innerHTML = Resource.getString("weapon.html");
 
 		divWeapon.querySelector("h3").innerText = weapon.name;
-		getField(divWeapon, "ammo").innerText = weapon.munitions;
-		getField(divWeapon, "range").innerText = if (weapon.range != null) '${weapon.range}c' else 'Contact';
+		if (weapon.munitions != null)
+			getField(divWeapon, "ammo").innerText = weapon.munitions;
+		else
+			getField(divWeapon, "ammo").innerText = "N/A";
+
+		getField(divWeapon, "range").innerText = if (weapon.range != 0) '${weapon.range}c' else 'Contact';
 		getField(divWeapon, "type").innerText = [
 			for (dt in weapon.damage_types)
 				switch (dt) {
@@ -310,11 +314,12 @@ class Fiche implements IJSAsync {
 			[WEAPON_ATTACK, CHARACTERISTIC(weapon.weaponAttackCharacteristic)]);
 		getField(divWeapon, "attack").innerText = attackMod.asMod();
 
-		getField(divWeapon,
-			"damage").innerText = [for (d in weapon.damage_dices) '1d' + d].join(" + ")
-				+ " "
-				+ (weapon.damage_modifier + character.getCaracMod(weapon.weaponDamageCharacteristic) + character.getTempMods([WEAPON_DAMAGE])
-					.sum()).asMod(true);
+		var damage = weapon.damage_modifier + character.getCaracMod(weapon.weaponDamageCharacteristic) + character.getTempMods([WEAPON_DAMAGE]).sum();
+		if (weapon.weaponHasPlus50PercentDamage) {
+			damage += Math.floor(character.getCaracMod(weapon.weaponDamageCharacteristic) / 2);
+		}
+
+		getField(divWeapon, "damage").innerText = [for (d in weapon.damage_dices) '1d' + d].join(" + ") + " " + damage.asMod(true);
 
 		character.applyTempModsClass(getField(divWeapon, "damage").parentElement, [WEAPON_DAMAGE, CHARACTERISTIC(weapon.weaponDamageCharacteristic)]);
 		getField(divWeapon, "critical").innerHTML = "Si " + weapon.critical_text.nums.join(",") + ": x" + weapon.critical_text.damageMultiplier;
