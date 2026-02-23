@@ -14,6 +14,7 @@ class Server implements IJSAsync {
 		app.use(Express.json({inflate: false}));
 		app.use(Express.serveStatic("static"));
 		app.use("/api/fiche", FicheRouter.getRouter());
+		app.use("/api/campaign", CampaignRouter.getRouter());
 		app.ws("/api/ws", (ws, req) -> {
 			new WebsocketClient(ws, req.ip);
 		});

@@ -1,3 +1,4 @@
+import js.html.WebSocket;
 import model.DiceRoll;
 import express.Express;
 import haxe.Unserializer;
@@ -24,6 +25,19 @@ class FicheRouter implements IJSAsync {
 		router.put("/:ficheId/notes/:noteId", checkFicheExists, onUpdateNote);
 		router.put("/debug/:ficheId/push", checkFicheExists, Express.raw({type: "*/*"}), onPushEvent);
 		return router;
+	}
+
+	@:jsasync static public function checkFicheExists(req:Request, res:Response, next:Next) {
+		var fiche_id = (req.params : Dynamic).ficheId;
+		var fiche = DatabaseHandler.exec("SELECT * FROM fiche WHERE fiche_id = ?", [fiche_id]).jsawait();
+		if (fiche.length == 0) {
+			res.status(404).end("Not found");
+			return;
+		}
+
+		req.fiche = fiche[0];
+
+		next.call();
 	}
 
 	@:jsasync static public function fetchDiceRolls(req:Request, res:Response, next:Next) {
@@ -100,19 +114,8 @@ class FicheRouter implements IJSAsync {
 		roll.roll();
 		var inserted = roll.insert().jsawait();
 		res.json({result: roll.result, roll_id: inserted});
-	}
 
-	@:jsasync static public function checkFicheExists(req:Request, res:Response, next:Next) {
-		var fiche_id = (req.params : Dynamic).ficheId;
-		var fiche = DatabaseHandler.exec("SELECT * FROM fiche WHERE fiche_id = ?", [fiche_id]).jsawait();
-		if (fiche.length == 0) {
-			res.status(404).end("Not found");
-			return;
-		}
-
-		req.fiche = fiche[0];
-
-		next.call();
+		WebsocketClient.notifyRoll(fiche_id, roll.toPublic());
 	}
 
 	@:jsasync static public function getFiche(req:Request, res:Response, next:Next) {

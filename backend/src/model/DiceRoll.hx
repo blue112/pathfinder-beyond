@@ -36,12 +36,23 @@ class DiceRoll implements IJSAsync {
 		};
 	}
 
+	@:jsasync static public function fetchLatest(fiche_id:String):Promise<DiceRoll> {
+		var results = DatabaseHandler.exec("SELECT * FROM dice_rolls WHERE fiche_id = ? ORDER BY roll_id DESC LIMIT 1", [fiche_id]).jsawait();
+		if (results.length == 0)
+			return null;
+
+		var r = new DiceRoll(results[0].fiche_id, results[0].field_name, results[0].faces_count, results[0].modifier);
+		r.result = results[0].result;
+		r.ts = results[0].ts_ms;
+		return r;
+	}
+
 	@:jsasync static public function fetch(fiche_id:String):Promise<Array<DiceRoll>> {
 		var results = DatabaseHandler.exec("SELECT * FROM dice_rolls WHERE fiche_id = ?", [fiche_id]).jsawait();
 
 		var out = [];
 		for (i in results) {
-			var r = new DiceRoll(i.fiche, i.field_name, i.faces_count, i.modifier);
+			var r = new DiceRoll(i.fiche_id, i.field_name, i.faces_count, i.modifier);
 			r.result = i.result;
 			r.ts = i.ts_ms;
 			out.push(r);

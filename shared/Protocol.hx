@@ -81,25 +81,6 @@ typedef WeaponCriticalStat = {
 	var damageMultiplier:Int;
 };
 
-typedef FullCharacter = {
-	@:optional var basics:BasicFicheData;
-	@:optional var characteristics:Characteristics;
-	@:optional var characteristicsMod:Characteristics;
-	var skillRanks:Array<SkillType>;
-	var current_hp:Int;
-	var max_hp_modifier:Int;
-	var levelUpDices:Array<Int>;
-	var level:Int;
-	var additionalClassSkills:Array<SkillType>;
-	var skillModifiers:Map<SkillType, Int>;
-	var exceptionalSkillModifiers:Array<ExceptionalSkillModifier>;
-	var protections:Array<Protection>;
-	var weapons:Array<Weapon>;
-	var tempMods:Array<TemporaryModifier>;
-	var money_po:Float;
-	var inventory:Array<InventoryItem>;
-}
-
 typedef TemporaryModifier = {
 	var on:Field;
 	var mod:Int;
@@ -195,13 +176,14 @@ enum SizeCategory {
 }
 
 enum WSClientMessage {
-	SUB_EVENTS(fiche_id:String, latest_event:Int);
+	SUB_EVENTS(fiche_id:String, latest_event:Int, withDiceRolls:Bool);
 	PING;
 }
 
 enum WSServerMessage {
 	SUB_OK;
 	NEW_EVENTS(fiche_id:String, events:Array<FicheEventTs>);
+	NEW_DICE_ROLL(fiche_id:String, dr:PublicDiceRoll);
 	PONG;
 }
 
@@ -210,4 +192,12 @@ typedef FicheNote = {
 	order:Null<Int>,
 	id:Int,
 	content:String,
+};
+
+typedef PublicDiceRoll = {
+	var field_name:String;
+	var faces:Int;
+	var result:Int;
+	var ts:Float;
+	var mod:Int;
 };

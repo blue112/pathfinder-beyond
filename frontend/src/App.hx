@@ -9,6 +9,8 @@ class App {
 			switch (paths[1]) {
 				case "fiche":
 					new Fiche(paths[2]);
+				case "campaign":
+					new Campaign(paths[2]);
 			}
 		}
 	}

@@ -9,6 +9,7 @@ class WsTalker {
 	var onDisconnect:Void->Void;
 
 	public var onNewEvent:String->FicheEventTs->Void;
+	public var onNewDiceRoll:String->PublicDiceRoll->Void;
 
 	var backoff:Int;
 	var isConnected:Bool = false;
@@ -48,6 +49,11 @@ class WsTalker {
 					for (ev in events) {
 						onNewEvent(fiche_id, ev);
 					}
+				case NEW_DICE_ROLL(fiche_id, dr):
+					if (onNewDiceRoll == null)
+						return;
+
+					onNewDiceRoll(fiche_id, dr);
 			}
 		}
 	}
@@ -57,7 +63,7 @@ class WsTalker {
 			ws.send(Serializer.run(msg));
 	}
 
-	public function subscribe(fiche_id:String, latest_event:Int) {
-		send(SUB_EVENTS(fiche_id, latest_event));
+	public function subscribe(fiche_id:String, latest_event:Int, withDiceRolls:Bool) {
+		send(SUB_EVENTS(fiche_id, latest_event, withDiceRolls));
 	}
 }

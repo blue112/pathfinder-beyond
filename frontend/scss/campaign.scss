@@ -1,0 +1,74 @@
+@use "variables";
+@use "sass:color";
+
+.campaign {
+    h1 {
+        text-align: center;
+    }
+
+    section.characters table {
+        border-collapse: collapse;
+        width: 100%;
+
+        thead th {
+            text-align: left;
+            padding: 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid black;
+
+            &.tmpmod {
+                text-align: center;
+            }
+        }
+        tbody tr {
+            background-color: color.adjust(variables.$backgroundColor, $lightness: -30%);
+            &:nth-of-type(2n + 1) {
+                background-color: color.adjust(variables.$backgroundColor, $lightness: -15%);
+            }
+
+            td {
+                padding: 10px;
+
+                &.roll {
+                    position: relative;
+
+                    .fieldname {
+                        text-transform: capitalize;
+                        font-weight: bold;
+                    }
+                    .roll {
+                        margin-left: 10px;
+                    }
+                    .ts {
+                        position: absolute;
+                        right: 10px;
+                        top: 10px;
+                        font-size: 0.7em;
+                        color: #555555;
+                    }
+                }
+                &.tempmod {
+                    text-align: center;
+                    padding: 0;
+
+                    .count {
+                        background: #868686;
+                        padding: 5px 7px;
+                        border-radius: 50%;
+                    }
+                }
+            }
+
+            a {
+                margin-right: 15px;
+                text-decoration: none;
+                color: black;
+                font-size: 0.8em;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}

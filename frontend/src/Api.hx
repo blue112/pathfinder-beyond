@@ -14,13 +14,14 @@ class Api implements IJSAsync {
 		return Unserializer.run(h);
 	}
 
-	@:jsasync static public function getRolls(ficheId:String):Promise<Array<{
-		result:Int,
-		ts:Int,
-		field_name:String,
-		mod:Int,
-		faces:Int
-	}>> {
+	@:jsasync static public function loadJson(route:String):Promise<Dynamic> {
+		if (route.charAt(0) != '/')
+			route = '/$route';
+		var r = Browser.window.fetch('/api$route').jsawait();
+		return r.json().jsawait();
+	}
+
+	@:jsasync static public function getRolls(ficheId:String):Promise<Array<PublicDiceRoll>> {
 		var r = Browser.window.fetch('/api/fiche/$ficheId/rolls').jsawait();
 		var j = r.json().jsawait();
 		return j;

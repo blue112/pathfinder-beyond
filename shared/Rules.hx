@@ -110,15 +110,6 @@ class Rules {
 			div.classList.remove("negative");
 	}
 
-	static public function getTempMods(character:FullCharacter, matching:Array<Field>) {
-		return character.tempMods.filter(t -> {
-			for (i in matching)
-				if (Type.enumEq(t.on, i))
-					return true;
-			return false;
-		});
-	}
-
 	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
 		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
 		return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus;
@@ -176,41 +167,6 @@ class Rules {
 			case SIZE_P: 4;
 			default: 6;
 		}
-	}
-
-	static public function getNumberHitDice(char:FullCharacter) {
-		if (char.basics.characterClass.match(CONJURATEUR_EIDOLON_BIPED)) {
-			return [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15, 15][char.level];
-		}
-
-		return char.level;
-	}
-
-	static public function getHitDice(cls:CharacterClass) {
-		return switch (cls) {
-			case CONJURATEUR, ROUBLARD:
-				8;
-			case CONJURATEUR_EIDOLON_BIPED:
-				10;
-		}
-	}
-
-	static public function getMaxHitPoints(char:FullCharacter) {
-		var predilectionClassBonus = if (char.basics.usePredilectionHP) 1 else 0;
-		var hd = getHitDice(char.basics.characterClass);
-		var total = hd + predilectionClassBonus + char.characteristicsMod.con;
-
-		// Add predilection bonus and cons
-		for (i in 1...getNumberHitDice(char)) {
-			total += predilectionClassBonus + char.characteristicsMod.con;
-		}
-		for (dice in char.levelUpDices) {
-			total += dice;
-		}
-
-		total += char.max_hp_modifier;
-
-		return total;
 	}
 
 	static public function dice(faces:Int) {

@@ -32,21 +32,7 @@ class Fiche implements IJSAsync {
 
 		this.fiche_id = fiche_id;
 
-		character = {
-			skillRanks: [],
-			current_hp: 0,
-			levelUpDices: [],
-			level: 1,
-			max_hp_modifier: 0,
-			additionalClassSkills: [],
-			skillModifiers: new Map(),
-			exceptionalSkillModifiers: [],
-			protections: [],
-			tempMods: [],
-			weapons: [],
-			inventory: [],
-			money_po: 0,
-		};
+		character = new FullCharacter();
 
 		mainElem.innerHTML = Resource.getString("fiche.html");
 
@@ -117,7 +103,7 @@ class Fiche implements IJSAsync {
 	}
 
 	@:jsasync function onActionLevelUp() {
-		var hd = Rules.getHitDice(character.basics.characterClass);
+		var hd = character.getHitDice();
 		var diceRoll = Api.rollDice(fiche_id, hd, 0, "level").jsawait();
 		var result = diceRoll.result;
 		new Alert("Montée de niveau", 'Résultat du lancer de dé de point de vie (d${hd}): $result');
@@ -336,18 +322,14 @@ class Fiche implements IJSAsync {
 	}
 
 	private function updateCharacts() {
-		character.characteristicsMod = cast {};
 		for (i in Reflect.fields(character.characteristics)) {
 			var value:Int = Reflect.getProperty(character.characteristics, i);
-			var mod:Int = Std.int(value / 2) - 5;
+			var mod:Int = Reflect.getProperty(character.characteristicsMod, i);
 			availableFields.get(i).innerText = Std.string(value);
 			var modField = availableFields.get(i).parentElement.querySelector(".mod");
 
-			var totalTempMod = character.getTempMods([CHARACTERISTIC(i.parseCarac())]).sum();
 			character.applyTempModsClass(modField, [CHARACTERISTIC(i.parseCarac())]);
-			mod += totalTempMod;
 
-			Reflect.setProperty(character.characteristicsMod, i, mod);
 			modField.innerText = mod.asMod(false);
 		}
 	}
@@ -372,10 +354,6 @@ class Fiche implements IJSAsync {
 				return true;
 			});
 		});
-	}
-
-	private function updateHP() {
-		character.current_hp = Rules.getMaxHitPoints(character);
 	}
 
 	private function updateAC(field:String, includeArmor:Bool, includeDex:Bool) {
@@ -423,9 +401,35 @@ class Fiche implements IJSAsync {
 		stDiv.innerText = mod.asMod(true);
 	}
 
+	private function updateBasics() {
+		var outBasics:Dynamic = Reflect.copy(character.basics);
+		outBasics.alignement = character.basics.alignement.alignementToString();
+		outBasics.characterClass = character.basics.characterClass.classToString();
+		outBasics.sizeCategory = character.basics.sizeCategory.sizeCategoryToString();
+		for (f in Reflect.fields(character.basics)) {
+			var fieldName = convertFieldName(f);
+			if (availableFields.exists(fieldName)) {
+				var value = Reflect.getProperty(outBasics, f);
+				if (Std.is(value, Int)) {
+					value = Std.string(value);
+				}
+				if (Std.is(value, String)) {
+					availableFields.get(fieldName).innerHTML = value;
+				} else {
+					trace('Invalid value for $fieldName: $value');
+				}
+			} else if (fieldName != "use-predilection-h-p") {
+				Browser.console.warn('[PFB] Field does not exist: $fieldName');
+			}
+		}
+	}
+
 	private function updateFiche() {
+		updateBasics();
 		if (character.characteristics == null)
 			return;
+
+		updateCharacts();
 
 		Browser.document.title = character.basics.characterName + " - Pathfinder Beyond 1e";
 
@@ -437,7 +441,7 @@ class Fiche implements IJSAsync {
 		character.applyTempModsClass(initField.parentElement, [CHARACTERISTIC(DEXTERITY), INITIATIVE]);
 		initField.innerText = (dexMod + character.getTempMods([INITIATIVE]).sum()).asMod(true);
 
-		var maxHP = Rules.getMaxHitPoints(character).string();
+		var maxHP = character.getMaxHitPoints().string();
 		availableFields.get("hp-max").innerText = maxHP;
 		availableFields.get("hp").innerText = character.current_hp.string();
 		availableFields.get("non-lethal-max").innerText = maxHP;
@@ -569,7 +573,7 @@ class Fiche implements IJSAsync {
 		var startTime = Date.now().getTime();
 		trace('Fetched ${result.length} events for this fiche');
 		for (i in result) {
-			processEvent(i.type);
+			character.processEvent(i.type);
 		}
 
 		updateFiche();
@@ -577,12 +581,12 @@ class Fiche implements IJSAsync {
 		trace('Fiche processed in ${elapsed}ms');
 
 		ws = new WsTalker(() -> {
-			ws.subscribe(fiche_id, ficheEvents[ficheEvents.length - 1].id);
+			ws.subscribe(fiche_id, ficheEvents[ficheEvents.length - 1].id, false);
 		}, () -> {});
 		ws.onNewEvent = (fiche_id:String, event:FicheEventTs) -> {
 			if (fiche_id == this.fiche_id) {
 				ficheEvents.push(event);
-				processEvent(event.type);
+				character.processEvent(event.type);
 				updateFiche();
 			}
 		};
@@ -669,95 +673,6 @@ class Fiche implements IJSAsync {
 		});
 	}
 
-	function processEvent(type:FicheEventType) {
-		switch (type) {
-			case CREATE(data):
-				this.character.basics = data;
-				var outData:Dynamic = Reflect.copy(data);
-				outData.alignement = data.alignement.alignementToString();
-				outData.characterClass = data.characterClass.classToString();
-				outData.sizeCategory = data.sizeCategory.sizeCategoryToString();
-				for (f in Reflect.fields(data)) {
-					var fieldName = convertFieldName(f);
-					if (availableFields.exists(fieldName)) {
-						var value = Reflect.getProperty(outData, f);
-						if (Std.is(value, Int)) {
-							value = Std.string(value);
-						}
-						if (Std.is(value, String)) {
-							availableFields.get(fieldName).innerHTML = value;
-						} else {
-							trace('Invalid value for $fieldName: $value');
-						}
-					} else if (fieldName != "use-predilection-h-p") {
-						Browser.console.warn('[PFB] Field does not exist: $fieldName');
-					}
-				}
-			case SET_CHARACTERISTICS(data):
-				this.character.characteristics = data;
-				updateCharacts();
-				updateHP();
-			case ADD_CLASS_SKILL(skill):
-				if (!Rules.isClassSkill(character, skill))
-					this.character.additionalClassSkills.push(skill);
-
-			case CHANGE_CARAC(c, amount):
-				switch (c) {
-					case STRENGTH: this.character.characteristics.str += amount;
-					case DEXTERITY: this.character.characteristics.dex += amount;
-					case CONSTITUTION:
-						var oldMod = Math.floor(this.character.characteristics.con / 2);
-						this.character.characteristics.con += amount;
-						var newMod = Math.floor(this.character.characteristics.con / 2);
-						// We need to update current HP depending on mod
-						var diffHP = (newMod - oldMod) * character.level;
-						if (diffHP > 0) character.current_hp = Math.min(character.current_hp + diffHP, character.getMaxHitPoints()).int();
-					case INTELLIGENCE: this.character.characteristics.int += amount;
-					case WISDOM: this.character.characteristics.wis += amount;
-					case CHARISMA: this.character.characteristics.cha += amount;
-				}
-				updateCharacts();
-			case ADD_WEAPON(weapon):
-				character.weapons.push(weapon);
-			case LEVEL_UP(hp_dice):
-				character.level += 1;
-				hp_dice = Math.min(hp_dice, Rules.getHitDice(character.basics.characterClass)).int(); // ?
-				character.levelUpDices.push(hp_dice);
-			case TRAIN_SKILL(skill):
-				character.skillRanks.push(skill);
-			case DECREASE_SKILL(skill):
-				character.skillRanks.remove(skill);
-			case CHANGE_HP(amount):
-				character.current_hp = Math.min(character.current_hp + amount, character.getMaxHitPoints()).int();
-			case CHANGE_MAX_HP(amount):
-				character.max_hp_modifier += amount;
-			case SET_SKILL_MODIFIER(skill, mod):
-				character.skillModifiers.set(skill, mod);
-			case ADD_EXCEPTIONAL_SKILL_MODIFIER(skill, mod, why):
-				character.exceptionalSkillModifiers.push({
-					skill: skill,
-					mod: mod,
-					why: why
-				});
-			case ADD_PROTECTION(armor):
-				character.protections.push(armor);
-			case ADD_TEMPORARY_MODIFIER(mod):
-				character.tempMods.push(mod);
-				updateCharacts();
-			case REMOVE_TEMPORARY_MODIFIER(index):
-				character.tempMods.splice(index, 1);
-				updateCharacts();
-			case CHANGE_MONEY(amount):
-				character.money_po += amount;
-			case ADD_INVENTORY_ITEM(item):
-				character.inventory.push(item);
-			case CHANGE_ITEM_QUANTITY(item, new_quantity):
-				character.inventory[item].quantity = new_quantity;
-			case REMOVE_INVENTORY_ITEM(item):
-				character.inventory.splice(item, 1);
-		}
-	}
-
 	@:expose("debug")
 	static public function debug(what:String, param1:String, param2:String, param3:String, param4:String, param5:String, param6:String) {
 		var ficheId = Browser.window.location.pathname.split("/")[2];
@@ -831,6 +746,7 @@ class Fiche implements IJSAsync {
 			attack_modifier: 0,
 			damage_modifier: 0,
 			weaponDamageCharacteristic: DEXTERITY,
+			weaponHasPlus50PercentDamage: false,
 			weaponAttackCharacteristic: DEXTERITY,
 			damage_types: [PERFORANT],
 			munitions: "Illimitées",

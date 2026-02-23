@@ -9,6 +9,16 @@ class WebsocketClient implements IJSAsync {
 	var disconnected:Bool = false;
 
 	static var subs:StringMap<Array<WebsocketClient>> = new StringMap();
+	static var subsDiceRolls:StringMap<Array<WebsocketClient>> = new StringMap();
+
+	static public function notifyRoll(fiche_id:String, diceroll:PublicDiceRoll) {
+		if (!subsDiceRolls.exists(fiche_id))
+			return;
+
+		for (client in subsDiceRolls.get(fiche_id)) {
+			client.send(NEW_DICE_ROLL(fiche_id, diceroll));
+		}
+	}
 
 	static public function notifySubs(fiche_id:String, event:FicheEventTs) {
 		if (!subs.exists(fiche_id))
@@ -25,6 +35,13 @@ class WebsocketClient implements IJSAsync {
 
 		subs.get(fiche_id).push(client);
 		trace('Subscribed to events from $fiche_id, currently ${subs.get(fiche_id).length} subs to this fiche');
+	}
+
+	static function addDiceRollsSubs(fiche_id:String, client:WebsocketClient) {
+		if (!subsDiceRolls.exists(fiche_id))
+			subsDiceRolls.set(fiche_id, []);
+
+		subsDiceRolls.get(fiche_id).push(client);
 	}
 
 	public function new(ws:Dynamic, ip:String) {
@@ -55,8 +72,11 @@ class WebsocketClient implements IJSAsync {
 
 	@:jsasync public function parseMsg(msg:WSClientMessage) {
 		switch (msg) {
-			case SUB_EVENTS(fiche_id, latest_event):
+			case SUB_EVENTS(fiche_id, latest_event, withDiceRolls):
 				addSub(fiche_id, this);
+				if (withDiceRolls)
+					addDiceRollsSubs(fiche_id, this);
+
 				send(SUB_OK);
 				if (latest_event != null) {
 					var newest_events = FicheEvent.getEventsAfter(fiche_id, latest_event).jsawait();

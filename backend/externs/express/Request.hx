@@ -8,12 +8,18 @@ typedef DatabaseFiche = {
 	characterName:String,
 };
 
+typedef DatabaseCampaign = {
+	campaign_id:String,
+	name:String,
+};
+
 extern class Request extends js.node.http.IncomingMessage {
 	var app:Express;
 	var baseUrl:String;
 	var body:{};
 
 	var fiche:DatabaseFiche;
+	var campaign:DatabaseCampaign;
 
 	// var cookies : {}; // TODO requires middleware
 	var fresh:Bool;

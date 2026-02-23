@@ -20,19 +20,15 @@ class DiceRollHistory extends Popup implements IJSAsync {
 	@:jsasync function fill() {
 		var list = Browser.document.createUListElement();
 
-		var data = Api.getRolls(fiche_id).jsawait();
+		var data:Array<PublicDiceRoll> = Api.getRolls(fiche_id).jsawait();
 		data.reverse();
 		for (i in data) {
 			var elem = Browser.document.createLIElement();
-			var fieldLabel = fieldsNames.get(i.field_name);
+			var fieldLabel = if (fieldsNames != null) fieldsNames.get(i.field_name) else i.field_name;
 			if (fieldLabel == null)
 				fieldLabel = 'FIXME(${i.field_name})';
-			if (i.mod != null && i.mod != 0) {
-				var mod = ' ${i.mod.asMod(true)}';
-				elem.innerHTML = '<small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> <strong>${fieldLabel}</strong> 1d${i.faces}$mod : (<strong>${i.result}</strong>$mod) = <strong>${i.result + i.mod}</strong>';
-			} else {
-				elem.innerHTML = '<small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> <strong>${fieldLabel}</strong> 1d${i.faces} : <strong>${i.result}</strong>';
-			}
+
+			elem.innerHTML = '<small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> <strong>${fieldLabel}</strong> ${i.dicerollToString()}';
 			list.appendChild(elem);
 		}
 
