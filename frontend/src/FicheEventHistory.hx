@@ -26,10 +26,10 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case SET_CHARACTERISTICS(_): "Lancer de caractéristiques initial";
 				case ADD_TEMPORARY_MODIFIER(mod):
 					currentMods.push(mod);
-					'Ajout d\'un modificateur temporaire (${mod.mod.asMod()}, ${mod.why})';
+					'Ajout d\'un modificateur temporaire (${mod.mod.asMod()}, ${mod.why.htmlEscape()})';
 				case REMOVE_TEMPORARY_MODIFIER(n):
 					var mod = currentMods.splice(n, 1)[0];
-					'Retrait d\'un modificateur temporaire (${mod.why})';
+					'Retrait d\'un modificateur temporaire (${mod.why.htmlEscape()})';
 				case ADD_CLASS_SKILL(skill): 'Ajout d\'une compétence de classe (${RulesSkills.getSkillLabel(skill)})';
 				case SET_SKILL_MODIFIER(skill, mod): 'Ajout d\'un modificateur de compétence (${RulesSkills.getSkillLabel(skill)}): ${mod.asMod()}';
 				case CHANGE_CARAC(c, amount): 'Modification ${c.caracToString(true)} : ${amount.asMod()}';
@@ -47,16 +47,20 @@ class FicheEventHistory extends Popup implements IJSAsync {
 					case SHIELD: "d'un bouclier";
 					case NATURAL_ARMOR: "d'une armure naturelle";
 					case EVADE: "d'un bonus d'esquive";
-				}}: ${armor.name} (+${armor.armor} CA)';
+				}}: ${armor.name.htmlEscape()} (+${armor.armor} CA)';
 				case ADD_INVENTORY_ITEM(item):
 					currentItems.push(item);
-					'Ajout d\'un objet à l\'inventaire: ${item.name} (x${item.quantity})';
+					'Ajout d\'un objet à l\'inventaire: ${item.name.htmlEscape()} (x${item.quantity})';
 				case CHANGE_ITEM_QUANTITY(item_n, new_quantity):
 					var item = currentItems[item_n];
-					'Ajout changement de quantité d\'un objet: ${item.name} (x${new_quantity})';
+					'Changement de quantité d\'un objet: ${item.name.htmlEscape()} (x${new_quantity})';
+				case CHANGE_ITEM_NAME(item_n, new_name):
+					var item = currentItems[item_n];
+					'Changement du nom d\'un objet: ${item.name.htmlEscape()} -> ${new_name.htmlEscape()}';
+					item.name = new_name;
 				case REMOVE_INVENTORY_ITEM(item_n):
 					var item = currentItems.splice(item_n, 1)[0];
-					'Suppression d\'un objet de l\'inventaire: ${item.name}';
+					'Suppression d\'un objet de l\'inventaire: ${item.name.htmlEscape()}';
 				case ADD_EXCEPTIONAL_SKILL_MODIFIER(skill, mod,
 					why): 'Ajout d\'un modificateur exceptionnel sur ${RulesSkills.getSkillLabel(skill)}: ${mod.asMod()} (${why.htmlEscape()})';
 			}

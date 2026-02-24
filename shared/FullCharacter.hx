@@ -108,6 +108,8 @@ class FullCharacter {
 				inventory.push(item);
 			case CHANGE_ITEM_QUANTITY(item, new_quantity):
 				inventory[item].quantity = new_quantity;
+			case CHANGE_ITEM_NAME(item, new_name):
+				inventory[item].name = new_name;
 			case REMOVE_INVENTORY_ITEM(item):
 				inventory.splice(item, 1);
 		}

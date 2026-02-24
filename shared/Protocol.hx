@@ -20,6 +20,7 @@ enum FicheEventType {
 	ADD_INVENTORY_ITEM(item:InventoryItem);
 	CHANGE_ITEM_QUANTITY(item:Int, new_quantity:Int);
 	REMOVE_INVENTORY_ITEM(item:Int);
+	CHANGE_ITEM_NAME(item:Int, newName:String);
 }
 
 typedef FicheEventTs = {

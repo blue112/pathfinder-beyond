@@ -617,6 +617,11 @@ class Fiche implements IJSAsync {
 					}
 				});
 			});
+			li.querySelector(".name").addEventListener('click', () -> {
+				new StringDialog('Changer le nom de l\'objet', "Nouveau nom", item.name, (newName) -> {
+					Api.pushEvent(fiche_id, CHANGE_ITEM_NAME(character.inventory.indexOf(item), newName));
+				});
+			});
 			inventory.querySelector("ul").appendChild(li);
 		}
 

@@ -590,6 +590,9 @@ h3 {
                         cursor: pointer;
                     }
                 }
+                &.name {
+                    cursor: pointer;
+                }
             }
             a.delete {
                 display: flex;
