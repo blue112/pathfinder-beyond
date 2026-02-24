@@ -49,15 +49,16 @@ class FicheEventHistory extends Popup implements IJSAsync {
 					case EVADE: "d'un bonus d'esquive";
 				}}: ${armor.name.htmlEscape()} (+${armor.armor} CA)';
 				case ADD_INVENTORY_ITEM(item):
-					currentItems.push(item);
+					currentItems.push(Reflect.copy(item));
 					'Ajout d\'un objet à l\'inventaire: ${item.name.htmlEscape()} (x${item.quantity})';
 				case CHANGE_ITEM_QUANTITY(item_n, new_quantity):
 					var item = currentItems[item_n];
 					'Changement de quantité d\'un objet: ${item.name.htmlEscape()} (x${new_quantity})';
 				case CHANGE_ITEM_NAME(item_n, new_name):
 					var item = currentItems[item_n];
-					'Changement du nom d\'un objet: ${item.name.htmlEscape()} -> ${new_name.htmlEscape()}';
-					item.name = new_name;
+					var str = 'Changement du nom d\'un objet: ${item.name.htmlEscape()} -> ${new_name.htmlEscape()}';
+					item.name = new_name; // Need to do that after so we have old and new name
+					str;
 				case REMOVE_INVENTORY_ITEM(item_n):
 					var item = currentItems.splice(item_n, 1)[0];
 					'Suppression d\'un objet de l\'inventaire: ${item.name.htmlEscape()}';

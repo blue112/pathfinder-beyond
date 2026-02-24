@@ -1,6 +1,5 @@
 package elems;
 
-import js.html.MouseEvent;
 import js.html.InputElement;
 import js.Browser;
 

@@ -105,7 +105,7 @@ class FullCharacter {
 			case CHANGE_MONEY(amount):
 				money_po += amount;
 			case ADD_INVENTORY_ITEM(item):
-				inventory.push(item);
+				inventory.push(Reflect.copy(item));
 			case CHANGE_ITEM_QUANTITY(item, new_quantity):
 				inventory[item].quantity = new_quantity;
 			case CHANGE_ITEM_NAME(item, new_name):

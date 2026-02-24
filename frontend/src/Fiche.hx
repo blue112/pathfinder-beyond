@@ -68,11 +68,25 @@ class Fiche implements IJSAsync {
 		bindCaracActions();
 		bindLevelActions();
 		bindMoneyActions();
+		bindFightActions();
 		bindACActions();
 		bindSavingThrowActions();
 		bindInitiativeActions();
 
 		load(fiche_id);
+	}
+
+	function bindFightActions() {
+		var menuLabels = ["Ajouter une arme"];
+		var action = mainElem.querySelector("section.fight h2 .plus");
+		action.addEventListener("click", () -> {
+			new ContextMenu(action.parentElement.parentElement, menuLabels, (choice) -> {
+				new WeaponDialog(menuLabels[choice], (weapon:Weapon) -> {
+					Api.pushEvent(fiche_id, ADD_WEAPON(weapon));
+				});
+				return true;
+			});
+		});
 	}
 
 	function bindMoneyActions() {

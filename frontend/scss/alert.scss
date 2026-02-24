@@ -54,7 +54,8 @@
         }
     }
 
-    &.amount {
+    &.amount,
+    &.weapon {
         .actions {
             margin-top: 20px;
         }
@@ -100,6 +101,36 @@
                 width: 70px;
                 text-align: center;
                 font-size: 3em;
+            }
+        }
+    }
+
+    &.weapon {
+        .main {
+            top: 50%;
+            height: 500px;
+            margin-top: -250px;
+
+            .content {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        .content > div.input-field {
+            display: flex;
+            flex-direction: column;
+            padding: 0 15px;
+            margin-top: 20px;
+
+            label {
+                font-weight: bold;
+                margin-bottom: 5px;
+                text-align: center;
+            }
+            input {
+                font-size: 1.2em;
+                text-align: center;
             }
         }
     }
