@@ -295,7 +295,7 @@ h3 {
         .name {
             @include mixins.box;
         }
-        .ca {
+        .ac {
             @include mixins.mod-box;
             font-size: 0.9em;
         }
@@ -325,6 +325,30 @@ h3 {
 
             .mod {
                 cursor: pointer;
+            }
+        }
+        .exp {
+            display: none;
+        }
+
+        &.exp .value::after {
+            content: "*";
+            color: rgb(103, 103, 103);
+        }
+
+        &.exp {
+            position: relative;
+
+            &:hover {
+                .exp {
+                    @include mixins.box;
+
+                    display: block;
+                    position: absolute;
+                    top: 40px;
+                    right: -50px;
+                    font-family: Roboto;
+                }
             }
         }
     }

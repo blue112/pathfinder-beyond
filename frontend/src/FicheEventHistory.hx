@@ -62,8 +62,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case REMOVE_INVENTORY_ITEM(item_n):
 					var item = currentItems.splice(item_n, 1)[0];
 					'Suppression d\'un objet de l\'inventaire: ${item.name.htmlEscape()}';
-				case ADD_EXCEPTIONAL_SKILL_MODIFIER(skill, mod,
-					why): 'Ajout d\'un modificateur exceptionnel sur ${RulesSkills.getSkillLabel(skill)}: ${mod.asMod()} (${why.htmlEscape()})';
+				case ADD_EXCEPTIONAL_MODIFIER(mod):
+					'Ajout d\'un modificateur exceptionnel sur ${mod.mod.asMod()} (${mod.why.htmlEscape()})';
 			}
 			elem.innerHTML = '<a class="del">x</a> <small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> $event';
 			list.appendChild(elem);

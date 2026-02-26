@@ -254,10 +254,34 @@ class Fiche implements IJSAsync {
 			throw "Cannot find parent id for this dice roll";
 		}
 
+		var expModEnum = if (parent.dataset.id.startsWith("saving-")) {
+			SAVING_THROW(SavingThrow.createByName(parent.dataset.id.split("-")[1].toUpperCase()));
+		} else if (parent.dataset.id == "attack") WEAPON_ATTACK else if (parent.dataset.id == "damage") WEAPON_DAMAGE else null;
+
+		if (expModEnum != null) {
+			var expMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, expModEnum));
+			if (expMods.length > 0) {
+				new ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})')), (choice) -> {
+					if (choice == 0)
+						doDiceRoll([modInt], parent.dataset.id)
+					else {
+						var mod = expMods[choice - 1];
+						doDiceRoll([modInt, mod.mod], parent.dataset.id);
+					}
+				});
+				return null;
+			}
+		}
+
 		var mods = [modInt];
 		if (additionalMod != null && additionalMod != 0)
 			mods.push(additionalMod);
-		var apiResult = Api.rollDice(fiche_id, 20, mods.fold((m, r) -> m + r, 0), parent.dataset.id).jsawait();
+
+		return doDiceRoll(mods, parent.dataset.id).jsawait();
+	}
+
+	@:jsasync public function doDiceRoll(mods:Array<Int>, id:String) {
+		var apiResult = Api.rollDice(fiche_id, 20, mods.fold((m, r) -> m + r, 0), id).jsawait();
 		Dice.roll(mods, apiResult.result);
 		return apiResult.result;
 	}
@@ -393,6 +417,14 @@ class Fiche implements IJSAsync {
 			acDiv.classList.remove("temp-mod");
 		}
 
+		// Check if we have an exceptional mod
+		var expCA = character.exceptionalModifiers.filter(m -> m.on.match(AC));
+		if (expCA.length > 0) {
+			mainElem.querySelector('.ac').classList.add('exp');
+			mainElem.querySelector('.ac .exp')
+				.innerHTML = '<strong>${expCA[0].why.htmlEscape()}</strong> : ${expCA[0].mod.asMod()} = ${mod + expCA[0].mod}'; // Fixme multiple CA mod
+		}
+
 		acDiv.innerText = mod.string();
 	}
 
@@ -493,7 +525,7 @@ class Fiche implements IJSAsync {
 		for (p in character.protections) {
 			var armorDiv = Browser.document.createDivElement();
 			armorDiv.classList.add("armor");
-			armorDiv.innerHTML = '<span class="name">${p.name.htmlEscape()}</span><span class="ca">${p.armor.asMod()} CA</span>';
+			armorDiv.innerHTML = '<span class="name">${p.name.htmlEscape()}</span><span class="ac">${p.armor.asMod()} CA</span>';
 			armorsDiv.appendChild(armorDiv);
 		}
 	}
@@ -534,7 +566,7 @@ class Fiche implements IJSAsync {
 
 			skillDiv.querySelector(".mod").addEventListener("click", (e:MouseEvent) -> {
 				e.stopPropagation();
-				var expMods = character.exceptionalSkillModifiers.filter(s -> s.skill == skill.name);
+				var expMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, SKILL(skill.name)));
 				if (expMods.length > 0) {
 					new ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})')), (choice) -> {
 						if (choice == 0)
@@ -709,7 +741,20 @@ class Fiche implements IJSAsync {
 			if (skill == null) {
 				return "Skill type not found";
 			}
-			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_SKILL_MODIFIER(skill, param2.parseInt(), param3));
+			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: SKILL(skill), mod: param2.parseInt(), why: param3}));
+			return "Ok";
+		} else if (what == "expsavingmod") {
+			var st = SavingThrow.createByName(param1.toUpperCase());
+			if (st == null) {
+				return "ST not found";
+			}
+			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: SAVING_THROW(st), mod: param2.parseInt(), why: param3}));
+			return "Ok";
+		} else if (what == "expattackmod") {
+			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: WEAPON_ATTACK, mod: param1.parseInt(), why: param2}));
+			return "Ok";
+		} else if (what == "expacmod") {
+			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: AC, mod: param1.parseInt(), why: param2}));
 			return "Ok";
 		} else if (what == "skillmod") {
 			var skill = SkillType.createByName(param1.toUpperCase());
@@ -746,7 +791,6 @@ class Fiche implements IJSAsync {
 			}
 			Api.pushEvent(ficheId, ADD_CLASS_SKILL(skill));
 		}
-
 		return 'Unknown debug $what';
 	}
 

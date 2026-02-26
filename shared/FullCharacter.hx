@@ -17,7 +17,7 @@ class FullCharacter {
 	public var level:Int;
 	public var additionalClassSkills:Array<SkillType>;
 	public var skillModifiers:Map<SkillType, Int>;
-	public var exceptionalSkillModifiers:Array<ExceptionalSkillModifier>;
+	public var exceptionalModifiers:Array<TemporaryModifier>;
 	public var protections:Array<Protection>;
 	public var weapons:Array<Weapon>;
 	public var tempMods:Array<TemporaryModifier>;
@@ -32,7 +32,7 @@ class FullCharacter {
 		this.max_hp_modifier = 0;
 		this.additionalClassSkills = [];
 		this.skillModifiers = new Map();
-		this.exceptionalSkillModifiers = [];
+		this.exceptionalModifiers = [];
 		this.protections = [];
 		this.tempMods = [];
 		this.weapons = [];
@@ -88,12 +88,8 @@ class FullCharacter {
 				max_hp_modifier += amount;
 			case SET_SKILL_MODIFIER(skill, mod):
 				skillModifiers.set(skill, mod);
-			case ADD_EXCEPTIONAL_SKILL_MODIFIER(skill, mod, why):
-				exceptionalSkillModifiers.push({
-					skill: skill,
-					mod: mod,
-					why: why
-				});
+			case ADD_EXCEPTIONAL_MODIFIER(mod):
+				exceptionalModifiers.push(mod);
 			case ADD_PROTECTION(armor):
 				protections.push(armor);
 			case ADD_TEMPORARY_MODIFIER(mod):

@@ -12,7 +12,7 @@ enum FicheEventType {
 	LEVEL_UP(hpDice:Int);
 	ADD_CLASS_SKILL(skill:SkillType);
 	SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
-	ADD_EXCEPTIONAL_SKILL_MODIFIER(skill:SkillType, mod:Int, why:String);
+	ADD_EXCEPTIONAL_MODIFIER(mod:TemporaryModifier);
 	ADD_PROTECTION(armor:Protection);
 	ADD_TEMPORARY_MODIFIER(mod:TemporaryModifier);
 	REMOVE_TEMPORARY_MODIFIER(index:Int);
