@@ -313,12 +313,12 @@ class Fiche implements IJSAsync {
 		divWeapon.innerHTML = Resource.getString("weapon.html");
 
 		divWeapon.querySelector("h3").innerText = weapon.name;
-		if (weapon.munitions != null)
+		if (weapon.munitions != null && weapon.munitions != "")
 			getField(divWeapon, "ammo").innerText = weapon.munitions;
 		else
 			getField(divWeapon, "ammo").innerText = "N/A";
 
-		getField(divWeapon, "range").innerText = if (weapon.range != 0) '${weapon.range}c' else 'Contact';
+		getField(divWeapon, "range").innerText = if (weapon.range != 0 && weapon.range != null) '${weapon.range}c' else 'Contact';
 		getField(divWeapon, "type").innerText = [
 			for (dt in weapon.damage_types)
 				switch (dt) {
@@ -781,9 +781,6 @@ class Fiche implements IJSAsync {
 				cha: param6.parseInt(),
 			}));
 			return "Ok";
-		} else if (what == "weapon") {
-			debugAddWeapon(ficheId);
-			return "Ok";
 		} else if (what == "cskill") {
 			var skill = SkillType.createByName(param1.toUpperCase());
 			if (skill == null) {
@@ -801,25 +798,6 @@ class Fiche implements IJSAsync {
 		}
 		Api.pushEvent(ficheId, TRAIN_SKILL(skill));
 		return "Ok";
-	}
-
-	static public function debugAddWeapon(ficheId:String) {
-		Api.pushEvent(ficheId, ADD_WEAPON({
-			name: "Arc Court",
-			attack_modifier: 0,
-			damage_modifier: 0,
-			weaponDamageCharacteristic: DEXTERITY,
-			weaponHasPlus50PercentDamage: false,
-			weaponAttackCharacteristic: DEXTERITY,
-			damage_types: [PERFORANT],
-			munitions: "Illimitées",
-			range: 12,
-			critical_text: {
-				nums: [20],
-				damageMultiplier: 3
-			},
-			damage_dices: [6]
-		}));
 	}
 
 	static public function generateCharac(ficheId:String) {
