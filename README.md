@@ -23,7 +23,7 @@
 - Full sheet edit history
 - Basic character details (name, player name, size, weight...)
 - 2 classes (Invoker Unchained, Rogue Unchained)
-- Size modifier
+- Size modifier (modifies AC, skills, weapon attack...)
 - HP management (lethal only)
 - Level up with HP dice roll
 - Predilection class (+1 HP)
@@ -31,14 +31,14 @@
 - Ranking up skills
 - D20, D6 and D3 visual launch (with 3D dices!)
 
-![Dice roll](screenshots/fr/dice_cast.webm)
+![Dice roll](screenshots/fr/dice_cast.mp4)
 ![Dice roll history](screenshots/fr/rolls.png)
 
 - Critical success and failure
 - Sharable link (anyone can edit for now though)
 - Temporary modifiers full management, with highlight of modified fields
   ![Temporary mods](screenshots/fr/temp-mods.png)
-  ![Active temporary mods](screenshots/fr/temp-mods2.png)
+  ![Active temporary mods](screenshots/fr/temp-mods-2.png)
 
 - Exceptional modifiers (+2 bluff when talking to a goblin ?)
   ![Exceptional modifiers](screenshots/fr/exc-mod.png)
