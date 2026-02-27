@@ -30,9 +30,8 @@
 - Class skills, with possibility to add custom ones
 - Ranking up skills
 - D20, D6 and D3 visual launch (with 3D dices!)
-
-![Dice roll](screenshots/fr/dice_cast.mp4)
-![Dice roll history](screenshots/fr/rolls.png)
+- [See dice roll example](https://imgur.com/a/jI0fAma)
+  ![Dice roll history](screenshots/fr/rolls.png)
 
 - Critical success and failure
 - Sharable link (anyone can edit for now though)
