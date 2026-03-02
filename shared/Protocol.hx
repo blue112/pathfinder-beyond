@@ -33,6 +33,7 @@ enum FicheEventType {
 	DECREASE_SKILL(skill:SkillType);
 	CHANGE_HP(amount:Int);
 	DAMAGE_HP(amount:Int, damageType:DamageType);
+	ADD_DAMAGE_RESISTANCE(damageType:DamageType, amount:Int);
 	CHANGE_MAX_HP(amount:Int);
 	LEVEL_UP(hpDice:Int);
 	ADD_CLASS_SKILL(skill:SkillType);

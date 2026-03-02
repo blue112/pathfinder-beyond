@@ -171,7 +171,7 @@ class Fiche implements IJSAsync {
 	function bindHPActions() {
 		var p = mainElem.querySelector(".hp .plus");
 		p.addEventListener("click", () -> {
-			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)"];
+			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)", "Ajouter une résistance"];
 			new ContextMenu(p.parentElement.parentElement, menuLabels, (choice) -> {
 				if (choice == 0) {
 					new DamageChoice((amount, damageType) -> {
@@ -179,11 +179,17 @@ class Fiche implements IJSAsync {
 							return;
 						Api.pushEvent(fiche_id, DAMAGE_HP(amount, damageType));
 					});
-				} else {
+				} else if (choice == 1) {
 					new AmountChoice(menuLabels[choice], "Combien de PV ajouter ?", (result, _) -> {
 						if (result == 0)
 							return;
 						Api.pushEvent(fiche_id, CHANGE_HP(result));
+					});
+				} else {
+					new ResistanceChoice((amount, damageType) -> {
+						if (amount == 0)
+							return;
+						Api.pushEvent(fiche_id, ADD_DAMAGE_RESISTANCE(damageType, amount));
 					});
 				}
 				return true;
