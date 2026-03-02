@@ -171,17 +171,30 @@ class Fiche implements IJSAsync {
 	function bindHPActions() {
 		var p = mainElem.querySelector(".hp .plus");
 		p.addEventListener("click", () -> {
-			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)"];
+			var resistCount = [for (_ in character.damageResistances.keys()) true].length;
+			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)", "Ajouter une résistance", 'Voir les résistances ($resistCount)'];
 			new ContextMenu(p.parentElement.parentElement, menuLabels, (choice) -> {
-				new AmountChoice(menuLabels[choice], if (choice == 0) "Combien de PV retirer ?" else "Combien de PV ajouter ?", (result, _) -> {
-					if (result == 0)
-						return;
-
-					if (choice == 0)
-						result = -result;
-
-					Api.pushEvent(fiche_id, CHANGE_HP(result));
-				});
+				if (choice == 0) {
+					new DamageChoice((amount, damageType) -> {
+						if (amount == 0)
+							return;
+						Api.pushEvent(fiche_id, DAMAGE_HP(amount, damageType));
+					});
+				} else if (choice == 1) {
+					new AmountChoice(menuLabels[choice], "Combien de PV ajouter ?", (result, _) -> {
+						if (result == 0)
+							return;
+						Api.pushEvent(fiche_id, CHANGE_HP(result));
+					});
+				} else if (choice == 2) {
+					new ResistanceChoice((amount, damageType) -> {
+						if (amount == 0)
+							return;
+						Api.pushEvent(fiche_id, ADD_DAMAGE_RESISTANCE(damageType, amount));
+					});
+				} else if (choice == 3) {
+					new ResistancesList(fiche_id, character.damageResistances);
+				}
 				return true;
 			});
 		});

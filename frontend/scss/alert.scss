@@ -3,7 +3,8 @@
 .popup.alert {
     .main {
         position: fixed;
-        top: 40%;
+        top: 50%;
+        transform: translateY(-50%);
         height: auto;
         width: 70%;
         left: 15%;
@@ -107,10 +108,6 @@
 
     &.weapon {
         .main {
-            top: 50%;
-            height: 500px;
-            margin-top: -250px;
-
             .content {
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr;
@@ -143,6 +140,44 @@
                 width: 100%;
                 height: 25px;
                 font-size: 1.1em;
+            }
+        }
+    }
+
+    &.damage {
+        .damage-types {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 8px 15px;
+
+            .category {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 5px;
+
+                .cat-label {
+                    flex: 0 0 100%;
+                    font-weight: bold;
+                    font-size: 0.85em;
+                    text-align: center;
+                }
+
+                .type-btn {
+                    padding: 3px 9px;
+                    border: 1px solid #888;
+                    cursor: pointer;
+                    font-size: 0.8em;
+                    background: white;
+                    user-select: none;
+
+                    &.selected {
+                        background: variables.$redColor;
+                        color: white;
+                        border-color: variables.$redColor;
+                    }
+                }
             }
         }
     }

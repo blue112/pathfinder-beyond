@@ -23,6 +23,7 @@ class FullCharacter {
 	public var tempMods:Array<TemporaryModifier>;
 	public var money_po:Float;
 	public var inventory:Array<InventoryItem>;
+	public var damageResistances:Map<DamageType, Int>;
 
 	public function new() {
 		this.skillRanks = [];
@@ -38,6 +39,7 @@ class FullCharacter {
 		this.weapons = [];
 		this.inventory = [];
 		this.money_po = 0;
+		this.damageResistances = new Map();
 	}
 
 	function updateHP() {
@@ -84,6 +86,18 @@ class FullCharacter {
 				skillRanks.remove(skill);
 			case CHANGE_HP(amount):
 				current_hp = Math.min(current_hp + amount, getMaxHitPoints()).int();
+			case DAMAGE_HP(amount, damageType):
+				var resistance = damageResistances.exists(damageType) ? damageResistances.get(damageType) : 0;
+				current_hp -= Math.max(amount - resistance, 0).int();
+			case REMOVE_DAMAGE_RESISTANCE(damageType):
+				damageResistances.remove(damageType);
+			case ADD_DAMAGE_RESISTANCE(damageType, amount):
+				var current = damageResistances.exists(damageType) ? damageResistances.get(damageType) : 0;
+				var newAmount = current + amount;
+				if (newAmount <= 0)
+					damageResistances.remove(damageType);
+				else
+					damageResistances.set(damageType, newAmount);
 			case CHANGE_MAX_HP(amount):
 				max_hp_modifier += amount;
 			case SET_SKILL_MODIFIER(skill, mod):

@@ -1,2 +1,1 @@
 curl http://localhost:8000/api/fiche/createFiche -XPOST -H 'Content-type: application/json' -d @seed.json
-curl http://localhost:8000/api/fiche/createFiche -XPOST -H 'Content-type: application/json' -d @seed.json

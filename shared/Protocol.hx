@@ -1,5 +1,29 @@
 import RulesSkills.SkillType;
 
+enum DamageType {
+	// Physical
+	BLUDGEONING;
+	PIERCING;
+	SLASHING;
+	// Energy
+	ACID;
+	COLD;
+	ELECTRICITY;
+	FIRE;
+	SONIC;
+	FORCE;
+	// Positive / Negative energy
+	POSITIVE;
+	NEGATIVE;
+	// Alignment
+	CHAOTIC;
+	EVIL;
+	GOOD;
+	LAWFUL;
+	// Fallback
+	UNTYPED;
+}
+
 enum FicheEventType {
 	CREATE(data:BasicFicheData);
 	SET_CHARACTERISTICS(data:Characteristics);
@@ -8,6 +32,9 @@ enum FicheEventType {
 	TRAIN_SKILL(skill:SkillType);
 	DECREASE_SKILL(skill:SkillType);
 	CHANGE_HP(amount:Int);
+	DAMAGE_HP(amount:Int, damageType:DamageType);
+	ADD_DAMAGE_RESISTANCE(damageType:DamageType, amount:Int);
+	REMOVE_DAMAGE_RESISTANCE(damageType:DamageType);
 	CHANGE_MAX_HP(amount:Int);
 	LEVEL_UP(hpDice:Int);
 	ADD_CLASS_SKILL(skill:SkillType);
