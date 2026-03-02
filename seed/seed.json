@@ -7,6 +7,7 @@
     "origin": "Korvosa",
     "race": "Human",
     "gender": "M",
+    "usePredilectionHP": true,
     "sizeCategory": "M",
     "age": 22,
     "heightCm": 155,

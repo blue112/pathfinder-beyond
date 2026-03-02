@@ -71,6 +71,27 @@ class ProtocolUtil {
 		};
 	}
 
+	static public function damageTypeToString(dt:DamageType) {
+		return switch (dt) {
+			case BLUDGEONING: "Contondant";
+			case PIERCING: "Perforant";
+			case SLASHING: "Tranchant";
+			case ACID: "Acide";
+			case COLD: "Froid";
+			case ELECTRICITY: "Électricité";
+			case FIRE: "Feu";
+			case SONIC: "Sonique";
+			case FORCE: "Force";
+			case POSITIVE: "Énergie positive";
+			case NEGATIVE: "Énergie négative";
+			case CHAOTIC: "Chaotique";
+			case EVIL: "Mal";
+			case GOOD: "Bien";
+			case LAWFUL: "Loi";
+			case UNTYPED: "Sans type";
+		}
+	}
+
 	static public function alignementToString(alignement:CharacterAlignement) {
 		return switch (alignement) {
 			case ALIGNEMENT_LB: "Loyal/Bon";

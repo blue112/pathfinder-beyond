@@ -84,6 +84,8 @@ class FullCharacter {
 				skillRanks.remove(skill);
 			case CHANGE_HP(amount):
 				current_hp = Math.min(current_hp + amount, getMaxHitPoints()).int();
+			case DAMAGE_HP(amount, _):
+				current_hp -= amount;
 			case CHANGE_MAX_HP(amount):
 				max_hp_modifier += amount;
 			case SET_SKILL_MODIFIER(skill, mod):

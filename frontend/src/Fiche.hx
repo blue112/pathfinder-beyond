@@ -173,15 +173,19 @@ class Fiche implements IJSAsync {
 		p.addEventListener("click", () -> {
 			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)"];
 			new ContextMenu(p.parentElement.parentElement, menuLabels, (choice) -> {
-				new AmountChoice(menuLabels[choice], if (choice == 0) "Combien de PV retirer ?" else "Combien de PV ajouter ?", (result, _) -> {
-					if (result == 0)
-						return;
-
-					if (choice == 0)
-						result = -result;
-
-					Api.pushEvent(fiche_id, CHANGE_HP(result));
-				});
+				if (choice == 0) {
+					new DamageChoice((amount, damageType) -> {
+						if (amount == 0)
+							return;
+						Api.pushEvent(fiche_id, DAMAGE_HP(amount, damageType));
+					});
+				} else {
+					new AmountChoice(menuLabels[choice], "Combien de PV ajouter ?", (result, _) -> {
+						if (result == 0)
+							return;
+						Api.pushEvent(fiche_id, CHANGE_HP(result));
+					});
+				}
 				return true;
 			});
 		});

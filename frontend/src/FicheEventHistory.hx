@@ -4,6 +4,7 @@ import js.Browser;
 import jsasync.IJSAsync;
 
 using DateTools;
+using ProtocolUtil;
 
 class FicheEventHistory extends Popup implements IJSAsync {
 	var fiche_id:String;
@@ -38,6 +39,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case DECREASE_SKILL(skill): 'Retrait d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
 				case CHANGE_HP(amount) if (amount > 0): 'Récupération de points de vie (${amount} pv)';
 				case CHANGE_HP(amount): 'Dégats subis (${- amount} pv)';
+				case DAMAGE_HP(amount, damageType): 'Dégats subis: ${amount} pv (${damageType.damageTypeToString().toLowerCase()})';
 				case CHANGE_MONEY(amount) if (amount > 0): 'Gain d\'argent (${amount} PO)';
 				case CHANGE_MONEY(amount): 'Perte d\'argent (${- amount} po)';
 				case CHANGE_MAX_HP(amount): 'Changement des PV max (${amount.asMod()} pv)';
