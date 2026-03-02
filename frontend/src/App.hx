@@ -5,13 +5,20 @@ class App {
 	public function new() {
 		var url = Browser.window.location.pathname;
 		var paths = url.split("/");
-		if (paths.length > 0) {
+		if (paths.length > 1 && paths[1] != "") {
 			switch (paths[1]) {
 				case "fiche":
-					new Fiche(paths[2]);
+					var uuid = paths[2];
+					if (uuid == "create") {
+						new FicheCreator();
+					} else {
+						new Fiche(uuid);
+					}
 				case "campaign":
 					new Campaign(paths[2]);
 			}
+		} else {
+			new WelcomePage();
 		}
 	}
 
