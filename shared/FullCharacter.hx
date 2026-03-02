@@ -89,6 +89,8 @@ class FullCharacter {
 			case DAMAGE_HP(amount, damageType):
 				var resistance = damageResistances.exists(damageType) ? damageResistances.get(damageType) : 0;
 				current_hp -= Math.max(amount - resistance, 0).int();
+			case REMOVE_DAMAGE_RESISTANCE(damageType):
+				damageResistances.remove(damageType);
 			case ADD_DAMAGE_RESISTANCE(damageType, amount):
 				var current = damageResistances.exists(damageType) ? damageResistances.get(damageType) : 0;
 				var newAmount = current + amount;

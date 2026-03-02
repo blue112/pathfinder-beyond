@@ -41,6 +41,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case CHANGE_HP(amount): 'Dégats subis (${- amount} pv)';
 				case DAMAGE_HP(amount, damageType): 'Dégats subis: ${amount} pv (${damageType.damageTypeToString().toLowerCase()})';
 				case ADD_DAMAGE_RESISTANCE(damageType, amount): 'Résistance modifiée: ${damageType.damageTypeToString()}: ${amount}';
+				case REMOVE_DAMAGE_RESISTANCE(damageType): 'Résistance retirée: ${damageType.damageTypeToString()}';
 				case CHANGE_MONEY(amount) if (amount > 0): 'Gain d\'argent (${amount} PO)';
 				case CHANGE_MONEY(amount): 'Perte d\'argent (${- amount} po)';
 				case CHANGE_MAX_HP(amount): 'Changement des PV max (${amount.asMod()} pv)';
