@@ -452,6 +452,8 @@ class Fiche implements IJSAsync {
 		outBasics.alignement = character.basics.alignement.alignementToString();
 		outBasics.characterClass = character.basics.characterClass.classToString();
 		outBasics.sizeCategory = character.basics.sizeCategory.sizeCategoryToString();
+		outBasics.race = character.basics.race.raceToString();
+		outBasics.gender = character.basics.gender.genderToString();
 		for (f in Reflect.fields(character.basics)) {
 			var fieldName = convertFieldName(f);
 			if (availableFields.exists(fieldName)) {

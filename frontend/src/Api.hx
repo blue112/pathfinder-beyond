@@ -70,6 +70,17 @@ class Api implements IJSAsync {
 		return j;
 	}
 
+	@:jsasync static public function createFiche(data:Dynamic):Promise<{ficheId:String}> {
+		var r = Browser.window.fetch('/api/fiche/createFiche', {
+			method: "post",
+			headers: {
+				"Content-type": "application/json",
+			},
+			body: Json.stringify(data)
+		}).jsawait();
+		return r.json().jsawait();
+	}
+
 	@:jsasync static public function pushEvent(ficheId:String, event:FicheEventType):Promise<Dynamic> {
 		var r = Browser.window.fetch('/api/fiche/debug/$ficheId/push', {
 			method: "put",

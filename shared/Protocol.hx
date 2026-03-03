@@ -128,7 +128,7 @@ typedef BasicFicheData = {
 	divinityName:String,
 	origin:String,
 	race:CharacterRace,
-	gender:String,
+	gender:CharacterGender,
 	usePredilectionHP:Bool,
 	sizeCategory:SizeCategory,
 	age:Int,
@@ -137,6 +137,11 @@ typedef BasicFicheData = {
 	hair:String,
 	eyes:String,
 };
+
+enum CharacterGender {
+	MALE;
+	FEMALE;
+}
 
 enum CharacterRace {
 	HUMAN;
