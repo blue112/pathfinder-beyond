@@ -48,12 +48,12 @@ class ProtocolUtil {
 
 	static public function classToString(cls:CharacterClass) {
 		return switch (cls) {
-			case ROUBLARD:
-				"Roublard(e)";
-			case CONJURATEUR:
-				"Conjurateur";
-			case CONJURATEUR_EIDOLON_BIPED:
-				"Eidolon du Conjurateur";
+			case ROUBLARD: "Roublard(e)";
+			case METAMORPHE: "Métamorphe";
+			case CONJURATEUR: "Conjurateur";
+			case CONJURATEUR_EIDOLON_BIPED: "Eidolon du Conjurateur";
+			case MAGICIEN: "Magicien(ne)";
+			case PRETRE: "Prêtre(sse)";
 		}
 	}
 
