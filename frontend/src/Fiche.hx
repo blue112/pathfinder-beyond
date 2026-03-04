@@ -76,13 +76,17 @@ class Fiche implements IJSAsync {
 		load(fiche_id);
 	}
 
+	function pushEvent(event:FicheEventType) {
+		Api.pushEvent(fiche_id, event);
+	}
+
 	function bindFightActions() {
 		var menuLabels = ["Ajouter une arme"];
 		var action = mainElem.querySelector("section.fight h2 .plus");
 		action.addEventListener("click", () -> {
 			new ContextMenu(action.parentElement.parentElement, menuLabels, (choice) -> {
 				new WeaponDialog(menuLabels[choice], (weapon:Weapon) -> {
-					Api.pushEvent(fiche_id, ADD_WEAPON(weapon));
+					pushEvent(ADD_WEAPON(weapon));
 				});
 				return true;
 			});
@@ -96,7 +100,7 @@ class Fiche implements IJSAsync {
 			new ContextMenu(cast action, menuLabels, (choice) -> {
 				new AmountChoice('Ajouter/retirer des PO', "Combien de PO ajouter ou retirer ?", {canBeNegative: true}, (value, _) -> {
 					if (value != 0)
-						Api.pushEvent(fiche_id, CHANGE_MONEY(value));
+						pushEvent(CHANGE_MONEY(value));
 				});
 				return true;
 			});
@@ -121,7 +125,7 @@ class Fiche implements IJSAsync {
 		var diceRoll = Api.rollDice(fiche_id, hd, 0, "level").jsawait();
 		var result = diceRoll.result;
 		new Alert("Montée de niveau", 'Résultat du lancer de dé de point de vie (d${hd}): $result');
-		Api.pushEvent(fiche_id, LEVEL_UP(result));
+		pushEvent(LEVEL_UP(result));
 	}
 
 	function bindInitiativeActions() {
@@ -139,7 +143,7 @@ class Fiche implements IJSAsync {
 					if (result == 0)
 						return;
 
-					Api.pushEvent(fiche_id, CHANGE_CARAC(id.parseCarac(), result));
+					pushEvent(CHANGE_CARAC(id.parseCarac(), result));
 				});
 			});
 		}
@@ -178,19 +182,19 @@ class Fiche implements IJSAsync {
 					new DamageChoice((amount, damageType) -> {
 						if (amount == 0)
 							return;
-						Api.pushEvent(fiche_id, DAMAGE_HP(amount, damageType));
+						pushEvent(DAMAGE_HP(amount, damageType));
 					});
 				} else if (choice == 1) {
 					new AmountChoice(menuLabels[choice], "Combien de PV ajouter ?", (result, _) -> {
 						if (result == 0)
 							return;
-						Api.pushEvent(fiche_id, CHANGE_HP(result));
+						pushEvent(CHANGE_HP(result));
 					});
 				} else if (choice == 2) {
 					new ResistanceChoice((amount, damageType) -> {
 						if (amount == 0)
 							return;
-						Api.pushEvent(fiche_id, ADD_DAMAGE_RESISTANCE(damageType, amount));
+						pushEvent(ADD_DAMAGE_RESISTANCE(damageType, amount));
 					});
 				} else if (choice == 3) {
 					new ResistancesList(fiche_id, character.damageResistances);
@@ -393,7 +397,7 @@ class Fiche implements IJSAsync {
 			new ContextMenu(attachMenuOn, menuLabels, (choice) -> {
 				if (choice == 0) {
 					new AmountChoice(menuLabels[choice], "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
-						Api.pushEvent(fiche_id, ADD_TEMPORARY_MODIFIER({
+						pushEvent(ADD_TEMPORARY_MODIFIER({
 							mod: result,
 							why: reason,
 							on: on
@@ -487,8 +491,15 @@ class Fiche implements IJSAsync {
 
 	private function updateFiche() {
 		updateBasics();
-		if (character.characteristics == null)
+		if (character.characteristics == null) {
+			new ChoicesDialog("Caractéristiques", ["Tirer les caractéristiques", "Saisir les valeurs manuellement"], (choice) -> {
+				if (choice == 0)
+					new Alert("Non implémenté", "Le tirage aléatoire des caractéristiques n'est pas encore disponible.");
+				else if (choice == 1)
+					new CaracInputDialog((caracs) -> pushEvent(SET_CHARACTERISTICS(caracs)));
+			});
 			return;
+		}
 
 		updateCharacts();
 
@@ -609,9 +620,9 @@ class Fiche implements IJSAsync {
 					var text = choicesText[choice - 1];
 					new YesNoAlert("Confirmer ?", text + " à la compétence " + skill.label + " ?", () -> {
 						if (choice == 1)
-							Api.pushEvent(fiche_id, TRAIN_SKILL(skill.name));
+							pushEvent(TRAIN_SKILL(skill.name));
 						else
-							Api.pushEvent(fiche_id, DECREASE_SKILL(skill.name));
+							pushEvent(DECREASE_SKILL(skill.name));
 					});
 				} else {
 					new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée");
@@ -668,19 +679,19 @@ class Fiche implements IJSAsync {
 			li.querySelector(".name").innerText = item.name;
 			li.querySelector(".delete").addEventListener('click', () -> {
 				new YesNoAlert("Effacer un objet", 'Supprimer l\'objet ${item.name} de l\'inventaire ?', () -> {
-					Api.pushEvent(fiche_id, REMOVE_INVENTORY_ITEM(character.inventory.indexOf(item)));
+					pushEvent(REMOVE_INVENTORY_ITEM(character.inventory.indexOf(item)));
 				});
 			});
 			li.querySelector(".change").addEventListener('click', () -> {
 				new AmountChoice('Changer la quantité de l\'objet ${item.name}', "Nouvelle quantité ?", {defaultValue: item.quantity}, (newQty, _) -> {
 					if (newQty > 0) {
-						Api.pushEvent(fiche_id, CHANGE_ITEM_QUANTITY(character.inventory.indexOf(item), newQty));
+						pushEvent(CHANGE_ITEM_QUANTITY(character.inventory.indexOf(item), newQty));
 					}
 				});
 			});
 			li.querySelector(".name").addEventListener('click', () -> {
 				new StringDialog('Changer le nom de l\'objet', "Nouveau nom", item.name, (newName) -> {
-					Api.pushEvent(fiche_id, CHANGE_ITEM_NAME(character.inventory.indexOf(item), newName));
+					pushEvent(CHANGE_ITEM_NAME(character.inventory.indexOf(item), newName));
 				});
 			});
 			inventory.querySelector("ul").appendChild(li);
@@ -688,7 +699,7 @@ class Fiche implements IJSAsync {
 
 		inventory.querySelector("a.add-new").addEventListener("click", () -> {
 			new ItemDialog((quantity, name) -> {
-				Api.pushEvent(fiche_id, ADD_INVENTORY_ITEM({
+				pushEvent(ADD_INVENTORY_ITEM({
 					name: name,
 					quantity: quantity
 				}));
@@ -778,24 +789,6 @@ class Fiche implements IJSAsync {
 			}
 			Api.pushEvent(ficheId, SET_SKILL_MODIFIER(skill, param2.parseInt()));
 			return "Ok";
-		} else if (what == "protection") {
-			Api.pushEvent(ficheId, ADD_PROTECTION({
-				name: param1,
-				armor: param2.parseInt(),
-				type: ProtectionType.createByName(param3.toUpperCase()),
-				max_dex: param4.parseInt(),
-			}));
-			return "Ok";
-		} else if (what == "caracset") {
-			Api.pushEvent(ficheId, SET_CHARACTERISTICS({
-				str: param1.parseInt(),
-				dex: param2.parseInt(),
-				con: param3.parseInt(),
-				int: param4.parseInt(),
-				wis: param5.parseInt(),
-				cha: param6.parseInt(),
-			}));
-			return "Ok";
 		} else if (what == "cskill") {
 			var skill = SkillType.createByName(param1.toUpperCase());
 			if (skill == null) {
@@ -804,15 +797,6 @@ class Fiche implements IJSAsync {
 			Api.pushEvent(ficheId, ADD_CLASS_SKILL(skill));
 		}
 		return 'Unknown debug $what';
-	}
-
-	static public function debugIncreaseSkill(ficheId:String, skillName:String) {
-		var skill = SkillType.createByName(skillName.toUpperCase());
-		if (skill == null) {
-			return "Skill type not found";
-		}
-		Api.pushEvent(ficheId, TRAIN_SKILL(skill));
-		return "Ok";
 	}
 
 	static public function generateCharac(ficheId:String) {
