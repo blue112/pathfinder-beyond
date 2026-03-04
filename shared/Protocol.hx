@@ -39,6 +39,7 @@ enum FicheEventType {
 	LEVEL_UP(hpDice:Int);
 	ADD_CLASS_SKILL(skill:SkillType);
 	SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
+	SET_SAVING_THROW_MODIFIER(st:SavingThrow, mod:Int);
 	ADD_EXCEPTIONAL_MODIFIER(mod:TemporaryModifier);
 	ADD_PROTECTION(armor:Protection);
 	REMOVE_PROTECTION(index:Int);

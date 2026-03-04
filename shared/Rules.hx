@@ -135,7 +135,8 @@ class Rules {
 
 	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
 		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
-		return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus;
+		var permanentMod = if (char.savingThrowModifiers.exists(st)) char.savingThrowModifiers.get(st) else 0;
+		return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus + permanentMod;
 	}
 
 	static public function getSizeMod(char:FullCharacter, forBMOOrDMD:Bool) {

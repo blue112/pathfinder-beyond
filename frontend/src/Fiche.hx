@@ -150,17 +150,22 @@ class Fiche implements IJSAsync {
 	}
 
 	function bindSavingThrowActions() {
-		var menuLabels = ["Ajouter un modificateur temporaire"];
 		var actions = mainElem.querySelectorAll(".saving .plus");
 		for (p in actions) {
 			var main = p.parentElement.parentElement;
 			var id = main.parentElement.dataset.id;
-			makeTempModMenu(cast p, main, SAVING_THROW(switch (id) {
+			var st = switch (id) {
 				case "saving-will": WILL;
 				case "saving-reflexes": REFLEXES;
 				case "saving-vigor": VIGOR;
 				default: throw "Unknown saving throw " + id;
-			}));
+			};
+			makeTempModMenu(cast p, main, SAVING_THROW(st), ["Ajouter un modificateur permanent"], (choice) -> {
+				if (choice == 1)
+					new AmountChoice("Ajouter un modificateur permanent", "Quel modificateur appliquer ?", {canBeNegative: true}, (result, _) -> {
+						pushEvent(SET_SAVING_THROW_MODIFIER(st, result));
+					});
+			});
 		}
 	}
 
