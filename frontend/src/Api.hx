@@ -73,6 +73,7 @@ class Api implements IJSAsync {
 	@:jsasync static public function createFiche(data:BasicFicheData):Promise<{ficheId:String}> {
 		var r = Browser.window.fetch('/api/fiche/createFiche', {
 			method: "post",
+			headers: {"Content-Type": "application/haxe-serialized"},
 			body: Serializer.run(data)
 		}).jsawait();
 		return r.json().jsawait();
@@ -81,6 +82,7 @@ class Api implements IJSAsync {
 	@:jsasync static public function pushEvent(ficheId:String, event:FicheEventType):Promise<Dynamic> {
 		var r = Browser.window.fetch('/api/fiche/debug/$ficheId/push', {
 			method: "put",
+			headers: {"Content-Type": "application/haxe-serialized"},
 			body: Serializer.run(event)
 		}).jsawait();
 		trace(r.text().jsawait());

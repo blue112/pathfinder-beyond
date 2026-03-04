@@ -1,7 +1,6 @@
 import js.html.WebSocket;
 import model.DiceRoll;
 import express.Express;
-import haxe.Unserializer;
 import jsasync.IJSAsync;
 import model.FicheEvent;
 import model.DatabaseHandler;
@@ -15,7 +14,7 @@ import express.Router;
 class FicheRouter implements IJSAsync {
 	static public function getRouter() {
 		var router = new Router();
-		router.post("/createFiche", Express.raw({type: "*/*"}), onCreateFiche);
+		router.post("/createFiche", onCreateFiche);
 		router.get("/:ficheId", checkFicheExists, getFiche);
 		router.delete("/:ficheId/:eventId", checkFicheExists, onDelEvent);
 		router.post("/:ficheId/roll", checkFicheExists, onDiceRoll);
@@ -23,7 +22,7 @@ class FicheRouter implements IJSAsync {
 		router.get("/:ficheId/notes", checkFicheExists, fetchNotes);
 		router.post("/:ficheId/notes", checkFicheExists, onInsertNote);
 		router.put("/:ficheId/notes/:noteId", checkFicheExists, onUpdateNote);
-		router.put("/debug/:ficheId/push", checkFicheExists, Express.raw({type: "*/*"}), onPushEvent);
+		router.put("/debug/:ficheId/push", checkFicheExists, onPushEvent);
 		return router;
 	}
 
@@ -136,7 +135,7 @@ class FicheRouter implements IJSAsync {
 	@:jsasync static public function onPushEvent(req:Request, res:Response, next:Next) {
 		var ficheId = req.fiche.fiche_id;
 
-		var event = Unserializer.run((cast req.body).toString());
+		var event:Dynamic = req.body;
 		if (!Std.isOfType(event, FicheEventType)) {
 			res.end("Invalid event");
 			return;
@@ -153,7 +152,7 @@ class FicheRouter implements IJSAsync {
 	@:jsasync static public function onCreateFiche(req:Request, res:Response, next:Next) {
 		var fiche:BasicFicheData;
 		try {
-			fiche = Unserializer.run((cast req.body).toString());
+			fiche = cast req.body;
 			for (i in GetAllFields.getNames(BasicFicheData)) {
 				if (Reflect.getProperty(fiche, i) == null) {
 					res.status(400).end('Invalid field $i');
