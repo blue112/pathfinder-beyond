@@ -67,6 +67,7 @@ enum ProtectionType {
 	SHIELD;
 	NATURAL_ARMOR;
 	EVADE; // Mod dex
+	ARMOR_BONUS; // Will apply to every CA
 }
 
 typedef Protection = {

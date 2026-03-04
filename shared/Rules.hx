@@ -160,6 +160,7 @@ class Rules {
 
 		var total = 10;
 		total += sizeMod; // Always
+		total += char.protections.filter(f -> f.type == ARMOR_BONUS).fold((i, r) -> r + i.armor, 0);
 		if (includeDex) {
 			total += char.characteristicsMod.dex;
 			total += char.protections.filter(f -> f.type == EVADE).fold((i, r) -> r + i.armor, 0);

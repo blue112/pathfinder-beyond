@@ -55,6 +55,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 						case SHIELD: "d'un bouclier";
 						case NATURAL_ARMOR: "d'une armure naturelle";
 						case EVADE: "d'un bonus d'esquive";
+						case ARMOR_BONUS: "bonus à la CA";
 					}}: ${armor.name.htmlEscape()} (+${armor.armor} CA$malusStr)';
 				case REMOVE_PROTECTION(n):
 					var p = currentProtections.splice(n, 1)[0];

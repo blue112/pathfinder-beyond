@@ -177,7 +177,12 @@ class Fiche implements IJSAsync {
 		var p = mainElem.querySelector(".hp .plus");
 		p.addEventListener("click", () -> {
 			var resistCount = [for (_ in character.damageResistances.keys()) true].length;
-			var menuLabels = ["Retirer des PV (dégats)", "Ajouter des PV (soins)", "Ajouter une résistance", 'Voir les résistances ($resistCount)'];
+			var menuLabels = [
+				"Retirer des PV (dégats)",
+				"Ajouter des PV (soins)",
+				"Ajouter une résistance",
+				'Voir les résistances ($resistCount)'
+			];
 			new ContextMenu(p.parentElement.parentElement, menuLabels, (choice) -> {
 				if (choice == 0) {
 					new DamageChoice((amount, damageType) -> {
@@ -832,6 +837,14 @@ class Fiche implements IJSAsync {
 				return "Skill type not found";
 			}
 			Api.pushEvent(ficheId, ADD_CLASS_SKILL(skill));
+		} else if (what == "protection") {
+			Api.pushEvent(ficheId, ADD_PROTECTION({
+				name: param1,
+				armor: param2.parseInt(),
+				type: ProtectionType.createByName(param3.toUpperCase()),
+				max_dex: param4.parseInt(),
+			}));
+			return "Ok";
 		}
 		return 'Unknown debug $what';
 	}
