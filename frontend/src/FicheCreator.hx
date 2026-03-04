@@ -30,7 +30,24 @@ class FicheCreator {
 
 	public function new() {
 		currentStep = 0;
-		currentData = cast {};
+		// TODO: generate a random character name
+		currentData = {
+			playerName: "Anonymous Player",
+			characterName: "Red Daemon",
+			characterClass: ROUBLARD,
+			race: HUMAN,
+			alignement: ALIGNEMENT_LN,
+			gender: MALE,
+			sizeCategory: SIZE_M,
+			age: 25,
+			heightCm: 175,
+			weightKg: 75,
+			hair: "Brun",
+			eyes: "Marron",
+			divinityName: "Aucune",
+			origin: "Taldor",
+			usePredilectionHP: true,
+		};
 
 		mainElem = Browser.document.createDivElement();
 		mainElem.classList.add("fiche-create");
@@ -106,7 +123,20 @@ class FicheCreator {
 		} else {
 			var inputType = if (currentStep == AGE || currentStep == HEIGHT_CM || currentStep == WEIGHT_KG) "number" else "text";
 			form.innerHTML = '<label></label><input type="$inputType" /><a class="next">Valider</a>';
-			(cast form.querySelector("input") : InputElement).addEventListener("keydown", (e:js.html.KeyboardEvent) -> {
+			var inp:InputElement = cast form.querySelector("input");
+			inp.value = switch (currentStep) {
+				case PLAYER_NAME: currentData.playerName;
+				case CHARACTER_NAME: currentData.characterName;
+				case AGE: Std.string(currentData.age);
+				case HEIGHT_CM: Std.string(currentData.heightCm);
+				case WEIGHT_KG: Std.string(currentData.weightKg);
+				case HAIR: currentData.hair;
+				case EYES: currentData.eyes;
+				case DIVINITY: currentData.divinityName;
+				case ORIGIN: currentData.origin;
+				case CHARACTER_CLASS | RACE | ALIGNEMENT | GENDER | SIZE_CATEGORY | USE_PREDILECTION_HP: throw "unreachable";
+			};
+			inp.addEventListener("keydown", (e:js.html.KeyboardEvent) -> {
 				if (e.key == "Enter") validateStep();
 			});
 		}
@@ -141,6 +171,7 @@ class FicheCreator {
 					opt.innerText = cls.classToString();
 					sel.appendChild(opt);
 				}
+				sel.value = currentData.characterClass.getName();
 			} else if (currentStep == RACE) {
 				for (race in Type.allEnums(CharacterRace)) {
 					var opt = Browser.document.createOptionElement();
@@ -148,6 +179,7 @@ class FicheCreator {
 					opt.innerText = race.raceToString();
 					sel.appendChild(opt);
 				}
+				sel.value = currentData.race.getName();
 			} else if (currentStep == GENDER) {
 				for (gender in Type.allEnums(CharacterGender)) {
 					var opt = Browser.document.createOptionElement();
@@ -155,6 +187,7 @@ class FicheCreator {
 					opt.innerText = gender.genderToString();
 					sel.appendChild(opt);
 				}
+				sel.value = currentData.gender.getName();
 			} else if (currentStep == ALIGNEMENT) {
 				for (align in Type.allEnums(CharacterAlignement)) {
 					var opt = Browser.document.createOptionElement();
@@ -162,6 +195,7 @@ class FicheCreator {
 					opt.innerText = align.alignementToString();
 					sel.appendChild(opt);
 				}
+				sel.value = currentData.alignement.getName();
 			} else if (currentStep == SIZE_CATEGORY) {
 				for (size in [SIZE_P, SIZE_M, SIZE_G]) {
 					var opt = Browser.document.createOptionElement();
@@ -179,6 +213,7 @@ class FicheCreator {
 				optComp.value = "false";
 				optComp.innerText = "+1 rang de compétence par niveau";
 				sel.appendChild(optComp);
+				sel.value = Std.string(currentData.usePredilectionHP);
 			}
 		}
 	}
