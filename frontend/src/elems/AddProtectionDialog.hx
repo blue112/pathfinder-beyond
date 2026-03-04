@@ -21,6 +21,7 @@ class AddProtectionDialog extends Popup {
 				<option value='SHIELD'>Bouclier</option>
 				<option value='NATURAL_ARMOR'>Armure naturelle</option>
 				<option value='EVADE'>Esquive</option>
+				<option value='ARMOR_BONUS'>Bonus complet à la CA</option>
 			</select>
 		</div>
 		<div class='input-field'>
