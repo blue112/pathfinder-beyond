@@ -15,7 +15,7 @@ import express.Router;
 class FicheRouter implements IJSAsync {
 	static public function getRouter() {
 		var router = new Router();
-		router.post("/createFiche", onCreateFiche);
+		router.post("/createFiche", Express.raw({type: "*/*"}), onCreateFiche);
 		router.get("/:ficheId", checkFicheExists, getFiche);
 		router.delete("/:ficheId/:eventId", checkFicheExists, onDelEvent);
 		router.post("/:ficheId/roll", checkFicheExists, onDiceRoll);
@@ -151,34 +151,18 @@ class FicheRouter implements IJSAsync {
 	}
 
 	@:jsasync static public function onCreateFiche(req:Request, res:Response, next:Next) {
-		var body:Dynamic<String> = req.body;
-		var fiche:BasicFicheData = cast body;
+		var fiche:BasicFicheData;
 		try {
-			fiche.alignement = body.alignement.parseCharacterAlignement();
-			fiche.characterClass = body.characterClass.parseCharacterClass();
-			fiche.race = body.race.parseCharacterRace();
-			fiche.gender = body.gender.parseCharacterGender();
-			fiche.sizeCategory = body.sizeCategory.parseSizeCategory();
-			fiche.usePredilectionHP = cast(body.usePredilectionHP, Bool);
-			fiche.age = body.age.parseInt();
-			fiche.heightCm = body.heightCm.parseInt();
-			fiche.weightKg = body.weightKg.parseInt();
-
-			// Let's check that we have everything
+			fiche = Unserializer.run((cast req.body).toString());
 			for (i in GetAllFields.getNames(BasicFicheData)) {
-				if (!Reflect.hasField(fiche, i)) {
-					res.status(400).end('Missing field $i');
-					return;
-				}
-				var value:Dynamic = Reflect.getProperty(fiche, i);
-				if (value == null || value == "" && value != false) {
-					res.status(400).end('Invalid value for $i ("$value")');
+				if (Reflect.getProperty(fiche, i) == null) {
+					res.status(400).end('Invalid field $i');
 					return;
 				}
 			}
 		} catch (e:Dynamic) {
-			trace('Error when creating fiche with body $body: $e');
-			res.status(500).end();
+			trace('Error when creating fiche: $e');
+			res.status(400).end();
 			return;
 		}
 

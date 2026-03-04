@@ -25,12 +25,12 @@ enum abstract Step(Int) from Int to Int {
 
 class FicheCreator {
 	var currentStep:Step;
-	var currentData:Dynamic;
+	var currentData:BasicFicheData;
 	var mainElem:DivElement;
 
 	public function new() {
 		currentStep = 0;
-		currentData = {};
+		currentData = cast {};
 
 		mainElem = Browser.document.createDivElement();
 		mainElem.classList.add("fiche-create");
@@ -53,15 +53,15 @@ class FicheCreator {
 				if (inp.value.length == 0 || inp.value.length > 50) return;
 				currentData.characterName = inp.value;
 			case CHARACTER_CLASS:
-				currentData.characterClass = sel.value;
+				currentData.characterClass = CharacterClass.createByName(sel.value);
 			case RACE:
-				currentData.race = sel.value;
+				currentData.race = CharacterRace.createByName(sel.value);
 			case ALIGNEMENT:
-				currentData.alignement = sel.value;
+				currentData.alignement = CharacterAlignement.createByName(sel.value);
 			case GENDER:
-				currentData.gender = sel.value;
+				currentData.gender = CharacterGender.createByName(sel.value);
 			case SIZE_CATEGORY:
-				currentData.sizeCategory = sel.value;
+				currentData.sizeCategory = SizeCategory.createByName(sel.value);
 			case AGE:
 				var age = Std.parseInt(inp.value);
 				if (age == null || age <= 0) return;
@@ -158,18 +158,18 @@ class FicheCreator {
 			} else if (currentStep == ALIGNEMENT) {
 				for (align in Type.allEnums(CharacterAlignement)) {
 					var opt = Browser.document.createOptionElement();
-					opt.value = align.getName().replace("ALIGNEMENT_", "");
+					opt.value = align.getName();
 					opt.innerText = align.alignementToString();
 					sel.appendChild(opt);
 				}
 			} else if (currentStep == SIZE_CATEGORY) {
 				for (size in [SIZE_P, SIZE_M, SIZE_G]) {
 					var opt = Browser.document.createOptionElement();
-					opt.value = size.getName().replace("SIZE_", "");
+					opt.value = size.getName();
 					opt.innerText = size.sizeCategoryToString();
 					sel.appendChild(opt);
 				}
-				sel.value = if (currentData.race == "GNOME") "P" else "M";
+				sel.value = if (currentData.race == CharacterRace.GNOME) "SIZE_P" else "SIZE_M";
 			} else if (currentStep == USE_PREDILECTION_HP) {
 				var optPv = Browser.document.createOptionElement();
 				optPv.value = "true";
