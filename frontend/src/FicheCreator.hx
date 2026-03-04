@@ -30,10 +30,9 @@ class FicheCreator {
 
 	public function new() {
 		currentStep = 0;
-		// TODO: generate a random character name
 		currentData = {
 			playerName: "Anonymous Player",
-			characterName: "Red Daemon",
+			characterName: NameGenerator.characterName(),
 			characterClass: ROUBLARD,
 			race: HUMAN,
 			alignement: ALIGNEMENT_LN,
