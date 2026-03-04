@@ -318,11 +318,38 @@ class Fiche implements IJSAsync {
 	}
 
 	private function updateWeapons() {
-		var weapons = mainElem.querySelector(".weapons");
-		weapons.innerHTML = "";
-		for (i in character.weapons) {
-			addWeapon(i);
+		var weaponsSection = mainElem.querySelector(".weapons");
+		weaponsSection.innerHTML = "<h2>Armes</h2>";
+
+		for (weapon in character.weapons)
+			addWeapon(weapon);
+
+		if (character.weapons.length <= 1)
+			return;
+
+		var weaponDivs = weaponsSection.querySelectorAll(".weapon");
+		var tabsDiv = Browser.document.createDivElement();
+		tabsDiv.classList.add("weapon-tabs");
+
+		for (idx in 0...character.weapons.length) {
+			var tab = Browser.document.createDivElement();
+			tab.classList.add("weapon-tab");
+			tab.innerText = character.weapons[idx].name;
+			tab.dataset.label = character.weapons[idx].name;
+			if (idx == 0)
+				tab.classList.add("active");
+			else
+				(cast weaponDivs.item(idx) : Element).classList.add("hidden");
+			tab.addEventListener("click", () -> {
+				tabsDiv.querySelector(".weapon-tab.active").classList.remove("active");
+				(cast weaponsSection.querySelector(".weapon:not(.hidden)") : Element).classList.add("hidden");
+				(cast weaponDivs.item(idx) : Element).classList.remove("hidden");
+				tab.classList.add("active");
+			});
+			tabsDiv.appendChild(tab);
 		}
+
+		weaponsSection.insertBefore(tabsDiv, weaponDivs.item(0));
 	}
 
 	private function addWeapon(weapon:Weapon) {
