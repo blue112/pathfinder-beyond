@@ -22,6 +22,27 @@ class ProtocolUtil {
 		return null;
 	}
 
+	static public function parseCharacterGender(gender:String):CharacterGender {
+		var byName = CharacterGender.createByName(gender.toUpperCase());
+		if (byName != null)
+			return byName;
+		return null;
+	}
+
+	static public function genderToString(gender:CharacterGender):String {
+		return switch (gender) {
+			case MALE: "M";
+			case FEMALE: "F";
+		};
+	}
+
+	static public function parseCharacterRace(race:String):CharacterRace {
+		var byName = CharacterRace.createByName(race.toUpperCase());
+		if (byName != null)
+			return byName;
+		return null;
+	}
+
 	static public function parseCarac(c:String):Characteristic {
 		return if (c == "str") STRENGTH else if (c == "dex") DEXTERITY else if (c == "wis") WISDOM else if (c == "int") INTELLIGENCE else if (c == "cha")
 			CHARISMA else if (c == "con") CONSTITUTION else null;
@@ -90,6 +111,17 @@ class ProtocolUtil {
 			case LAWFUL: "Loi";
 			case UNTYPED: "Sans type";
 		}
+	}
+
+	static public function raceToString(race:CharacterRace):String {
+		return switch (race) {
+			case HUMAN: "Humain(e)";
+			case DWARF: "Nain(e)";
+			case ELF: "Elfe";
+			case HALF_ELF: "Demi-elfe";
+			case GNOME: "Gnome";
+			case HALF_ORC: "Demi-orque";
+		};
 	}
 
 	static public function alignementToString(alignement:CharacterAlignement) {

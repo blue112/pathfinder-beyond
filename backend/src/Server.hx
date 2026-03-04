@@ -12,6 +12,7 @@ class Server implements IJSAsync {
 		var app = new express.Express();
 		js.Node.require('express-ws')(app);
 		app.use(Express.json({inflate: false}));
+		app.use(HaxeBody.middleware);
 		app.use(Express.serveStatic("static"));
 		app.use("/api/fiche", FicheRouter.getRouter());
 		app.use("/api/campaign", CampaignRouter.getRouter());

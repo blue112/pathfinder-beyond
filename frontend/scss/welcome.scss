@@ -1,0 +1,32 @@
+@use "sass:color";
+@use "variables";
+@use "_mixins";
+
+.welcome {
+    h1 {
+        text-align: center;
+    }
+
+    .new-fiche {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        @include mixins.btn;
+        display: block;
+    }
+
+    footer {
+        position: absolute;
+        bottom: 10px;
+        text-align: center;
+        width: 100%;
+        font-size: 0.8em;
+
+        a {
+            color: black;
+        }
+    }
+}

@@ -1,7 +1,6 @@
 import js.html.WebSocket;
 import model.DiceRoll;
 import express.Express;
-import haxe.Unserializer;
 import jsasync.IJSAsync;
 import model.FicheEvent;
 import model.DatabaseHandler;
@@ -23,7 +22,7 @@ class FicheRouter implements IJSAsync {
 		router.get("/:ficheId/notes", checkFicheExists, fetchNotes);
 		router.post("/:ficheId/notes", checkFicheExists, onInsertNote);
 		router.put("/:ficheId/notes/:noteId", checkFicheExists, onUpdateNote);
-		router.put("/debug/:ficheId/push", checkFicheExists, Express.raw({type: "*/*"}), onPushEvent);
+		router.put("/debug/:ficheId/push", checkFicheExists, onPushEvent);
 		return router;
 	}
 
@@ -136,7 +135,7 @@ class FicheRouter implements IJSAsync {
 	@:jsasync static public function onPushEvent(req:Request, res:Response, next:Next) {
 		var ficheId = req.fiche.fiche_id;
 
-		var event = Unserializer.run((cast req.body).toString());
+		var event:Dynamic = req.body;
 		if (!Std.isOfType(event, FicheEventType)) {
 			res.end("Invalid event");
 			return;
@@ -151,32 +150,18 @@ class FicheRouter implements IJSAsync {
 	}
 
 	@:jsasync static public function onCreateFiche(req:Request, res:Response, next:Next) {
-		var body:Dynamic<String> = req.body;
-		var fiche:BasicFicheData = cast body;
+		var fiche:BasicFicheData;
 		try {
-			fiche.alignement = body.alignement.parseCharacterAlignement();
-			fiche.characterClass = body.characterClass.parseCharacterClass();
-			fiche.sizeCategory = body.sizeCategory.parseSizeCategory();
-			fiche.usePredilectionHP = cast(body.usePredilectionHP, Bool);
-			fiche.age = body.age.parseInt();
-			fiche.heightCm = body.heightCm.parseInt();
-			fiche.weightKg = body.weightKg.parseInt();
-
-			// Let's check that we have everything
+			fiche = cast req.body;
 			for (i in GetAllFields.getNames(BasicFicheData)) {
-				if (!Reflect.hasField(fiche, i)) {
-					res.status(400).end('Missing field $i');
-					return;
-				}
-				var value:Dynamic = Reflect.getProperty(fiche, i);
-				if (value == null || value == "" && value != false) {
-					res.status(400).end('Invalid value for $i ("$value")');
+				if (Reflect.getProperty(fiche, i) == null) {
+					res.status(400).end('Invalid field $i');
 					return;
 				}
 			}
 		} catch (e:Dynamic) {
-			trace('Error when creating fiche with body $body: $e');
-			res.status(500).end();
+			trace('Error when creating fiche: $e');
+			res.status(400).end();
 			return;
 		}
 
