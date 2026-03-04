@@ -837,14 +837,6 @@ class Fiche implements IJSAsync {
 				return "Skill type not found";
 			}
 			Api.pushEvent(ficheId, ADD_CLASS_SKILL(skill));
-		} else if (what == "protection") {
-			Api.pushEvent(ficheId, ADD_PROTECTION({
-				name: param1,
-				armor: param2.parseInt(),
-				type: ProtectionType.createByName(param3.toUpperCase()),
-				max_dex: param4.parseInt(),
-			}));
-			return "Ok";
 		}
 		return 'Unknown debug $what';
 	}
