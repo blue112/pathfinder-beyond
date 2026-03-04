@@ -67,6 +67,10 @@ class Rules {
 	}
 
 	static public function getSkillsMods(char:FullCharacter) {
+		var armorPenalty = char.protections
+			.filter(p -> (p.type == ARMOR || p.type == SHIELD) && p.armorMalus != null)
+			.fold((p, acc) -> acc + p.armorMalus, 0);
+
 		return RulesSkills.skills.map(n -> {
 			var ranks = char.getSkillRank(n.name);
 			var classSkill = isClassSkill(char, n.name) || char.additionalClassSkills.contains(n.name);
@@ -78,6 +82,7 @@ class Rules {
 			var charMod = char.skillModifiers.get(n.name);
 			if (charMod == null)
 				charMod = 0;
+			var armorMod = if (n.modifier == DEXTERITY || n.modifier == STRENGTH) armorPenalty else 0;
 
 			return {
 				id: n.name.getName().toLowerCase(),
@@ -87,7 +92,7 @@ class Rules {
 				characteristic: n.modifier,
 				ranks: ranks,
 				canUse: canUse,
-				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod
+				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod + armorMod
 			};
 		});
 	}

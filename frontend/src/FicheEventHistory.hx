@@ -16,6 +16,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 
 		var currentMods = [];
 		var currentItems = [];
+		var currentProtections:Array<Protection> = [];
 		this.fiche_id = fiche_id;
 
 		var list = Browser.document.createUListElement();
@@ -46,12 +47,18 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case CHANGE_MONEY(amount): 'Perte d\'argent (${- amount} po)';
 				case CHANGE_MAX_HP(amount): 'Changement des PV max (${amount.asMod()} pv)';
 				case LEVEL_UP(dice): 'Montée d\'un niveau ! Dé de vie = + $dice pv';
-				case ADD_PROTECTION(armor): 'Ajout ${switch (armor.type) {
-					case ARMOR: "d'une armure";
-					case SHIELD: "d'un bouclier";
-					case NATURAL_ARMOR: "d'une armure naturelle";
-					case EVADE: "d'un bonus d'esquive";
-				}}: ${armor.name.htmlEscape()} (+${armor.armor} CA)';
+				case ADD_PROTECTION(armor):
+					currentProtections.push(armor);
+					var malusStr = if (armor.armorMalus != null && armor.armorMalus != 0) ', malus ${armor.armorMalus.asMod()}' else "";
+					'Ajout ${switch (armor.type) {
+						case ARMOR: "d'une armure";
+						case SHIELD: "d'un bouclier";
+						case NATURAL_ARMOR: "d'une armure naturelle";
+						case EVADE: "d'un bonus d'esquive";
+					}}: ${armor.name.htmlEscape()} (+${armor.armor} CA$malusStr)';
+				case REMOVE_PROTECTION(n):
+					var p = currentProtections.splice(n, 1)[0];
+					'Retrait d\'une protection (${p.name.htmlEscape()})';
 				case ADD_INVENTORY_ITEM(item):
 					currentItems.push(Reflect.copy(item));
 					'Ajout d\'un objet à l\'inventaire: ${item.name.htmlEscape()} (x${item.quantity})';

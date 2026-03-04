@@ -421,6 +421,8 @@ h3 {
     div.skill.active,
     section.money > div:hover,
     section.money > div.active,
+    section.armorlist > div:hover,
+    section.armorlist > div.active,
     div.label:has(.actions-hover):hover,
     div.label.active,
     h2:has(.actions-hover):hover,
@@ -517,6 +519,13 @@ h3 {
             margin-right: 5px;
             font-family: "Roboto";
             font-size: 1.1em;
+        }
+    }
+
+    section.armorlist > div {
+        &:hover,
+        &.active {
+            grid-template-columns: 27px 1fr 100px;
         }
     }
 

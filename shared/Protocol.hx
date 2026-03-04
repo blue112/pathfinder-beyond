@@ -41,6 +41,7 @@ enum FicheEventType {
 	SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
 	ADD_EXCEPTIONAL_MODIFIER(mod:TemporaryModifier);
 	ADD_PROTECTION(armor:Protection);
+	REMOVE_PROTECTION(index:Int);
 	ADD_TEMPORARY_MODIFIER(mod:TemporaryModifier);
 	REMOVE_TEMPORARY_MODIFIER(index:Int);
 	CHANGE_MONEY(amount_po:Float);
@@ -73,6 +74,7 @@ typedef Protection = {
 	var type:ProtectionType;
 	var armor:Int;
 	var max_dex:Null<Int>;
+	var armorMalus:Null<Int>;
 };
 
 typedef Weapon = {

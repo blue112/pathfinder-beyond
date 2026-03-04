@@ -165,10 +165,11 @@ class Fiche implements IJSAsync {
 	}
 
 	function bindACActions() {
-		var menuLabels = ["Ajouter un modificateur temporaire", "Ajouter une protection"];
 		var action = mainElem.querySelector(".ac .plus");
 		makeTempModMenu(action, action.parentElement.parentElement, AC, ["Ajouter une protection"], (_) -> {
-			new Alert("Non implémenté", "Cette fonctionnalité n'est pas encore implémentée.");
+			new AddProtectionDialog((protection) -> {
+				pushEvent(ADD_PROTECTION(protection));
+			});
 		});
 	}
 
@@ -548,10 +549,19 @@ class Fiche implements IJSAsync {
 	function addArmor() {
 		var armorsDiv = mainElem.querySelector(".armorlist");
 		armorsDiv.innerHTML = "<h2>Protections <small>(déjà appliquées à la CA)</small></h2>";
-		for (p in character.protections) {
+		for (i in 0...character.protections.length) {
+			var p = character.protections[i];
 			var armorDiv = Browser.document.createDivElement();
 			armorDiv.classList.add("armor");
-			armorDiv.innerHTML = '<span class="name">${p.name.htmlEscape()}</span><span class="ac">${p.armor.asMod()} CA</span>';
+			armorDiv.innerHTML = '<div class="actions-hover"><a class="plus">+</a></div><span class="name">${p.name.htmlEscape()}</span><span class="ac">${p.armor.asMod()} CA</span>';
+			var plus = armorDiv.querySelector(".actions-hover .plus");
+			plus.addEventListener("click", () -> {
+				new ContextMenu(armorDiv, ["Supprimer la protection"], (choice) -> {
+					if (choice == 0)
+						pushEvent(REMOVE_PROTECTION(i));
+					return true;
+				});
+			});
 			armorsDiv.appendChild(armorDiv);
 		}
 	}

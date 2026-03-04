@@ -106,6 +106,8 @@ class FullCharacter {
 				exceptionalModifiers.push(mod);
 			case ADD_PROTECTION(armor):
 				protections.push(armor);
+			case REMOVE_PROTECTION(index):
+				protections.splice(index, 1);
 			case ADD_TEMPORARY_MODIFIER(mod):
 				tempMods.push(mod);
 				updateCharacts();
