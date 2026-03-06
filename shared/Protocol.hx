@@ -24,6 +24,7 @@ enum DamageType {
 	UNTYPED;
 }
 
+// Name matters, order does not
 enum FicheEventType {
 	CREATE(data:BasicFicheData);
 	SET_CHARACTERISTICS(data:Characteristics);

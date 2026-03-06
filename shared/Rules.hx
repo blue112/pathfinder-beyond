@@ -67,9 +67,8 @@ class Rules {
 	}
 
 	static public function getSkillsMods(char:FullCharacter) {
-		var armorPenalty = char.protections
-			.filter(p -> (p.type == ARMOR || p.type == SHIELD) && p.armorMalus != null)
-			.fold((p, acc) -> acc + p.armorMalus, 0);
+		var armorPenalty = char.protections.filter(p -> (p.type == ARMOR || p.type == SHIELD)
+			&& p.armorMalus != null).fold((p, acc) -> acc + p.armorMalus, 0);
 
 		return RulesSkills.skills.map(n -> {
 			var ranks = char.getSkillRank(n.name);
