@@ -187,6 +187,10 @@ class Rules {
 	static public function getVD(char:FullCharacter) {
 		// Todo, heavy armor
 		// https://www.pathfinder-fr.org/Wiki/Pathfinder-RPG.Valeurs%20de%20combat.ashx#VITESSEDEDEPLACEMENT
+		if (char.basics.race.match(DWARF)) {
+			return 4;
+		}
+
 		return switch (char.basics.sizeCategory) {
 			case SIZE_M: 6;
 			case SIZE_P: 4;
