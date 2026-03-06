@@ -58,7 +58,7 @@ class DatabaseHandler implements IJSAsync {
 
 	@:jsasync static function checkMigration() {
 		try {
-			var results = exec("SELECT id FROM migrations ORDER BY id DESC").jsawait();
+			var results = exec("SELECT id FROM migrations ORDER BY id DESC LIMIT 1").jsawait();
 			if (results.length == 0) {
 				runMigrations(0);
 				return;
