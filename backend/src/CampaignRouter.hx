@@ -1,3 +1,4 @@
+import model.CampaignEvent;
 import model.DiceRoll;
 import model.FicheEvent;
 import model.DatabaseHandler;
@@ -14,6 +15,7 @@ class CampaignRouter implements IJSAsync {
 		router.post("/new", onCreateCampaign);
 		router.get("/:campaignId", checkCampaignExists, loadCampaign);
 		router.post("/:campaignId/link", checkCampaignExists, linkFiche);
+		router.post("/:campaignId/event", checkCampaignExists, pushCampaignEvent);
 		return router;
 	}
 
@@ -65,7 +67,21 @@ class CampaignRouter implements IJSAsync {
 				i.latestDiceRoll = latestDiceRoll.toPublic();
 		}
 
-		res.hx({name: req.campaign.name, fiches: linkedFiche});
+		var campaignEvents = CampaignEvent.getEvents(req.campaign.campaign_id).jsawait();
+
+		res.hx({name: req.campaign.name, fiches: linkedFiche, campaignEvents: campaignEvents});
+	}
+
+	@:jsasync static public function pushCampaignEvent(req:Request, res:Response, next:Next) {
+		var event:Dynamic = req.body;
+		if (!Std.isOfType(event, CampaignEventType)) {
+			res.status(400).end("Invalid event");
+			return;
+		}
+
+		var ce = new CampaignEvent(req.campaign.campaign_id, event);
+		ce.insert().jsawait();
+		res.json({"success": true});
 	}
 
 	@:jsasync static public function onCreateCampaign(req:Request, res:Response, next:Next) {

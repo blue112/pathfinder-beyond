@@ -2,6 +2,7 @@
 using jsasync.JSAsyncTools;
 
 import Protocol;
+import CampaignProtocol;
 
 using ProtocolUtil;
 using Lambda;

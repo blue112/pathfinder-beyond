@@ -79,6 +79,15 @@ class Api implements IJSAsync {
 		return r.json().jsawait();
 	}
 
+	@:jsasync static public function pushCampaignEvent(campaignId:String, event:CampaignEventType):Promise<Dynamic> {
+		var r = Browser.window.fetch('/api/campaign/$campaignId/event', {
+			method: "post",
+			headers: {"Content-Type": "application/haxe-serialized"},
+			body: Serializer.run(event)
+		}).jsawait();
+		return r.json().jsawait();
+	}
+
 	@:jsasync static public function pushEvent(ficheId:String, event:FicheEventType):Promise<Dynamic> {
 		var r = Browser.window.fetch('/api/fiche/debug/$ficheId/push', {
 			method: "put",

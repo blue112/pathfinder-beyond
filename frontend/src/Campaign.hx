@@ -8,12 +8,26 @@ import js.Browser;
 import js.html.DivElement;
 import jsasync.IJSAsync;
 
+private typedef CampaignFicheInfo = {
+	var fiche_id:String;
+	var characterName:String;
+	var latestDiceRoll:Null<PublicDiceRoll>;
+	var events:Array<FicheEventTs>;
+};
+
+private typedef CampaignLoadResult = {
+	var name:String;
+	var fiches:Array<CampaignFicheInfo>;
+	var campaignEvents:Array<CampaignEventTs>;
+};
+
 class Campaign implements IJSAsync {
 	var campaign_id:String;
 	var mainElem:DivElement;
 	var charactersByFicheId:StringMap<FullCharacter>;
 	var tableLineByFicheId:StringMap<TableRowElement>;
 	var latestDiceRollByFicheId:StringMap<PublicDiceRoll>;
+	var campaignState:CampaignState;
 
 	public function new(campaign_id:String) {
 		this.campaign_id = campaign_id;
@@ -67,15 +81,7 @@ class Campaign implements IJSAsync {
 		if (!campaignIdRegex.match(campaign_id))
 			return;
 
-		var result:{
-			name:String,
-			fiches:Array<{
-				fiche_id:String,
-				characterName:String,
-				latestDiceRoll:PublicDiceRoll,
-				events:Array<FicheEventTs>
-			}>
-		} = Api.load('/campaign/$campaign_id').jsawait();
+		var result:CampaignLoadResult = Api.load('/campaign/$campaign_id').jsawait();
 		mainElem.querySelector("h1").innerText = result.name;
 
 		var characters = mainElem.querySelector(".characters");
@@ -83,6 +89,10 @@ class Campaign implements IJSAsync {
 		charactersByFicheId = new StringMap();
 		tableLineByFicheId = new StringMap();
 		latestDiceRollByFicheId = new StringMap();
+		campaignState = new CampaignState();
+		for (event in result.campaignEvents) {
+			campaignState.processEvent(event.type);
+		}
 		for (char in result.fiches) {
 			var elem = Browser.document.createTableRowElement();
 			elem.innerHTML = Resource.getString('campaign_line.html');
@@ -135,5 +145,12 @@ class Campaign implements IJSAsync {
 				updateRoll(i);
 			}
 		};
+	}
+
+	@:jsasync private function pushEvent(event:CampaignEventType) {
+		var result = Api.pushCampaignEvent(campaign_id, event).jsawait();
+		if (result.success) {
+			campaignState.processEvent(event);
+		}
 	}
 }

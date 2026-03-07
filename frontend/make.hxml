@@ -1,6 +1,5 @@
 -js ../backend/static/main.js
 -main App
--cp ../shared
 --resource src/assets/fiche.tpl.html@fiche.html
 --resource src/assets/weapon.tpl.html@weapon.html
 --resource src/assets/campaign.tpl.html@campaign.html
@@ -9,3 +8,4 @@
 -cp src
 -debug
 -lib jsasync
+-cp ../shared
