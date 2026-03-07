@@ -52,6 +52,8 @@ class FullCharacter {
 		switch (type) {
 			case CREATE(data):
 				this.basics = data;
+			case CHANGE_ALIGNEMENT(alignement):
+				this.basics.alignement = alignement;
 			case SET_CHARACTERISTICS(data):
 				this.characteristics = data;
 				updateCharacts();

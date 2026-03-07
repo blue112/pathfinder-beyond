@@ -35,6 +35,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case ADD_CLASS_SKILL(skill): 'Ajout d\'une compétence de classe (${RulesSkills.getSkillLabel(skill)})';
 				case SET_SKILL_MODIFIER(skill, mod): 'Ajout d\'un modificateur de compétence (${RulesSkills.getSkillLabel(skill)}): ${mod.asMod()}';
 				case SET_SAVING_THROW_MODIFIER(st, mod): 'Modificateur permanent de jet de sauvegarde (${st.savingThrowToString()}): ${mod.asMod()}';
+				case CHANGE_ALIGNEMENT(alignement): 'Changement d\'alignement : ${alignement.alignementToString()}';
 				case CHANGE_CARAC(c, amount): 'Modification ${c.caracToString(true)} : ${amount.asMod()}';
 				case ADD_WEAPON(weapon): 'Ajout d\'une arme (${weapon.name.htmlEscape()})';
 				case TRAIN_SKILL(skill): 'Ajout d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';

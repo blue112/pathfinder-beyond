@@ -73,6 +73,7 @@ class Fiche implements IJSAsync {
 		bindACActions();
 		bindSavingThrowActions();
 		bindInitiativeActions();
+		bindChangeAlignementAction();
 
 		load(fiche_id);
 	}
@@ -168,6 +169,16 @@ class Fiche implements IJSAsync {
 					});
 			});
 		}
+	}
+
+	function bindChangeAlignementAction() {
+		var plus = mainElem.querySelector(".field[data-id=alignement] .plus");
+		plus.addEventListener("click", () -> {
+			var all = CharacterAlignement.createAll();
+			new ChoicesDialog("Changer l'alignement", all.map(a -> a.alignementToString()), (choice) -> {
+				pushEvent(CHANGE_ALIGNEMENT(all[choice]));
+			});
+		});
 	}
 
 	function bindACActions() {
