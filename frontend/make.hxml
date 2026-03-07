@@ -3,7 +3,7 @@
 --resource src/assets/fiche.tpl.html@fiche.html
 --resource src/assets/weapon.tpl.html@weapon.html
 --resource src/assets/campaign.tpl.html@campaign.html
---resource src/assets/campaign_line.tpl.html@campaign_line.html
+--resource src/assets/campaign_character.tpl.html@campaign_character.html
 --resource src/assets/welcome.tpl.html@welcome.html
 -cp src
 -debug

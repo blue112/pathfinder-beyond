@@ -6,6 +6,75 @@
         text-align: center;
     }
 
+    section.encounter {
+        display: none;
+        margin-bottom: 40px;
+
+        &.shown {
+            display: block;
+        }
+
+        h2 {
+            text-align: center;
+            position: relative;
+        }
+
+        h2 a.end-encounter {
+            position: absolute;
+            right: 5px;
+            display: inline-block;
+            border: 1px solid black;
+            padding: 1px 5px;
+            background: white;
+            line-height: 16px;
+            color: black;
+            cursor: pointer;
+            font-size: 0.7em;
+            vertical-align: middle;
+            text-decoration: none;
+
+            &:hover {
+                background: color.adjust(white, $lightness: -10%);
+            }
+        }
+
+        td a.remove-encounter {
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+
+            &:hover {
+                color: red;
+            }
+        }
+
+        td.character {
+            font-weight: bold;
+        }
+
+        td.npc-hp {
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        td.note {
+            cursor: pointer;
+            font-style: italic;
+            color: #555555;
+
+            &:empty::before {
+                content: "…";
+            }
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
     section.npcs {
         margin-top: 40px;
 
@@ -27,8 +96,26 @@
         }
     }
 
+    td.add-encounter a {
+        display: inline-block;
+        border: 1px solid black;
+        padding: 1px 5px;
+        background: white;
+        line-height: 16px;
+        color: black;
+        cursor: pointer;
+        font-size: 0.8em;
+        text-decoration: none;
+
+        &:hover {
+            background: color.adjust(white, $lightness: -10%);
+            text-decoration: none;
+        }
+    }
+
     section.characters table,
-    section.npcs table {
+    section.npcs table,
+    section.encounter table {
         border-collapse: collapse;
         width: 100%;
 
@@ -86,10 +173,6 @@
                 text-decoration: none;
                 color: black;
                 font-size: 0.8em;
-
-                &:hover {
-                    text-decoration: underline;
-                }
             }
         }
     }

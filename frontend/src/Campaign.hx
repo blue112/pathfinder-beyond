@@ -8,6 +8,8 @@ import js.Browser;
 import js.html.DivElement;
 import jsasync.IJSAsync;
 
+using Rules;
+
 private typedef CampaignFicheInfo = {
 	var fiche_id:String;
 	var characterName:String;
@@ -43,6 +45,12 @@ class Campaign implements IJSAsync {
 			});
 		});
 
+		mainElem.querySelector(".end-encounter").addEventListener("click", () -> {
+			new elems.YesNoAlert("Terminer la rencontre", "Terminer la rencontre en cours ?", () -> {
+				pushEvent(CLEAR_ENCOUNTER);
+			});
+		});
+
 		load();
 	}
 
@@ -63,6 +71,7 @@ class Campaign implements IJSAsync {
 		tableLine.querySelector(".max").innerText = character.getMaxHitPoints().string();
 		tableLine.querySelector(".tempmod .count").innerText = character.tempMods.length.string();
 		updateRoll(fiche_id);
+		renderEncounter();
 	}
 
 	function updateRoll(fiche_id:String) {
@@ -100,9 +109,10 @@ class Campaign implements IJSAsync {
 			campaignState.processEvent(event.type);
 		}
 		renderNpcs();
+		renderEncounter();
 		for (char in result.fiches) {
 			var elem = Browser.document.createTableRowElement();
-			elem.innerHTML = Resource.getString('campaign_line.html');
+			elem.innerHTML = Resource.getString('campaign_character.html');
 
 			var fc = new FullCharacter();
 			for (event in char.events) {
@@ -123,6 +133,30 @@ class Campaign implements IJSAsync {
 			});
 			elem.querySelector(".tempmod .count").addEventListener('click', () -> {
 				new TemporaryModifiersList(char.fiche_id, fc.tempMods);
+			});
+			elem.querySelector(".add-encounter a").addEventListener('click', () -> {
+				var alreadyIn = campaignState.encounter.exists(e -> switch (e.entity) {
+					case CHARACTER(id): id == char.fiche_id;
+					case NPC(_): false;
+				});
+				if (alreadyIn) {
+					new elems.Alert("Rencontre", '${charactersByFicheId.get(char.fiche_id).basics.characterName} est déjà dans la rencontre.');
+					return;
+				}
+				var roll = latestDiceRollByFicheId.get(char.fiche_id);
+				var initiative:Int;
+				if (roll != null && roll.field_name == "initiative") {
+					initiative = roll.result + (if (roll.mod != null) roll.mod else 0);
+				} else {
+					var input = js.Browser.window.prompt('Initiative de ${charactersByFicheId.get(char.fiche_id).basics.characterName} ?');
+					if (input == null)
+						return;
+					var parsed = input.parseInt();
+					if (parsed == null)
+						return;
+					initiative = parsed;
+				}
+				pushEvent(ADD_TO_ENCOUNTER(CHARACTER(char.fiche_id), initiative));
 			});
 
 			characters.querySelector("tbody").appendChild(elem);
@@ -166,7 +200,100 @@ class Campaign implements IJSAsync {
 				<td title="Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}">${npc.ac}</td>
 				<td>${npc.cr}</td>
 				<td>${notes}</td>
+				<td class="add-encounter"><a>+</a></td>
 			';
+			row.querySelector(".add-encounter a").addEventListener("click", () -> {
+				var initiative = dice(20) + npc.initiativeModifier;
+				pushEvent(ADD_TO_ENCOUNTER(NPC(npc.name), initiative));
+			});
+			tbody.appendChild(row);
+		}
+	}
+
+	private function renderEncounter() {
+		var section = (cast mainElem.querySelector("section.encounter") : js.html.Element);
+		var tbody = mainElem.querySelector("section.encounter tbody");
+		var encounter = campaignState.encounter;
+		section.classList.toggle("shown", encounter.length > 0);
+		tbody.innerHTML = "";
+		for (i in 0...encounter.length) {
+			var entry = encounter[i];
+			var isNpc = entry.entity.match(NPC(_));
+			var name = switch (entry.entity) {
+				case CHARACTER(ficheId):
+					var fc = charactersByFicheId.get(ficheId);
+					if (fc != null) fc.basics.characterName else "?";
+				case NPC(npcName): npcName;
+			}
+			var hp = switch (entry.entity) {
+				case CHARACTER(ficheId):
+					var fc = charactersByFicheId.get(ficheId);
+					if (fc != null) '${fc.current_hp} / ${fc.getMaxHitPoints()}' else "?";
+				case NPC(npcName):
+					var npc = campaignState.npcs.find(n -> n.name == npcName);
+					if (npc != null && entry.currentHp != null) '${entry.currentHp} / ${npc.maxHp}' else "?";
+			}
+			var ac = switch (entry.entity) {
+				case CHARACTER(ficheId):
+					var fc = charactersByFicheId.get(ficheId);
+					if (fc != null) fc.getAC().string() else "?";
+				case NPC(npcName):
+					var npc = campaignState.npcs.find(n -> n.name == npcName);
+					if (npc != null) npc.ac.string() else "?";
+			}
+			var acTooltip = switch (entry.entity) {
+				case CHARACTER(ficheId):
+					var fc = charactersByFicheId.get(ficheId);
+					if (fc != null) 'Contact: ${fc.getACContact()} / Surprise: ${fc.getACSurprise()}' else "";
+				case NPC(npcName):
+					var npc = campaignState.npcs.find(n -> n.name == npcName);
+					if (npc != null) 'Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}' else "";
+			}
+			var row = Browser.document.createTableRowElement();
+			row.innerHTML = '
+				<td class="initiative"></td>
+				<td class="name"></td>
+				<td class="hp"></td>
+				<td class="ca"></td>
+				<td class="note"></td>
+				<td><a class="remove-encounter">✕</a></td>
+			';
+			row.querySelector(".initiative").innerText = entry.initiative.string();
+			row.querySelector(".name").innerText = name;
+			row.querySelector(".hp").innerText = hp;
+			var caCell = row.querySelector(".ca");
+			caCell.innerText = ac;
+			caCell.title = acTooltip;
+			var noteCell = row.querySelector(".note");
+			noteCell.innerText = if (entry.note != null) entry.note else "";
+			noteCell.addEventListener("click", () -> {
+				new elems.NoteDialog(entry.note, (note) -> {
+					pushEvent(SET_ENCOUNTER_NOTE(i, note));
+				});
+			});
+			row.querySelector(".remove-encounter").addEventListener("click", () -> {
+				pushEvent(REMOVE_FROM_ENCOUNTER(i));
+			});
+			if (isNpc) {
+				row.querySelector(".name").classList.add("npc");
+				row.querySelector(".hp").classList.add("npc-hp");
+				row.querySelector(".npc-hp").addEventListener("click", () -> {
+					new ContextMenu(cast row.querySelector(".npc-hp"), ["Dégâts", "Soins"], (choice) -> {
+						if (choice == 0) {
+							new elems.DamageChoice((amount, damageType) -> {
+								pushEvent(DAMAGE_NPC_IN_ENCOUNTER(i, amount, damageType));
+							});
+						} else if (choice == 1) {
+							new elems.AmountChoice("Soins", "Combien de PV rendre ?", null, (amount, _) -> {
+								pushEvent(HEAL_NPC_IN_ENCOUNTER(i, amount));
+							});
+						}
+						return true;
+					});
+				});
+			} else {
+				row.querySelector(".name").classList.add("character");
+			}
 			tbody.appendChild(row);
 		}
 	}
@@ -176,6 +303,7 @@ class Campaign implements IJSAsync {
 		if (result.success) {
 			campaignState.processEvent(event);
 			renderNpcs();
+			renderEncounter();
 		}
 	}
 }
