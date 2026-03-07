@@ -37,6 +37,12 @@ class Campaign implements IJSAsync {
 		mainElem.innerHTML = Resource.getString('campaign.html');
 		Browser.document.body.appendChild(mainElem);
 
+		mainElem.querySelector(".add-npc").addEventListener("click", () -> {
+			new elems.AddNPCDialog((npc) -> {
+				pushEvent(ADD_NPC(npc));
+			});
+		});
+
 		load();
 	}
 
@@ -93,6 +99,7 @@ class Campaign implements IJSAsync {
 		for (event in result.campaignEvents) {
 			campaignState.processEvent(event.type);
 		}
+		renderNpcs();
 		for (char in result.fiches) {
 			var elem = Browser.document.createTableRowElement();
 			elem.innerHTML = Resource.getString('campaign_line.html');
@@ -147,10 +154,28 @@ class Campaign implements IJSAsync {
 		};
 	}
 
+	private function renderNpcs() {
+		var tbody = mainElem.querySelector(".npcs tbody");
+		tbody.innerHTML = "";
+		for (npc in campaignState.npcs) {
+			var row = Browser.document.createTableRowElement();
+			var notes = if (npc.notes != null) npc.notes else "";
+			row.innerHTML = '
+				<td>${npc.name}</td>
+				<td>${npc.maxHp}</td>
+				<td title="Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}">${npc.ac}</td>
+				<td>${npc.cr}</td>
+				<td>${notes}</td>
+			';
+			tbody.appendChild(row);
+		}
+	}
+
 	@:jsasync private function pushEvent(event:CampaignEventType) {
 		var result = Api.pushCampaignEvent(campaign_id, event).jsawait();
 		if (result.success) {
 			campaignState.processEvent(event);
+			renderNpcs();
 		}
 	}
 }

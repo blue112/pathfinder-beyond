@@ -6,7 +6,29 @@
         text-align: center;
     }
 
-    section.characters table {
+    section.npcs {
+        margin-top: 40px;
+
+        h2 a.add-npc {
+            display: inline-block;
+            border: 1px solid black;
+            padding: 1px 5px;
+            background: white;
+            line-height: 16px;
+            color: black;
+            cursor: pointer;
+            font-size: 0.7em;
+            vertical-align: middle;
+            text-decoration: none;
+
+            &:hover {
+                background: color.adjust(white, $lightness: -10%);
+            }
+        }
+    }
+
+    section.characters table,
+    section.npcs table {
         border-collapse: collapse;
         width: 100%;
 
