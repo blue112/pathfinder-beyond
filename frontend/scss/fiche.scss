@@ -466,40 +466,6 @@ h3 {
         padding: 0;
         position: relative;
 
-        menu {
-            position: absolute;
-            left: 0px;
-            top: 15px;
-            background-color: color.adjust($color: variables.$backgroundColor, $lightness: 10%);
-            width: 300px;
-            padding: 0;
-            margin-top: 10px;
-            margin-bottom: 0;
-            font-weight: normal;
-            font-size: 1rem;
-            color: black;
-
-            ul {
-                padding: 0;
-                list-style: none;
-                line-height: 1.2;
-
-                li {
-                    border-bottom: 1px dotted #555555;
-                    padding: 10px;
-                    cursor: pointer;
-
-                    &:last-child {
-                        border-bottom: none;
-                    }
-
-                    &:hover {
-                        background-color: #c2ffaf;
-                    }
-                }
-            }
-        }
-
         .actions-hover {
             grid-column: 1;
             background: rgba(0, 0, 0, 0.5);
@@ -570,10 +536,6 @@ h3 {
             grid-column: 2;
             background: none;
 
-            menu {
-                top: 0px;
-                left: 0px;
-            }
         }
     }
 
