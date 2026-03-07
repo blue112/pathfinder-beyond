@@ -40,6 +40,7 @@ class Fiche implements IJSAsync {
 
 		availableFields = new StringMap();
 		fieldsNames = new StringMap();
+		fieldsNames.set("libre", "Lancé de dé libre");
 		for (i in mainElem.querySelectorAll("*")) {
 			var e:Element = cast i;
 			var id = e.dataset.id;
@@ -225,6 +226,16 @@ class Fiche implements IJSAsync {
 		mainElem.querySelector("a.see-temp-mods").addEventListener("click", () -> {
 			new TemporaryModifiersList(fiche_id, character.tempMods);
 		});
+		mainElem.querySelector("a.roll-free-dice").addEventListener("click", () -> {
+			new FreeDiceDialog((choice) -> {
+				rollFreeDice(FreeDiceDialog.diceForIndex(choice));
+			});
+		});
+	}
+
+	@:jsasync function rollFreeDice(faces:Int) {
+		var apiResult = Api.rollDice(fiche_id, faces, 0, "libre").jsawait();
+		Dice.roll([], apiResult.result, faces);
 	}
 
 	function bindD20() {
