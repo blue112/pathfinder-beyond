@@ -30,6 +30,7 @@ enum FicheEventType {
 	SET_CHARACTERISTICS(data:Characteristics);
 	CHANGE_CARAC(carac:Characteristic, amount:Int);
 	ADD_WEAPON(weapon:Weapon);
+	REMOVE_WEAPON(index:Int);
 	TRAIN_SKILL(skill:SkillType);
 	DECREASE_SKILL(skill:SkillType);
 	CHANGE_HP(amount:Int);

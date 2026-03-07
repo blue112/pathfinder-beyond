@@ -17,6 +17,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 		var currentMods = [];
 		var currentItems = [];
 		var currentProtections:Array<Protection> = [];
+		var currentWeapons:Array<Weapon> = [];
 		this.fiche_id = fiche_id;
 
 		var list = Browser.document.createUListElement();
@@ -37,7 +38,12 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case SET_SAVING_THROW_MODIFIER(st, mod): 'Modificateur permanent de jet de sauvegarde (${st.savingThrowToString()}): ${mod.asMod()}';
 				case CHANGE_ALIGNEMENT(alignement): 'Changement d\'alignement : ${alignement.alignementToString()}';
 				case CHANGE_CARAC(c, amount): 'Modification ${c.caracToString(true)} : ${amount.asMod()}';
-				case ADD_WEAPON(weapon): 'Ajout d\'une arme (${weapon.name.htmlEscape()})';
+				case ADD_WEAPON(weapon):
+					currentWeapons.push(weapon);
+					'Ajout d\'une arme (${weapon.name.htmlEscape()})';
+				case REMOVE_WEAPON(n):
+					var w = currentWeapons.splice(n, 1)[0];
+					'Retrait d\'une arme (${w.name.htmlEscape()})';
 				case TRAIN_SKILL(skill): 'Ajout d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
 				case DECREASE_SKILL(skill): 'Retrait d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
 				case CHANGE_HP(amount) if (amount > 0): 'Récupération de points de vie (${amount} pv)';

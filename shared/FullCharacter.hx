@@ -80,6 +80,8 @@ class FullCharacter {
 				updateCharacts();
 			case ADD_WEAPON(weapon):
 				weapons.push(weapon);
+			case REMOVE_WEAPON(index):
+				weapons.splice(index, 1);
 			case LEVEL_UP(hp_dice):
 				level += 1;
 				hp_dice = Math.min(hp_dice, getHitDice()).int();

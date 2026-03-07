@@ -423,6 +423,20 @@ h3 {
 
                 h3 {
                     border-color: color.adjust($color: #b8ae98, $lightness: -20%);
+                    display: grid;
+                    grid-template-columns: 27px 1fr;
+                    align-items: center;
+                    position: relative;
+
+                    span {
+                        grid-column: 2;
+                    }
+
+                    &:hover {
+                        grid-template-columns: 27px 1fr;
+                        padding: 2px 0;
+                        padding-bottom: 5px;
+                    }
                 }
 
                 .field .value.mod.num {
@@ -450,17 +464,12 @@ h3 {
     }
 
     div.skill:hover,
-    div.skill.active,
     section.money > div:hover,
-    section.money > div.active,
     section.armorlist > div:hover,
-    section.armorlist > div.active,
     div.label:has(.actions-hover):hover,
-    div.label.active,
     h2:has(.actions-hover):hover,
-    h2.active,
-    div.value:has(.actions-hover):hover,
-    div.value.active {
+    h3:has(.actions-hover):hover,
+    div.value:has(.actions-hover):hover {
         display: grid;
         grid-template-columns: auto 1fr;
         padding: 0;
@@ -502,8 +511,7 @@ h3 {
         margin: 0;
         display: grid;
 
-        &:hover,
-        &.active {
+        &:hover {
             padding: 1px;
             grid-template-columns: 27px 1fr;
         }
@@ -521,14 +529,12 @@ h3 {
     }
 
     section.armorlist > div {
-        &:hover,
-        &.active {
+        &:hover {
             grid-template-columns: 27px 1fr 100px;
         }
     }
 
-    .field div.value:hover,
-    .field div.value.active {
+    .field div.value:hover {
         overflow: visible;
         grid-template-columns: 1fr auto;
         .actions-hover {

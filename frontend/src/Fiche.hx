@@ -353,8 +353,8 @@ class Fiche implements IJSAsync {
 		var weaponsSection = mainElem.querySelector(".weapons");
 		weaponsSection.innerHTML = "<h2>Armes</h2>";
 
-		for (weapon in character.weapons)
-			addWeapon(weapon);
+		for (idx in 0...character.weapons.length)
+			addWeapon(character.weapons[idx], idx);
 
 		if (character.weapons.length <= 1)
 			return;
@@ -384,12 +384,20 @@ class Fiche implements IJSAsync {
 		weaponsSection.insertBefore(tabsDiv, weaponDivs.item(0));
 	}
 
-	private function addWeapon(weapon:Weapon) {
+	private function addWeapon(weapon:Weapon, idx:Int) {
 		var divWeapon = Browser.document.createDivElement();
 		divWeapon.classList.add("weapon");
 		divWeapon.innerHTML = Resource.getString("weapon.html");
 
-		divWeapon.querySelector("h3").innerText = weapon.name;
+		divWeapon.querySelector("h3 span").innerText = weapon.name;
+		var plus = divWeapon.querySelector("h3 .plus");
+		plus.addEventListener("click", () -> {
+			new ContextMenu(plus, ["Supprimer l'arme"], (choice) -> {
+				if (choice == 0)
+					pushEvent(REMOVE_WEAPON(idx));
+				return true;
+			});
+		});
 		if (weapon.munitions != null && weapon.munitions != "")
 			getField(divWeapon, "ammo").innerText = weapon.munitions;
 		else
