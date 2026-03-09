@@ -87,7 +87,7 @@ class ProtocolUtil {
 			case MAGICIEN: "magicien";
 			case PRETRE: "pretre";
 		};
-		return '/assets/icons/$name.svg';
+		return '/assets/icons/classes/$name.svg';
 	}
 
 	static public function sizeCategoryToString(size:SizeCategory) {
