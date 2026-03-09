@@ -651,7 +651,10 @@ class Fiche implements IJSAsync {
                 <div class='skill-mod'></div>
 			";
 
-			skillDiv.querySelector(".label").innerHTML = skill.label + (if (skill.classSkill) " <ins title='Compétence de classe'>(C)</ins>" else "");
+			var iconPath = skill.characteristic.characteristicToIconPath();
+		var caracName = skill.characteristic.caracToString(false);
+		var classSkillSuffix = if (skill.classSkill) " <ins title='Compétence de classe'>(C)</ins>" else "";
+		skillDiv.querySelector(".label").innerHTML = '<img src="$iconPath" class="carac-icon" title="$caracName" alt="$caracName"> ${skill.label}$classSkillSuffix';
 			var mod = skill.mod + character.getTempMods([SKILL(skill.name)]).sum();
 			if (skill.canUse)
 				skillDiv.querySelector(".mod").innerText = mod.asMod();

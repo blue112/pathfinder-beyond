@@ -58,12 +58,12 @@ class ProtocolUtil {
 
 	static public function caracToString(c:Characteristic, withPrefix:Bool) {
 		return switch (c) {
-			case STRENGTH: if (withPrefix) "de la force" else "force";
-			case DEXTERITY: if (withPrefix) "de la dextérité" else "dextérité";
-			case WISDOM: if (withPrefix) "de la sagesse" else "sagesse";
-			case INTELLIGENCE: if (withPrefix) "de l'intelligence" else "intelligence";
-			case CHARISMA: if (withPrefix) "du charisme" else "charisme";
-			case CONSTITUTION: if (withPrefix) "de la constitution" else "constitution";
+			case STRENGTH: if (withPrefix) "de la force" else "Force";
+			case DEXTERITY: if (withPrefix) "de la dextérité" else "Dextérité";
+			case WISDOM: if (withPrefix) "de la sagesse" else "Sagesse";
+			case INTELLIGENCE: if (withPrefix) "de l'intelligence" else "Intelligence";
+			case CHARISMA: if (withPrefix) "du charisme" else "Charisme";
+			case CONSTITUTION: if (withPrefix) "de la constitution" else "Constitution";
 		};
 	}
 
@@ -76,6 +76,10 @@ class ProtocolUtil {
 			case MAGICIEN: "Magicien(ne)";
 			case PRETRE: "Prêtre(sse)";
 		}
+	}
+
+	static public function characteristicToIconPath(c:Characteristic) {
+		return '/assets/icons/characs/${c.getName().toLowerCase()}.svg';
 	}
 
 	static public function classToIconPath(cls:CharacterClass) {

@@ -4,19 +4,35 @@
 
 @mixin skill {
     display: grid;
-    grid-template-columns: 1fr 30px 30px;
+    grid-template-columns: auto 1fr 30px 30px;
     gap: 5px;
     margin-bottom: 2px;
     border-bottom: 1px solid #b0a896;
     height: 29px;
 
+    .actions-hover {
+        display: flex;
+        align-items: center;
+        visibility: hidden;
+        padding: 0 5px;
+
+        a {
+            display: block;
+            border: 1px solid black;
+            padding: 2px;
+            background: white;
+            line-height: 10px;
+            color: black;
+            cursor: pointer;
+        }
+    }
+
     &:hover,
     &.active {
         background: color.adjust($color: variables.$backgroundColor, $lightness: -3%);
-        grid-template-columns: auto 1fr 30px 30px;
 
         .actions-hover {
-            padding: 0 5px;
+            visibility: visible;
         }
 
         .skill-mod {
@@ -31,7 +47,14 @@
         font-size: 0.9rem;
         display: flex;
         align-items: center;
+        gap: 5px;
         padding-right: 10px;
+
+        img.carac-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
     }
     .mod {
         @include mixins.mod-box;
