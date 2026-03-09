@@ -71,6 +71,7 @@ class AddNPCDialog extends Popup {
 				},
 				cr: inputValue("cr"),
 				notes: if (notesStr == "") null else notesStr,
+				weapons: [],
 			};
 			onChoice(npc);
 			close();

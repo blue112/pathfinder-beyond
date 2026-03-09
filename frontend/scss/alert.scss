@@ -33,6 +33,21 @@
             p {
                 text-align: center;
             }
+
+            p.weapon-roll-note {
+                font-style: italic;
+                color: #666;
+                font-size: 0.9em;
+                margin-top: 8px;
+            }
+
+            span.die-result {
+                background: #f5ecd7;
+                border: 1px solid #c8a96e;
+                border-radius: 3px;
+                padding: 1px 6px;
+                font-weight: bold;
+            }
             .actions {
                 display: flex;
                 justify-content: center;

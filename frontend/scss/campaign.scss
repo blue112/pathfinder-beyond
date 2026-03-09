@@ -38,6 +38,22 @@
             }
         }
 
+        td a.use-weapon {
+            cursor: pointer;
+            text-decoration: none;
+            margin-right: 8px;
+
+            img {
+                width: 18px;
+                height: 18px;
+                vertical-align: middle;
+            }
+
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+
         td a.remove-encounter {
             cursor: pointer;
             text-decoration: none;
@@ -77,6 +93,24 @@
 
     section.npcs {
         margin-top: 40px;
+
+        td.npc-name {
+            cursor: pointer;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        tr.npc-weapon td {
+            padding: 2px 10px 2px 20px;
+            font-size: 0.85em;
+            color: #444;
+            font-style: italic;
+
+            span.weapon-note {
+                color: #777;
+            }
+        }
 
         h2 a.add-npc {
             display: inline-block;

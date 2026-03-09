@@ -1,4 +1,15 @@
 import Protocol.DamageType;
+import Protocol.WeaponDamageType;
+
+typedef NPCWeapon = {
+	var name:String;
+	var attackBonus:Int;
+	var damage:String;
+	var damageTypes:Array<WeaponDamageType>;
+	var criticalNums:Array<Int>;
+	var criticalMultiplier:Int;
+	var note:Null<String>;
+};
 
 typedef NPCSavingThrows = {
 	var reflexes:Int;
@@ -16,6 +27,7 @@ typedef NPCInfo = {
 	var savingThrows:NPCSavingThrows;
 	var cr:String;
 	var notes:Null<String>;
+	var weapons:Array<NPCWeapon>;
 };
 
 enum EncounterEntityType {
@@ -38,6 +50,7 @@ enum CampaignEventType {
 	DAMAGE_NPC_IN_ENCOUNTER(index:Int, amount:Int, damageType:DamageType);
 	HEAL_NPC_IN_ENCOUNTER(index:Int, amount:Int);
 	SET_ENCOUNTER_NOTE(index:Int, note:String);
+	ADD_NPC_WEAPON(npcName:String, weapon:NPCWeapon);
 }
 
 typedef CampaignEventTs = {

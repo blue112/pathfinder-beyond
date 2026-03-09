@@ -200,18 +200,52 @@ class Campaign implements IJSAsync {
 			var row = Browser.document.createTableRowElement();
 			var notes = if (npc.notes != null) npc.notes else "";
 			row.innerHTML = '
-				<td>${npc.name}</td>
+				<td class="npc-name"></td>
 				<td>${npc.maxHp}</td>
 				<td title="Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}">${npc.ac}</td>
 				<td>${npc.cr}</td>
-				<td>${notes}</td>
+				<td></td>
 				<td class="add-encounter"><a>+</a></td>
 			';
+			var nameCell = row.querySelector(".npc-name");
+			nameCell.innerText = npc.name;
+			var notesCell = row.querySelectorAll("td").item(4);
+			(cast notesCell : js.html.Element).innerText = notes;
+			nameCell.addEventListener("click", () -> {
+				new ContextMenu(cast nameCell, ["Ajouter une arme"], (choice) -> {
+					if (choice == 0) {
+						new elems.NPCWeaponDialog((weapon) -> {
+							pushEvent(ADD_NPC_WEAPON(npc.name, weapon));
+						});
+					}
+					return true;
+				});
+			});
 			row.querySelector(".add-encounter a").addEventListener("click", () -> {
 				var initiative = dice(20) + npc.initiativeModifier;
 				pushEvent(ADD_TO_ENCOUNTER(NPC(npc.name), initiative));
 			});
 			tbody.appendChild(row);
+			for (weapon in npc.weapons) {
+				var weaponRow = Browser.document.createTableRowElement();
+				weaponRow.classList.add("npc-weapon");
+				var damageTypesStr = weapon.damageTypes.map(dt -> switch (dt) {
+					case PERFORANT: "P";
+					case TRANCHANT: "T";
+					case CONTONDANT: "C";
+				}).join("/");
+				var critStr = '${weapon.criticalNums.join(",")} ×${weapon.criticalMultiplier}';
+				weaponRow.innerHTML = '<td colspan="6"></td>';
+				var cell = weaponRow.querySelector("td");
+				cell.innerText = '${weapon.name} — ${weapon.attackBonus.asMod()} — ${weapon.damage} (${damageTypesStr}) crit: ${critStr}';
+				if (weapon.note != null) {
+					var noteSpan = Browser.document.createSpanElement();
+					noteSpan.className = "weapon-note";
+					noteSpan.innerText = ' — ${weapon.note}';
+					cell.appendChild(noteSpan);
+				}
+				tbody.appendChild(weaponRow);
+			}
 		}
 	}
 
@@ -281,6 +315,19 @@ class Campaign implements IJSAsync {
 						return true;
 					});
 				});
+				if (npc != null && npc.weapons.length > 0) {
+					var weaponBtn = Browser.document.createAnchorElement();
+					var weaponImg = Browser.document.createImageElement();
+					weaponImg.src = "/assets/icons/attack.svg";
+					weaponImg.alt = "Attaquer";
+					weaponBtn.appendChild(weaponImg);
+					weaponBtn.className = "use-weapon";
+					weaponBtn.title = "Attaquer";
+					row.querySelector("td:last-child").insertBefore(weaponBtn, row.querySelector(".remove-encounter"));
+					weaponBtn.addEventListener("click", () -> {
+						useWeapon(weaponBtn, npc.weapons);
+					});
+				}
 			} else {
 				nameCell.classList.add("character");
 				if (fc != null) {
@@ -295,6 +342,17 @@ class Campaign implements IJSAsync {
 				}
 			}
 			tbody.appendChild(row);
+		}
+	}
+
+	private function useWeapon(anchor:js.html.AnchorElement, weapons:Array<NPCWeapon>) {
+		if (weapons.length == 1) {
+			new elems.WeaponRollDialog(weapons[0]);
+		} else {
+			new ContextMenu(cast anchor, weapons.map(w -> w.name), (choice) -> {
+				new elems.WeaponRollDialog(weapons[choice]);
+				return true;
+			});
 		}
 	}
 

@@ -12,7 +12,11 @@ class CampaignState {
 	public function processEvent(type:CampaignEventType) {
 		switch (type) {
 			case ADD_NPC(npc):
+				npc.weapons = [];
 				npcs.push(npc);
+			case ADD_NPC_WEAPON(npcName, weapon):
+				var npc = npcs.find(n -> n.name == npcName);
+				if (npc != null) npc.weapons.push(weapon);
 			case ADD_TO_ENCOUNTER(entity, initiative):
 				encounter.push({entity: entity, initiative: initiative, currentHp: npcMaxHp(entity), note: null});
 				encounter.sort((a, b) -> b.initiative - a.initiative);

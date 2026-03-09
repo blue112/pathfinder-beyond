@@ -42,7 +42,7 @@ class ContextMenu {
 
 	function onClick(e:MouseEvent) {
 		var t:Element = cast e.target;
-		while (t != Browser.document.body) {
+		while (t != null && t != Browser.document.body) {
 			if (t == menu)
 				return;
 
