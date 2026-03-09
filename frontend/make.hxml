@@ -8,4 +8,5 @@
 -cp src
 -debug
 -lib jsasync
+-D jsasync-no-markers
 -cp ../shared
