@@ -78,6 +78,18 @@ class ProtocolUtil {
 		}
 	}
 
+	static public function classToIconPath(cls:CharacterClass) {
+		var name = switch (cls) {
+			case ROUBLARD: "roublard";
+			case METAMORPHE: "metamorphe";
+			case CONJURATEUR: "conjurateur";
+			case CONJURATEUR_EIDOLON_BIPED: "eidolon_du_conjurateur";
+			case MAGICIEN: "magicien";
+			case PRETRE: "pretre";
+		};
+		return '/assets/icons/$name.svg';
+	}
+
 	static public function sizeCategoryToString(size:SizeCategory) {
 		return switch (size) {
 			case SIZE_I: "I (Infime)";

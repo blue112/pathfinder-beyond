@@ -61,4 +61,8 @@
 - Manage fights with a whole party as a DM ⏳
 - Full Spell management
 
+# Attributions
+
+Icons are from https://github.com/intrinsical/tw-dnd/tree/main, used under CC BY-SA
+
 ### Powered by Haxe

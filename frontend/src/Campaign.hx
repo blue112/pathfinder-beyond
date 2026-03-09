@@ -121,8 +121,13 @@ class Campaign implements IJSAsync {
 			charactersByFicheId.set(char.fiche_id, fc);
 
 			(cast elem.querySelector("a") : AnchorElement).href = '/fiche/${char.fiche_id}';
-			elem.querySelector(".name").innerText = char.characterName.split(' ')[0];
-			elem.querySelector(".cls").innerText = fc.basics.characterClass.classToString();
+			var img = Browser.document.createImageElement();
+			img.src = fc.basics.characterClass.classToIconPath();
+			img.title = fc.basics.characterClass.classToString();
+			img.alt = fc.basics.characterClass.classToString();
+			var nameCell = elem.querySelector(".name");
+			nameCell.appendChild(img);
+			nameCell.appendChild(Browser.document.createTextNode(' ' + char.characterName.split(' ')[0]));
 
 			tableLineByFicheId.set(char.fiche_id, elem);
 			latestDiceRollByFicheId.set(char.fiche_id, char.latestDiceRoll);
@@ -219,36 +224,19 @@ class Campaign implements IJSAsync {
 		for (i in 0...encounter.length) {
 			var entry = encounter[i];
 			var isNpc = entry.entity.match(NPC(_));
-			var name = switch (entry.entity) {
-				case CHARACTER(ficheId):
-					var fc = charactersByFicheId.get(ficheId);
-					if (fc != null) fc.basics.characterName else "?";
-				case NPC(npcName): npcName;
+
+			var fc:FullCharacter = null;
+			var npc:NPCInfo = null;
+			switch (entry.entity) {
+				case CHARACTER(ficheId): fc = charactersByFicheId.get(ficheId);
+				case NPC(npcName): npc = campaignState.npcs.find(n -> n.name == npcName);
 			}
-			var hp = switch (entry.entity) {
-				case CHARACTER(ficheId):
-					var fc = charactersByFicheId.get(ficheId);
-					if (fc != null) '${fc.current_hp} / ${fc.getMaxHitPoints()}' else "?";
-				case NPC(npcName):
-					var npc = campaignState.npcs.find(n -> n.name == npcName);
-					if (npc != null && entry.currentHp != null) '${entry.currentHp} / ${npc.maxHp}' else "?";
-			}
-			var ac = switch (entry.entity) {
-				case CHARACTER(ficheId):
-					var fc = charactersByFicheId.get(ficheId);
-					if (fc != null) fc.getAC().string() else "?";
-				case NPC(npcName):
-					var npc = campaignState.npcs.find(n -> n.name == npcName);
-					if (npc != null) npc.ac.string() else "?";
-			}
-			var acTooltip = switch (entry.entity) {
-				case CHARACTER(ficheId):
-					var fc = charactersByFicheId.get(ficheId);
-					if (fc != null) 'Contact: ${fc.getACContact()} / Surprise: ${fc.getACSurprise()}' else "";
-				case NPC(npcName):
-					var npc = campaignState.npcs.find(n -> n.name == npcName);
-					if (npc != null) 'Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}' else "";
-			}
+
+			var name = if (fc != null) fc.basics.characterName else if (npc != null) npc.name else "?";
+			var hp = if (fc != null) '${fc.current_hp} / ${fc.getMaxHitPoints()}' else if (npc != null && entry.currentHp != null) '${entry.currentHp} / ${npc.maxHp}' else "?";
+			var ac = if (fc != null) fc.getAC().string() else if (npc != null) npc.ac.string() else "?";
+			var acTooltip = if (fc != null) 'Contact: ${fc.getACContact()} / Surprise: ${fc.getACSurprise()}' else if (npc != null) 'Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}' else "";
+
 			var row = Browser.document.createTableRowElement();
 			row.innerHTML = '
 				<td class="initiative"></td>
@@ -259,7 +247,6 @@ class Campaign implements IJSAsync {
 				<td><a class="remove-encounter">✕</a></td>
 			';
 			row.querySelector(".initiative").innerText = entry.initiative.string();
-			row.querySelector(".name").innerText = name;
 			row.querySelector(".hp").innerText = hp;
 			var caCell = row.querySelector(".ca");
 			caCell.innerText = ac;
@@ -274,8 +261,11 @@ class Campaign implements IJSAsync {
 			row.querySelector(".remove-encounter").addEventListener("click", () -> {
 				pushEvent(REMOVE_FROM_ENCOUNTER(i));
 			});
+
+			var nameCell = row.querySelector(".name");
 			if (isNpc) {
-				row.querySelector(".name").classList.add("npc");
+				nameCell.classList.add("npc");
+				nameCell.innerText = name;
 				row.querySelector(".hp").classList.add("npc-hp");
 				row.querySelector(".npc-hp").addEventListener("click", () -> {
 					new ContextMenu(cast row.querySelector(".npc-hp"), ["Dégâts", "Soins"], (choice) -> {
@@ -292,7 +282,17 @@ class Campaign implements IJSAsync {
 					});
 				});
 			} else {
-				row.querySelector(".name").classList.add("character");
+				nameCell.classList.add("character");
+				if (fc != null) {
+					var img = Browser.document.createImageElement();
+					img.src = fc.basics.characterClass.classToIconPath();
+					img.title = fc.basics.characterClass.classToString();
+					img.alt = fc.basics.characterClass.classToString();
+					nameCell.appendChild(img);
+					nameCell.appendChild(Browser.document.createTextNode(' $name'));
+				} else {
+					nameCell.innerText = name;
+				}
 			}
 			tbody.appendChild(row);
 		}
