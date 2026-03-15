@@ -16,6 +16,7 @@ class CampaignRouter implements IJSAsync {
 		router.get("/:campaignId", checkCampaignExists, loadCampaign);
 		router.post("/:campaignId/link", checkCampaignExists, linkFiche);
 		router.post("/:campaignId/event", checkCampaignExists, pushCampaignEvent);
+		router.delete("/:campaignId/event/:eventId", checkCampaignExists, delCampaignEvent);
 		return router;
 	}
 
@@ -82,6 +83,13 @@ class CampaignRouter implements IJSAsync {
 		var ce = new CampaignEvent(req.campaign.campaign_id, event);
 		ce.insert().jsawait();
 		res.json({"success": true});
+	}
+
+	@:jsasync static public function delCampaignEvent(req:Request, res:Response, next:Next) {
+		var campaign_id = req.campaign.campaign_id;
+		var eventId = (req.params : Dynamic).eventId;
+		DatabaseHandler.exec("DELETE FROM campaign_events WHERE campaign_id = ? AND id = ?", [campaign_id, eventId]).jsawait();
+		res.json({success: true});
 	}
 
 	@:jsasync static public function onCreateCampaign(req:Request, res:Response, next:Next) {

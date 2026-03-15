@@ -58,21 +58,7 @@ h3 {
     flex-direction: column;
 
     section.actions {
-        position: absolute;
-        top: 0;
-        right: 0;
-
-        a {
-            border: 1px solid black;
-            background: color.adjust(variables.$backgroundColor, $lightness: -30%);
-            font-size: 0.8em;
-            padding: 3px 8px;
-            cursor: pointer;
-
-            &:hover {
-                background: color.adjust(variables.$backgroundColor, $lightness: -20%);
-            }
-        }
+        @include mixins.actions-bar();
 
         .see-temp-mods .count {
             margin-right: 5px;

@@ -1,9 +1,16 @@
 @use "variables";
 @use "sass:color";
+@use "mixins";
 
 .campaign {
+    position: relative;
+
     h1 {
         text-align: center;
+    }
+
+    div.actions {
+        @include mixins.actions-bar();
     }
 
     section.encounter {

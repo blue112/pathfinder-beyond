@@ -30,6 +30,7 @@ class Campaign implements IJSAsync {
 	var tableLineByFicheId:StringMap<TableRowElement>;
 	var latestDiceRollByFicheId:StringMap<PublicDiceRoll>;
 	var campaignState:CampaignState;
+	var campaignEvents:Array<CampaignEventTs>;
 
 	public function new(campaign_id:String) {
 		this.campaign_id = campaign_id;
@@ -49,6 +50,14 @@ class Campaign implements IJSAsync {
 			new elems.YesNoAlert("Terminer la rencontre", "Terminer la rencontre en cours ?", () -> {
 				pushEvent(CLEAR_ENCOUNTER);
 			});
+		});
+
+		mainElem.querySelector("a.history").addEventListener("click", () -> {
+			var ficheNames = new StringMap<String>();
+			for (ficheId in charactersByFicheId.keys()) {
+				ficheNames.set(ficheId, charactersByFicheId.get(ficheId).basics.characterName);
+			}
+			new CampaignEventHistory(campaign_id, campaignEvents, ficheNames);
 		});
 
 		load();
@@ -105,6 +114,7 @@ class Campaign implements IJSAsync {
 		tableLineByFicheId = new StringMap();
 		latestDiceRollByFicheId = new StringMap();
 		campaignState = new CampaignState();
+		campaignEvents = result.campaignEvents;
 		for (event in result.campaignEvents) {
 			campaignState.processEvent(event.type);
 		}
