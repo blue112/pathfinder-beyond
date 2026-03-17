@@ -1,6 +1,11 @@
 import Protocol.DamageType;
 import Protocol.WeaponDamageType;
 
+typedef NPCDamageReduction = {
+	var amount:Int;
+	var bypassTypes:Array<DamageType>;
+};
+
 typedef NPCWeapon = {
 	var name:String;
 	var attackBonus:Int;
@@ -28,6 +33,7 @@ typedef NPCInfo = {
 	var cr:String;
 	var notes:Null<String>;
 	var weapons:Array<NPCWeapon>;
+	var damageReduction:Null<NPCDamageReduction>;
 };
 
 enum EncounterEntityType {
@@ -53,6 +59,7 @@ enum CampaignEventType {
 	SET_ENCOUNTER_NOTE(index:Int, note:String);
 	ADD_NPC_WEAPON(npcName:String, weapon:NPCWeapon);
 	SET_NPC_AC_IN_ENCOUNTER(index:Int, ac:Int);
+	SET_NPC_DAMAGE_REDUCTION(npcName:String, damageReduction:NPCDamageReduction);
 }
 
 typedef CampaignEventTs = {

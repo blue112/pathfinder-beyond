@@ -178,6 +178,11 @@
     }
 
     &.damage {
+        p.damage-types-label {
+            margin-top: 20px;
+            margin-bottom: 4px;
+        }
+
         .damage-types {
             display: flex;
             flex-direction: column;

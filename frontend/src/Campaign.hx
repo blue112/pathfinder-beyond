@@ -209,23 +209,32 @@ class Campaign implements IJSAsync {
 		for (npc in campaignState.npcs) {
 			var row = Browser.document.createTableRowElement();
 			var notes = if (npc.notes != null) npc.notes else "";
+			var damageReductionStr = if (npc.damageReduction == null) "—" else {
+				var types = npc.damageReduction.bypassTypes.map(t -> t.damageTypeToString()).join(", ");
+				'${npc.damageReduction.amount}/${if (types == "") "—" else types}';
+			};
 			row.innerHTML = '
 				<td class="npc-name"></td>
 				<td>${npc.maxHp}</td>
 				<td title="Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}">${npc.ac}</td>
+				<td class="npc-rd"></td>
 				<td>${npc.cr}</td>
-				<td></td>
+				<td class="npc-notes"></td>
 				<td class="add-encounter"><a>+</a></td>
 			';
 			var nameCell = row.querySelector(".npc-name");
 			nameCell.innerText = npc.name;
-			var notesCell = row.querySelectorAll("td").item(4);
-			(cast notesCell : js.html.Element).innerText = notes;
+			row.querySelector(".npc-rd").innerText = damageReductionStr;
+			row.querySelector(".npc-notes").innerText = notes;
 			nameCell.addEventListener("click", () -> {
-				new ContextMenu(cast nameCell, ["Ajouter une arme"], (choice) -> {
+				new ContextMenu(cast nameCell, ["Ajouter une arme", "Définir la RD"], (choice) -> {
 					if (choice == 0) {
 						new elems.NPCWeaponDialog((weapon) -> {
 							pushEvent(ADD_NPC_WEAPON(npc.name, weapon));
+						});
+					} else if (choice == 1) {
+						new elems.NPCDamageReductionDialog(npc.damageReduction, (damageReduction) -> {
+							pushEvent(SET_NPC_DAMAGE_REDUCTION(npc.name, damageReduction));
 						});
 					}
 					return true;
@@ -245,7 +254,7 @@ class Campaign implements IJSAsync {
 					case CONTONDANT: "C";
 				}).join("/");
 				var critStr = '${weapon.criticalNums.join(",")} ×${weapon.criticalMultiplier}';
-				weaponRow.innerHTML = '<td colspan="6"></td>';
+				weaponRow.innerHTML = '<td colspan="7"></td>';
 				var cell = weaponRow.querySelector("td");
 				cell.innerText = '${weapon.name} — ${weapon.attackBonus.asMod()} — ${weapon.damage} (${damageTypesStr}) crit: ${critStr}';
 				if (weapon.note != null) {

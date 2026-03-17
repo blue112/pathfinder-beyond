@@ -24,10 +24,19 @@ class CampaignState {
 				encounter.splice(index, 1);
 			case CLEAR_ENCOUNTER:
 				encounter = [];
-			case DAMAGE_NPC_IN_ENCOUNTER(index, amount, _):
+			case DAMAGE_NPC_IN_ENCOUNTER(index, amount, damageType):
 				var entry = encounter[index];
-				if (entry.currentHp != null)
-					entry.currentHp = entry.currentHp - amount;
+				if (entry.currentHp != null) {
+					var npc = switch (entry.entity) {
+						case NPC(npcName): npcs.find(n -> n.name == npcName);
+						case CHARACTER(_): null;
+					};
+					var effectiveAmount = if (npc != null && npc.damageReduction != null && !npc.damageReduction.bypassTypes.has(damageType))
+						Std.int(Math.max(amount - npc.damageReduction.amount, 0))
+					else
+						amount;
+					entry.currentHp = entry.currentHp - effectiveAmount;
+				}
 			case HEAL_NPC_IN_ENCOUNTER(index, amount):
 				var entry = encounter[index];
 				if (entry.currentHp != null) {
@@ -38,6 +47,9 @@ class CampaignState {
 				encounter[index].note = note;
 		case SET_NPC_AC_IN_ENCOUNTER(index, ac):
 			encounter[index].currentAc = ac;
+		case SET_NPC_DAMAGE_REDUCTION(npcName, damageReduction):
+			var npc = npcs.find(n -> n.name == npcName);
+			if (npc != null) npc.damageReduction = damageReduction;
 		}
 	}
 

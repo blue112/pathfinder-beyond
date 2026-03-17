@@ -48,6 +48,10 @@ class CampaignEventHistory extends Popup {
 				case SET_NPC_AC_IN_ENCOUNTER(index, ac):
 					var entityName = index < currentEncounter.length ? entityToName(currentEncounter[index].entity, ficheNames) : '?';
 					'CA modifiée sur ${entityName.htmlEscape()}: $ac';
+				case SET_NPC_DAMAGE_REDUCTION(npcName, damageReduction):
+					var types = damageReduction.bypassTypes.map(t -> t.damageTypeToString()).join(", ");
+					var rdStr = '${damageReduction.amount}/${if (types == "") "&mdash;" else types}';
+					'RD de ${npcName.htmlEscape()} définie: $rdStr';
 			};
 			elem.innerHTML = '<a class="del">x</a> <small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> $event';
 			list.appendChild(elem);
