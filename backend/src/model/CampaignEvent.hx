@@ -18,6 +18,9 @@ class CampaignEvent implements IJSAsync {
 		this.ts_ms = Date.now().getTime();
 	}
 
+	public function getId():Int { return id; }
+	public function getTs():Float { return ts_ms; }
+
 	public function toPublic():CampaignEventTs {
 		return {
 			id: id,

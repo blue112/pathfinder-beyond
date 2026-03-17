@@ -385,6 +385,7 @@ class Campaign implements IJSAsync {
 		var result = Api.pushCampaignEvent(campaign_id, event).jsawait();
 		if (result.success) {
 			campaignState.processEvent(event);
+			campaignEvents.push({type: event, id: result.eventId, ts: result.eventTs});
 			renderNpcs();
 			renderEncounter();
 		}

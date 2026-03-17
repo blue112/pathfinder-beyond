@@ -82,7 +82,7 @@ class CampaignRouter implements IJSAsync {
 
 		var ce = new CampaignEvent(req.campaign.campaign_id, event);
 		ce.insert().jsawait();
-		res.json({"success": true});
+		res.json({"success": true, "eventId": ce.getId(), "eventTs": ce.getTs()});
 	}
 
 	@:jsasync static public function delCampaignEvent(req:Request, res:Response, next:Next) {
