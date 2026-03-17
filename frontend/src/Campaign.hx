@@ -278,7 +278,7 @@ class Campaign implements IJSAsync {
 
 			var name = if (fc != null) fc.basics.characterName else if (npc != null) npc.name else "?";
 			var hp = if (fc != null) '${fc.current_hp} / ${fc.getMaxHitPoints()}' else if (npc != null && entry.currentHp != null) '${entry.currentHp} / ${npc.maxHp}' else "?";
-			var ac = if (fc != null) fc.getAC().string() else if (npc != null) npc.ac.string() else "?";
+			var ac = if (fc != null) fc.getAC().string() else if (entry.currentAc != null) entry.currentAc.string() else "?";
 			var acTooltip = if (fc != null) 'Contact: ${fc.getACContact()} / Surprise: ${fc.getACSurprise()}' else if (npc != null) 'Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}' else "";
 
 			var row = Browser.document.createTableRowElement();
@@ -323,6 +323,12 @@ class Campaign implements IJSAsync {
 							});
 						}
 						return true;
+					});
+				});
+				caCell.classList.add("npc-ac");
+				caCell.addEventListener("click", () -> {
+					new elems.AmountChoice("Modifier la CA", "Nouvelle valeur de CA :", {defaultValue: if (entry.currentAc != null) entry.currentAc else 0}, (newAc, _) -> {
+						pushEvent(SET_NPC_AC_IN_ENCOUNTER(i, newAc));
 					});
 				});
 				if (npc != null && npc.weapons.length > 0) {

@@ -18,7 +18,7 @@ class CampaignState {
 				var npc = npcs.find(n -> n.name == npcName);
 				if (npc != null) npc.weapons.push(weapon);
 			case ADD_TO_ENCOUNTER(entity, initiative):
-				encounter.push({entity: entity, initiative: initiative, currentHp: npcMaxHp(entity), note: null});
+				encounter.push({entity: entity, initiative: initiative, currentHp: npcMaxHp(entity), currentAc: npcBaseAc(entity), note: null});
 				encounter.sort((a, b) -> b.initiative - a.initiative);
 			case REMOVE_FROM_ENCOUNTER(index):
 				encounter.splice(index, 1);
@@ -36,6 +36,8 @@ class CampaignState {
 				}
 			case SET_ENCOUNTER_NOTE(index, note):
 				encounter[index].note = note;
+		case SET_NPC_AC_IN_ENCOUNTER(index, ac):
+			encounter[index].currentAc = ac;
 		}
 	}
 
@@ -44,7 +46,16 @@ class CampaignState {
 			case NPC(npcName):
 				var npc = npcs.find(n -> n.name == npcName);
 				if (npc != null) npc.maxHp else null;
-			case CHARACTER(_): null; // HP is tracked in FullCharacter, not CampaignState
+			case CHARACTER(_): null;
+		};
+	}
+
+	function npcBaseAc(entity:EncounterEntityType):Null<Int> {
+		return switch (entity) {
+			case NPC(npcName):
+				var npc = npcs.find(n -> n.name == npcName);
+				if (npc != null) npc.ac else null;
+			case CHARACTER(_): null;
 		};
 	}
 }

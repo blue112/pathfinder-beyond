@@ -39,6 +39,7 @@ typedef EncounterEntry = {
 	var entity:EncounterEntityType;
 	var initiative:Int;
 	var currentHp:Null<Int>;
+	var currentAc:Null<Int>;
 	var note:Null<String>;
 };
 
@@ -51,6 +52,7 @@ enum CampaignEventType {
 	HEAL_NPC_IN_ENCOUNTER(index:Int, amount:Int);
 	SET_ENCOUNTER_NOTE(index:Int, note:String);
 	ADD_NPC_WEAPON(npcName:String, weapon:NPCWeapon);
+	SET_NPC_AC_IN_ENCOUNTER(index:Int, ac:Int);
 }
 
 typedef CampaignEventTs = {

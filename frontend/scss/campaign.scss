@@ -75,7 +75,8 @@
             font-weight: bold;
         }
 
-        td.npc-hp {
+        td.npc-hp,
+        td.npc-ac {
             cursor: pointer;
 
             &:hover {
