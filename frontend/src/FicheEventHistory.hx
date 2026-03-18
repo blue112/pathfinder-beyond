@@ -52,7 +52,9 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case ADD_DAMAGE_RESISTANCE(damageType, amount): 'Résistance modifiée: ${damageType.damageTypeToString()}: ${amount}';
 				case REMOVE_DAMAGE_RESISTANCE(damageType): 'Résistance retirée: ${damageType.damageTypeToString()}';
 				case CHANGE_MONEY(amount) if (amount > 0): 'Gain d\'argent (${amount} PO)';
-				case CHANGE_MONEY(amount): 'Perte d\'argent (${- amount} po)';
+				case CHANGE_MONEY(amount): 'Perte d\'argent (${- amount} PO)';
+				case CHANGE_BANK_MONEY(amount) if (amount > 0): 'Dépôt en banque (${amount} PO)';
+				case CHANGE_BANK_MONEY(amount): 'Retrait en banque (${- amount} PO)';
 				case CHANGE_MAX_HP(amount): 'Changement des PV max (${amount.asMod()} pv)';
 				case LEVEL_UP(dice): 'Montée d\'un niveau ! Dé de vie = + $dice pv';
 				case ADD_PROTECTION(armor):
