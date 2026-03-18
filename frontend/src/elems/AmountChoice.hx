@@ -51,6 +51,8 @@ class AmountChoice extends Popup {
 		mainElem.querySelector("p").innerText = message;
 		input = cast mainElem.querySelector(".input input");
 		input.value = options.defaultValue.string();
+		resizeInput();
+		input.addEventListener("input", resizeInput);
 		reasonInput = cast mainElem.querySelector(".reason input");
 		mainElem.querySelector("a.decrease").addEventListener("click", changeAmount.bind(false));
 		mainElem.querySelector("a.increase").addEventListener("click", changeAmount.bind(true));
@@ -60,6 +62,11 @@ class AmountChoice extends Popup {
 		});
 
 		Browser.document.body.appendChild(mainElem);
+	}
+
+	function resizeInput(?_:js.html.Event) {
+		var len = input.value.length;
+		input.style.width = 'calc(${if (len > 1) len else 2}ch + 10px)';
 	}
 
 	function changeAmount(up:Bool, e:MouseEvent) {
@@ -74,5 +81,6 @@ class AmountChoice extends Popup {
 			current = Math.max(current, 0).int();
 
 		input.value = current.string();
+		resizeInput();
 	}
 }
