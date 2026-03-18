@@ -752,11 +752,15 @@ class Fiche implements IJSAsync {
 		<ul></ul>
     <a class='add-new'>Ajouter un nouvel objet</a>";
 
-		for (item in character.inventory) {
+		var sorted = character.inventory.copy();
+		sorted.sort((a, b) -> (if (a.priority == null) 0 else a.priority) - (if (b.priority == null) 0 else b.priority));
+
+		for (item in sorted) {
 			var li = Browser.document.createLIElement();
-			li.innerHTML = "<div class='qty'><span class='text'></span><a class='change'>✎</a></div><div class='name'></div><a class='delete' title='Supprimer'>X</a>";
+			li.innerHTML = "<div class='qty'><a class='change'>✎</a><span class='text'></span></div><div class='name'></div><div class='priority'></div><a class='delete' title='Supprimer'>X</a>";
 			li.querySelector(".qty .text").innerText = item.quantity.string();
 			li.querySelector(".name").innerText = item.name;
+			li.querySelector(".priority").innerText = (if (item.priority == null) 0 else item.priority).string();
 			li.querySelector(".delete").addEventListener('click', () -> {
 				new YesNoAlert("Effacer un objet", 'Supprimer l\'objet ${item.name} de l\'inventaire ?', () -> {
 					pushEvent(REMOVE_INVENTORY_ITEM(character.inventory.indexOf(item)));
@@ -774,14 +778,20 @@ class Fiche implements IJSAsync {
 					pushEvent(CHANGE_ITEM_NAME(character.inventory.indexOf(item), newName));
 				});
 			});
+			li.querySelector(".priority").addEventListener('click', () -> {
+				new AmountChoice('Priorité de l\'objet ${item.name}', "Priorité (−1000 à 1000)", {defaultValue: if (item.priority == null) 0 else item.priority, canBeNegative: true}, (newPriority, _) -> {
+					pushEvent(CHANGE_ITEM_PRIORITY(character.inventory.indexOf(item), newPriority));
+				});
+			});
 			inventory.querySelector("ul").appendChild(li);
 		}
 
 		inventory.querySelector("a.add-new").addEventListener("click", () -> {
-			new ItemDialog((quantity, name) -> {
+			new ItemDialog((quantity, name, priority) -> {
 				pushEvent(ADD_INVENTORY_ITEM({
 					name: name,
-					quantity: quantity
+					quantity: quantity,
+					priority: priority
 				}));
 			});
 		});

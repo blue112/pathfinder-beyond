@@ -53,6 +53,7 @@ enum FicheEventType {
 	CHANGE_ITEM_QUANTITY(item:Int, new_quantity:Int);
 	REMOVE_INVENTORY_ITEM(item:Int);
 	CHANGE_ITEM_NAME(item:Int, newName:String);
+	CHANGE_ITEM_PRIORITY(item:Int, priority:Int);
 }
 
 typedef FicheEventTs = {
@@ -64,6 +65,7 @@ typedef FicheEventTs = {
 typedef InventoryItem = {
 	var name:String;
 	var quantity:Int;
+	var ?priority:Int;
 }
 
 enum ProtectionType {

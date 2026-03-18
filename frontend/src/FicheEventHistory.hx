@@ -79,6 +79,10 @@ class FicheEventHistory extends Popup implements IJSAsync {
 					var str = 'Changement du nom d\'un objet: ${item.name.htmlEscape()} -> ${new_name.htmlEscape()}';
 					item.name = new_name; // Need to do that after so we have old and new name
 					str;
+				case CHANGE_ITEM_PRIORITY(item_n, priority):
+					var item = currentItems[item_n];
+					item.priority = priority;
+					'Changement de priorité d\'un objet: ${item.name.htmlEscape()} ($priority)';
 				case REMOVE_INVENTORY_ITEM(item_n):
 					var item = currentItems.splice(item_n, 1)[0];
 					'Suppression d\'un objet de l\'inventaire: ${item.name.htmlEscape()}';

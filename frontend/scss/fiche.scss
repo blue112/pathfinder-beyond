@@ -605,7 +605,7 @@ h3 {
             display: grid;
             background: none;
             border: none;
-            grid-template-columns: 75px 1fr 30px;
+            grid-template-columns: 75px 1fr 45px 30px;
             gap: 5px;
             cursor: auto;
             padding: 0;
@@ -616,15 +616,26 @@ h3 {
                 border: 3px solid #b8ae98;
                 padding: 5px 10px;
                 &.qty {
+                    position: relative;
                     text-align: center;
 
                     a {
-                        margin-left: 5px;
+                        position: absolute;
+                        left: 8px;
+                        top: 50%;
+                        transform: translateY(-50%);
                         cursor: pointer;
                     }
                 }
                 &.name {
                     cursor: pointer;
+                }
+                &.priority {
+                    text-align: center;
+                    cursor: pointer;
+                    color: #888;
+                    font-size: 0.75em;
+                    padding: 2px 4px;
                 }
             }
             a.delete {
