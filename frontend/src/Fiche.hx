@@ -41,6 +41,8 @@ class Fiche implements IJSAsync {
 		availableFields = new StringMap();
 		fieldsNames = new StringMap();
 		fieldsNames.set("libre", "Lancé de dé libre");
+		for (r in elems.FreeDiceDialog.contactRolls)
+			fieldsNames.set(r.id, r.label);
 		for (i in mainElem.querySelectorAll("*")) {
 			var e:Element = cast i;
 			var id = e.dataset.id;
@@ -252,7 +254,14 @@ class Fiche implements IJSAsync {
 		});
 		mainElem.querySelector("a.roll-free-dice").addEventListener("click", () -> {
 			new FreeDiceDialog((choice) -> {
-				rollFreeDice(FreeDiceDialog.diceForIndex(choice));
+				if (FreeDiceDialog.isContactRoll(choice)) {
+					var roll = FreeDiceDialog.contactRollForIndex(choice);
+					var bba = Rules.getBBA(character);
+					var caracMod = if (roll.id == "contact-cac") character.characteristicsMod.str else character.characteristicsMod.dex;
+					doDiceRoll([bba, caracMod], roll.id);
+				} else {
+					rollFreeDice(FreeDiceDialog.diceForIndex(choice));
+				}
 			});
 		});
 	}
