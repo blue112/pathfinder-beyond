@@ -79,6 +79,8 @@ class Campaign implements IJSAsync {
 		tableLine.querySelector(".pv").innerText = character.current_hp.string();
 		tableLine.querySelector(".max").innerText = character.getMaxHitPoints().string();
 		tableLine.querySelector(".tempmod .count").innerText = character.tempMods.length.string();
+		var perceptionMod = character.getSkillsMods().find(s -> s.name == PERCEPTION).mod;
+		tableLine.querySelector(".perception").innerText = perceptionMod.asMod();
 		updateRoll(fiche_id);
 		renderEncounter();
 	}
@@ -143,6 +145,21 @@ class Campaign implements IJSAsync {
 			latestDiceRollByFicheId.set(char.fiche_id, char.latestDiceRoll);
 			updateChar(char.fiche_id);
 
+			elem.querySelector(".perception").addEventListener("click", () -> {
+				var fc = charactersByFicheId.get(char.fiche_id);
+				var perceptionMod = fc.getSkillsMods().find(s -> s.name == PERCEPTION).mod;
+				var expMods = fc.exceptionalModifiers.filter(m -> Type.enumEq(m.on, SKILL(PERCEPTION)));
+				var doRoll = (extraMod:Int) -> {
+					new elems.SkillRollDialog("Perception", perceptionMod, extraMod);
+				};
+				if (expMods.length > 0) {
+					new elems.ChoicesDialog("Lancer avec modificateur ?",
+						["Normal"].concat(expMods.map(m -> '${m.why} (${m.mod.asMod()})')),
+						(choice) -> { doRoll(if (choice == 0) 0 else expMods[choice - 1].mod); });
+				} else {
+					doRoll(0);
+				}
+			});
 			elem.querySelector(".roll").addEventListener('click', () -> {
 				new DiceRollHistory(char.fiche_id, null);
 			});
