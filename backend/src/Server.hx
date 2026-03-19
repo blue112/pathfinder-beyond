@@ -7,8 +7,13 @@ import express.Express;
 import jsasync.IJSAsync;
 
 class Server implements IJSAsync {
+	@:jsasync static function initAndMigrate() {
+		DatabaseHandler.init().jsawait();
+		DataMigrations.run().jsawait();
+	}
+
 	static function main() {
-		DatabaseHandler.init();
+		initAndMigrate();
 		var app = new express.Express();
 		js.Node.require('express-ws')(app);
 		app.use(Express.json({inflate: false}));
