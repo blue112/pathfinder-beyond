@@ -370,6 +370,26 @@ class Campaign implements IJSAsync {
 						useWeapon(weaponBtn, npc.weapons);
 					});
 				}
+				if (npc != null) {
+					var saveBtn = Browser.document.createAnchorElement();
+					saveBtn.className = "use-saving-throw";
+					saveBtn.title = "Jet de sauvegarde";
+					saveBtn.innerText = "JdS";
+					row.querySelector("td:last-child").insertBefore(saveBtn, row.querySelector(".remove-encounter"));
+					saveBtn.addEventListener("click", () -> {
+						var st = npc.savingThrows;
+						new ContextMenu(cast saveBtn, [
+							'Vigueur (${st.vigor.asMod()})',
+							'Réflexes (${st.reflexes.asMod()})',
+							'Volonté (${st.will.asMod()})',
+						], (choice) -> {
+							if (choice == 0) new elems.SkillRollDialog("Vigueur", st.vigor, 0);
+							else if (choice == 1) new elems.SkillRollDialog("Réflexes", st.reflexes, 0);
+							else if (choice == 2) new elems.SkillRollDialog("Volonté", st.will, 0);
+							return true;
+						});
+					});
+				}
 			} else {
 				nameCell.classList.add("character");
 				if (fc != null) {
