@@ -137,6 +137,7 @@ class ProtocolUtil {
 			case HALF_ELF: "Demi-elfe";
 			case GNOME: "Gnome";
 			case HALF_ORC: "Demi-orque";
+		case ANGEL: "Ange";
 		};
 	}
 

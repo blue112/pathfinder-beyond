@@ -17,12 +17,13 @@ class DataMigrations implements IJSAsync {
 		} catch (_:Dynamic) {}
 		// Fall back to old display-name option values from raceToString()
 		return switch (s) {
-			case "Humain(e)": HUMAN;
+			case "Humain" | "Humain(e)": HUMAN;
 			case "Nain(e)": DWARF;
 			case "Elfe": ELF;
 			case "Demi-elfe": HALF_ELF;
 			case "Gnome": GNOME;
 			case "Demi-orque": HALF_ORC;
+			case "Ange": ANGEL;
 			case _: null;
 		};
 	}

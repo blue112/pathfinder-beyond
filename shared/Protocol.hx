@@ -187,6 +187,7 @@ enum CharacterRace {
 	HALF_ELF;
 	GNOME;
 	HALF_ORC;
+	ANGEL;
 }
 
 enum CharacterClass {
