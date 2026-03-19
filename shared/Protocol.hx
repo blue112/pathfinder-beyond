@@ -42,6 +42,7 @@ enum FicheEventType {
     ADD_CLASS_SKILL(skill:SkillType);
     SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
     SET_SAVING_THROW_MODIFIER(st:SavingThrow, mod:Int);
+    SET_SPEED_MODIFIER(mod:Int);
     CHANGE_ALIGNEMENT(alignement:CharacterAlignement);
     ADD_EXCEPTIONAL_MODIFIER(mod:TemporaryModifier);
     ADD_PROTECTION(armor:Protection);

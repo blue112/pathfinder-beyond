@@ -74,6 +74,7 @@ class Fiche implements IJSAsync {
         bindFightActions();
         bindACActions();
         bindSavingThrowActions();
+        bindSpeedActions();
         bindInitiativeActions();
         bindChangeAlignementAction();
 
@@ -164,6 +165,15 @@ class Fiche implements IJSAsync {
                 });
             });
         }
+    }
+
+    function bindSpeedActions() {
+        var plus = mainElem.querySelector(".speed .plus");
+        plus.addEventListener("click", () -> {
+            new AmountChoice("Modificateur de déplacement", "Quel modificateur appliquer (en cases) ?", {canBeNegative: true}, (result, _) -> {
+                pushEvent(SET_SPEED_MODIFIER(result));
+            });
+        });
     }
 
     function bindSavingThrowActions() {

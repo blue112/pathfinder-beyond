@@ -26,6 +26,7 @@ class FullCharacter {
     public var bank_po:Float;
     public var inventory:Array<InventoryItem>;
     public var damageResistances:Map<DamageType, Int>;
+    public var speed_mod:Int;
 
     public function new() {
         this.skillRanks = [];
@@ -44,6 +45,7 @@ class FullCharacter {
         this.money_po = 0;
         this.bank_po = 0;
         this.damageResistances = new Map();
+        this.speed_mod = 0;
     }
 
     function updateHP() {
@@ -112,6 +114,8 @@ class FullCharacter {
                 skillModifiers.set(skill, mod);
             case SET_SAVING_THROW_MODIFIER(st, mod):
                 savingThrowModifiers.set(st, mod);
+            case SET_SPEED_MODIFIER(mod):
+                speed_mod += mod;
             case ADD_EXCEPTIONAL_MODIFIER(mod):
                 exceptionalModifiers.push(mod);
             case ADD_PROTECTION(armor):
