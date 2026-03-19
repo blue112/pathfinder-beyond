@@ -123,8 +123,7 @@ class Fiche implements IJSAsync {
                     pushEvent(CHANGE_BANK_MONEY(value));
             });
         });
-        var spellsBtn = mainElem.querySelector(".spells-btn");
-        spellsBtn.addEventListener("click", () -> {
+        mainElem.querySelector(".spells-btn").addEventListener("click", () -> {
             new elems.SpellListPopup(character.spells,
                 (spell) -> pushEvent(ADD_SPELL(spell)),
                 (index) -> pushEvent(REMOVE_SPELL(index))
@@ -609,6 +608,12 @@ class Fiche implements IJSAsync {
 
     private function updateFiche() {
         updateBasics();
+        var spellsSection = mainElem.querySelector("section.spells-section");
+        if (character.basics.characterClass.canCastSpells()) {
+            spellsSection.classList.remove("hidden");
+        } else {
+            spellsSection.classList.add("hidden");
+        }
         if (character.characteristics == null) {
             new ChoicesDialog("Caractéristiques", ["Tirer les caractéristiques", "Saisir les valeurs manuellement"], (choice) -> {
                 if (choice == 0)

@@ -6,6 +6,13 @@ using Rules;
 using Lambda;
 
 class Rules {
+    static public function canCastSpells(cls:CharacterClass):Bool {
+        return switch (cls) {
+            case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | MAGICIEN | PRETRE: true;
+            case ROUBLARD | METAMORPHE: false;
+        };
+    }
+
     static var bbaTables = [
         ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
         CONJURATEUR => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
