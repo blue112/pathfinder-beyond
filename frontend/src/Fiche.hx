@@ -258,7 +258,9 @@ class Fiche implements IJSAsync {
 					var roll = FreeDiceDialog.contactRollForIndex(choice);
 					var bba = Rules.getBBA(character);
 					var caracMod = if (roll.id == "contact-cac") character.characteristicsMod.str else character.characteristicsMod.dex;
-					doDiceRoll([bba, caracMod], roll.id);
+					var sizeMod = Rules.getSizeMod(character, false);
+					var mods = if (sizeMod != 0) [bba, caracMod, sizeMod] else [bba, caracMod];
+					doDiceRoll(mods, roll.id);
 				} else {
 					rollFreeDice(FreeDiceDialog.diceForIndex(choice));
 				}
