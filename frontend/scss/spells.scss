@@ -165,7 +165,7 @@ section.spells-section {
 
         li {
             display: grid;
-            grid-template-columns: 55px 130px 1fr 30px;
+            grid-template-columns: 55px 1fr 30px;
             gap: 6px;
             margin-bottom: 6px;
 
@@ -187,18 +187,26 @@ section.spells-section {
                 border-color: #b8ae98;
             }
 
-            .spell-school {
-                font-style: italic;
-                color: #666;
-                font-size: 0.85em;
+            .spell-name-cell {
                 display: flex;
                 align-items: center;
+                gap: 10px;
                 border-color: #b8ae98;
-            }
+                cursor: pointer;
 
-            .spell-name {
-                font-family: serif;
-                border-color: #b8ae98;
+                &:hover {
+                    background: #f0ece0;
+                }
+
+                .spell-name {
+                    font-family: serif;
+                }
+
+                .spell-short-desc {
+                    font-style: italic;
+                    color: #888;
+                    font-size: 0.85em;
+                }
             }
 
             a.delete {
@@ -229,6 +237,91 @@ section.spells-section {
 
         &:hover {
             background: #f0ece0;
+        }
+    }
+}
+
+// Spell detail popup
+.popup.spell-detail {
+    .main {
+        top: 5%;
+        height: 90%;
+        width: 70%;
+        left: 15%;
+
+        a.back {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            padding: 6px 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #aaa;
+            color: #555;
+            font-size: 0.85em;
+
+            &:hover {
+                border-color: #555;
+                color: #222;
+            }
+        }
+
+        .content {
+            overflow-y: auto;
+            padding: 0 20px 20px;
+        }
+    }
+
+    dl.spell-detail-dl {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 0;
+        margin: 0;
+
+        dt, dd {
+            padding: 7px 10px;
+            border-bottom: 1px solid #eee;
+            margin: 0;
+        }
+
+        dt {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        dd {
+            white-space: pre-wrap;
+        }
+    }
+
+    .spell-long-desc {
+        margin-top: 15px;
+        padding: 12px 15px;
+        background: #fafaf7;
+        border: 1px solid #ddd;
+        white-space: pre-wrap;
+        line-height: 1.6;
+        font-size: 0.95em;
+    }
+
+    .actions {
+        margin-top: 20px;
+        text-align: center;
+
+        a.cast-btn {
+            display: inline-block;
+            padding: 10px 40px;
+            background: variables.$redColor;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 1.1em;
+
+            &:hover {
+                opacity: 0.85;
+            }
         }
     }
 }

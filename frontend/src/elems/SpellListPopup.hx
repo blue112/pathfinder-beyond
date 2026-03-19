@@ -23,10 +23,15 @@ class SpellListPopup extends Popup {
 
         for (spell in sorted) {
             var li = Browser.document.createLIElement();
-            li.innerHTML = "<span class='spell-level'></span><span class='spell-school'></span><span class='spell-name'></span><a class='delete' title='Supprimer'>×</a>";
+            li.innerHTML = "<span class='spell-level'></span><span class='spell-name-cell'><a class='spell-name'></a><span class='spell-short-desc'></span></span><a class='delete' title='Supprimer'>×</a>";
             li.querySelector(".spell-level").innerText = 'Niv.${spell.level}';
-            li.querySelector(".spell-school").innerText = spell.school.spellSchoolToString();
             li.querySelector(".spell-name").innerText = spell.name;
+            if (spell.shortDescription != null)
+                li.querySelector(".spell-short-desc").innerText = spell.shortDescription;
+            li.querySelector(".spell-name-cell").addEventListener("click", () -> {
+                close();
+                new SpellDetailPopup(spell, () -> new SpellListPopup(spells, onAdd, onRemove));
+            });
             li.querySelector(".delete").addEventListener("click", () -> {
                 new YesNoAlert("Effacer un sort", 'Supprimer le sort "${spell.name}" ?', () -> {
                     onRemove(spells.indexOf(spell));
@@ -39,7 +44,7 @@ class SpellListPopup extends Popup {
         content.querySelector("a.add-new").addEventListener("click", () -> {
             new SpellDialog((spell) -> {
                 onAdd(spell);
-                close();
+                render(spells, onAdd, onRemove);
             });
         });
     }
