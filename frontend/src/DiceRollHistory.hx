@@ -5,33 +5,33 @@ import jsasync.IJSAsync;
 using DateTools;
 
 class DiceRollHistory extends Popup implements IJSAsync {
-	var fiche_id:String;
-	var fieldsNames:StringMap<String>;
+    var fiche_id:String;
+    var fieldsNames:StringMap<String>;
 
-	public function new(fiche_id:String, fieldsNames:StringMap<String>) {
-		super("Derniers lancés de dés");
+    public function new(fiche_id:String, fieldsNames:StringMap<String>) {
+        super("Derniers lancés de dés");
 
-		this.fiche_id = fiche_id;
-		this.fieldsNames = fieldsNames;
+        this.fiche_id = fiche_id;
+        this.fieldsNames = fieldsNames;
 
-		fill();
-	}
+        fill();
+    }
 
-	@:jsasync function fill() {
-		var list = Browser.document.createUListElement();
+    @:jsasync function fill() {
+        var list = Browser.document.createUListElement();
 
-		var data:Array<PublicDiceRoll> = Api.getRolls(fiche_id).jsawait();
-		data.reverse();
-		for (i in data) {
-			var elem = Browser.document.createLIElement();
-			var fieldLabel = if (fieldsNames != null) fieldsNames.get(i.field_name) else i.field_name;
-			if (fieldLabel == null)
-				fieldLabel = 'FIXME(${i.field_name})';
+        var data:Array<PublicDiceRoll> = Api.getRolls(fiche_id).jsawait();
+        data.reverse();
+        for (i in data) {
+            var elem = Browser.document.createLIElement();
+            var fieldLabel = if (fieldsNames != null) fieldsNames.get(i.field_name) else i.field_name;
+            if (fieldLabel == null)
+                fieldLabel = 'FIXME(${i.field_name})';
 
-			elem.innerHTML = '<small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> <strong>${fieldLabel}</strong> ${i.dicerollToString()}';
-			list.appendChild(elem);
-		}
+            elem.innerHTML = '<small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> <strong>${fieldLabel}</strong> ${i.dicerollToString()}';
+            list.appendChild(elem);
+        }
 
-		getContent().appendChild(list);
-	}
+        getContent().appendChild(list);
+    }
 }

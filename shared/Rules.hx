@@ -6,198 +6,198 @@ using Rules;
 using Lambda;
 
 class Rules {
-	static var bbaTables = [
-		ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
-		CONJURATEUR => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
-		METAMORPHE => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-		CONJURATEUR_EIDOLON_BIPED => [1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15, 15],
-		MAGICIEN => [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
-		PRETRE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
-	];
-	static var savingThrowTables = [
-		ROUBLARD => [
-			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
-		],
-		MAGICIEN => [
-			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
-		],
-		PRETRE => [
-			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
-			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
-		],
-		METAMORPHE => [
-			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
-			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
-		],
-		CONJURATEUR => [
-			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
-			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
-		],
-		CONJURATEUR_EIDOLON_BIPED => [
-			WILL => [2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9],
-			REFLEXES => [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5],
-			VIGOR => [2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9],
-		]
-	];
+    static var bbaTables = [
+        ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+        CONJURATEUR => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+        METAMORPHE => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+        CONJURATEUR_EIDOLON_BIPED => [1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15, 15],
+        MAGICIEN => [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
+        PRETRE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+    ];
+    static var savingThrowTables = [
+        ROUBLARD => [
+            WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+            VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+            REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+        ],
+        MAGICIEN => [
+            REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+            VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+            WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+        ],
+        PRETRE => [
+            REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+            VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+            WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+        ],
+        METAMORPHE => [
+            WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+            REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+            VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+        ],
+        CONJURATEUR => [
+            WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+            REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+            VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+        ],
+        CONJURATEUR_EIDOLON_BIPED => [
+            WILL => [2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9],
+            REFLEXES => [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5],
+            VIGOR => [2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9],
+        ]
+    ];
 
-	static public function getSkillRank(char:FullCharacter, skill:SkillType) {
-		return char.skillRanks.count(n -> n == skill);
-	}
+    static public function getSkillRank(char:FullCharacter, skill:SkillType) {
+        return char.skillRanks.count(n -> n == skill);
+    }
 
-	static public function getCaracMod(char:FullCharacter, carac:Characteristic) {
-		return switch (carac) {
-			case STRENGTH: char.characteristicsMod.str;
-			case INTELLIGENCE: char.characteristicsMod.int;
-			case DEXTERITY: char.characteristicsMod.dex;
-			case WISDOM: char.characteristicsMod.wis;
-			case CHARISMA: char.characteristicsMod.cha;
-			case CONSTITUTION: char.characteristicsMod.con;
-		}
-	}
+    static public function getCaracMod(char:FullCharacter, carac:Characteristic) {
+        return switch (carac) {
+            case STRENGTH: char.characteristicsMod.str;
+            case INTELLIGENCE: char.characteristicsMod.int;
+            case DEXTERITY: char.characteristicsMod.dex;
+            case WISDOM: char.characteristicsMod.wis;
+            case CHARISMA: char.characteristicsMod.cha;
+            case CONSTITUTION: char.characteristicsMod.con;
+        }
+    }
 
-	static public function isClassSkill(char:FullCharacter, skill:SkillType) {
-		return RulesSkills.getSkill(skill).classSkillFor.contains(char.basics.characterClass);
-	}
+    static public function isClassSkill(char:FullCharacter, skill:SkillType) {
+        return RulesSkills.getSkill(skill).classSkillFor.contains(char.basics.characterClass);
+    }
 
-	static public function getSkillsMods(char:FullCharacter) {
-		var armorPenalty = char.protections.filter(p -> (p.type == ARMOR || p.type == SHIELD)
-			&& p.armorMalus != null).fold((p, acc) -> acc + p.armorMalus, 0);
+    static public function getSkillsMods(char:FullCharacter) {
+        var armorPenalty = char.protections.filter(p -> (p.type == ARMOR || p.type == SHIELD)
+            && p.armorMalus != null).fold((p, acc) -> acc + p.armorMalus, 0);
 
-		return RulesSkills.skills.map(n -> {
-			var ranks = char.getSkillRank(n.name);
-			var classSkill = isClassSkill(char, n.name) || char.additionalClassSkills.contains(n.name);
-			var specialMod = 0;
-			if (n.name.match(DISCRETION) && char.basics.sizeCategory.match(SIZE_P)) {
-				specialMod = 4;
-			}
-			var canUse = !n.needTraining || ranks > 0;
-			var charMod = char.skillModifiers.get(n.name);
-			if (charMod == null)
-				charMod = 0;
-			var armorMod = if (n.modifier == DEXTERITY || n.modifier == STRENGTH) armorPenalty else 0;
+        return RulesSkills.skills.map(n -> {
+            var ranks = char.getSkillRank(n.name);
+            var classSkill = isClassSkill(char, n.name) || char.additionalClassSkills.contains(n.name);
+            var specialMod = 0;
+            if (n.name.match(DISCRETION) && char.basics.sizeCategory.match(SIZE_P)) {
+                specialMod = 4;
+            }
+            var canUse = !n.needTraining || ranks > 0;
+            var charMod = char.skillModifiers.get(n.name);
+            if (charMod == null)
+                charMod = 0;
+            var armorMod = if (n.modifier == DEXTERITY || n.modifier == STRENGTH) armorPenalty else 0;
 
-			return {
-				id: n.name.getName().toLowerCase(),
-				name: n.name,
-				label: n.label,
-				classSkill: classSkill,
-				characteristic: n.modifier,
-				ranks: ranks,
-				canUse: canUse,
-				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod + armorMod
-			};
-		});
-	}
+            return {
+                id: n.name.getName().toLowerCase(),
+                name: n.name,
+                label: n.label,
+                classSkill: classSkill,
+                characteristic: n.modifier,
+                ranks: ranks,
+                canUse: canUse,
+                mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod + armorMod
+            };
+        });
+    }
 
-	static public function getBMO(char:FullCharacter) {
-		return getBBA(char) + char.characteristicsMod.str + getSizeMod(char, true);
-	}
+    static public function getBMO(char:FullCharacter) {
+        return getBBA(char) + char.characteristicsMod.str + getSizeMod(char, true);
+    }
 
-	static public function getDMD(char:FullCharacter) {
-		return 10 + getBBA(char) + char.characteristicsMod.str + char.characteristicsMod.dex + getSizeMod(char, true);
-	}
+    static public function getDMD(char:FullCharacter) {
+        return 10 + getBBA(char) + char.characteristicsMod.str + char.characteristicsMod.dex + getSizeMod(char, true);
+    }
 
-	static public function getBBA(char:FullCharacter) {
-		return bbaTables.get(char.basics.characterClass)[char.level - 1];
-	}
+    static public function getBBA(char:FullCharacter) {
+        return bbaTables.get(char.basics.characterClass)[char.level - 1];
+    }
 
-	static public function getSavingThrowCarac(st:SavingThrow) {
-		return switch (st) {
-			case REFLEXES: DEXTERITY;
-			case VIGOR: CONSTITUTION;
-			case WILL: WISDOM;
-		}
-	}
+    static public function getSavingThrowCarac(st:SavingThrow) {
+        return switch (st) {
+            case REFLEXES: DEXTERITY;
+            case VIGOR: CONSTITUTION;
+            case WILL: WISDOM;
+        }
+    }
 
-	static public function sum(tempMod:Array<TemporaryModifier>) {
-		return tempMod.fold((t, r) -> t.mod + r, 0);
-	}
+    static public function sum(tempMod:Array<TemporaryModifier>) {
+        return tempMod.fold((t, r) -> t.mod + r, 0);
+    }
 
-	static public function applyTempModsClass(character:FullCharacter, div:Element, matching:Array<Field>) {
-		var tempMod = character.getTempMods(matching).sum();
-		if (tempMod != 0)
-			div.classList.add("temp-mod");
-		else
-			div.classList.remove("temp-mod");
-		if (tempMod < 0)
-			div.classList.add("negative");
-		else
-			div.classList.remove("negative");
-	}
+    static public function applyTempModsClass(character:FullCharacter, div:Element, matching:Array<Field>) {
+        var tempMod = character.getTempMods(matching).sum();
+        if (tempMod != 0)
+            div.classList.add("temp-mod");
+        else
+            div.classList.remove("temp-mod");
+        if (tempMod < 0)
+            div.classList.add("negative");
+        else
+            div.classList.remove("negative");
+    }
 
-	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
-		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
-		var permanentMod = if (char.savingThrowModifiers.exists(st)) char.savingThrowModifiers.get(st) else 0;
-		return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus + permanentMod;
-	}
+    static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
+        var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
+        var permanentMod = if (char.savingThrowModifiers.exists(st)) char.savingThrowModifiers.get(st) else 0;
+        return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus + permanentMod;
+    }
 
-	static public function getSizeMod(char:FullCharacter, forBMOOrDMD:Bool) {
-		var sizeMod = switch (char.basics.sizeCategory) {
-			case SIZE_I: 8;
-			case SIZE_MIN: 4;
-			case SIZE_TP: 2;
-			case SIZE_P: 1;
-			case SIZE_M: 0;
-			case SIZE_G: -1;
-			case SIZE_TG: -2;
-			case SIZE_GIG: -4;
-			case SIZE_C: -8;
-		}
-		if (forBMOOrDMD)
-			return -sizeMod;
-		return sizeMod;
-	}
+    static public function getSizeMod(char:FullCharacter, forBMOOrDMD:Bool) {
+        var sizeMod = switch (char.basics.sizeCategory) {
+            case SIZE_I: 8;
+            case SIZE_MIN: 4;
+            case SIZE_TP: 2;
+            case SIZE_P: 1;
+            case SIZE_M: 0;
+            case SIZE_G: -1;
+            case SIZE_TG: -2;
+            case SIZE_GIG: -4;
+            case SIZE_C: -8;
+        }
+        if (forBMOOrDMD)
+            return -sizeMod;
+        return sizeMod;
+    }
 
-	static public function getAC(char:FullCharacter, includeArmor:Bool = true, includeDex:Bool = true) {
-		var sizeMod = getSizeMod(char, false);
+    static public function getAC(char:FullCharacter, includeArmor:Bool = true, includeDex:Bool = true) {
+        var sizeMod = getSizeMod(char, false);
 
-		var total = 10;
-		total += sizeMod; // Always
-		total += char.protections.filter(f -> f.type == ARMOR_BONUS).fold((i, r) -> r + i.armor, 0);
-		if (includeDex) {
-			total += char.characteristicsMod.dex;
-			total += char.protections.filter(f -> f.type == EVADE).fold((i, r) -> r + i.armor, 0);
-		}
+        var total = 10;
+        total += sizeMod; // Always
+        total += char.protections.filter(f -> f.type == ARMOR_BONUS).fold((i, r) -> r + i.armor, 0);
+        if (includeDex) {
+            total += char.characteristicsMod.dex;
+            total += char.protections.filter(f -> f.type == EVADE).fold((i, r) -> r + i.armor, 0);
+        }
 
-		if (includeArmor) {
-			total += char.protections.filter(f -> f.type == ARMOR || f.type == SHIELD || f.type == NATURAL_ARMOR).fold((i, r) -> r + i.armor, 0);
-		}
+        if (includeArmor) {
+            total += char.protections.filter(f -> f.type == ARMOR || f.type == SHIELD || f.type == NATURAL_ARMOR).fold((i, r) -> r + i.armor, 0);
+        }
 
-		return total;
-	}
+        return total;
+    }
 
-	static public function getACSurprise(char:FullCharacter) {
-		// Remove dex
-		return getAC(char, true, false);
-	}
+    static public function getACSurprise(char:FullCharacter) {
+        // Remove dex
+        return getAC(char, true, false);
+    }
 
-	static public function getACContact(char:FullCharacter) {
-		// Remove armor and shield
-		return getAC(char, false, true);
-	}
+    static public function getACContact(char:FullCharacter) {
+        // Remove armor and shield
+        return getAC(char, false, true);
+    }
 
-	static public function getVD(char:FullCharacter) {
-		// Todo, heavy armor
-		// https://www.pathfinder-fr.org/Wiki/Pathfinder-RPG.Valeurs%20de%20combat.ashx#VITESSEDEDEPLACEMENT
-		if (char.basics.race.match(DWARF)) {
-			return 4;
-		}
+    static public function getVD(char:FullCharacter) {
+        // Todo, heavy armor
+        // https://www.pathfinder-fr.org/Wiki/Pathfinder-RPG.Valeurs%20de%20combat.ashx#VITESSEDEDEPLACEMENT
+        if (char.basics.race.match(DWARF)) {
+            return 4;
+        }
 
-		return switch (char.basics.sizeCategory) {
-			case SIZE_M: 6;
-			case SIZE_P: 4;
-			default: 6;
-		}
-	}
+        return switch (char.basics.sizeCategory) {
+            case SIZE_M: 6;
+            case SIZE_P: 4;
+            default: 6;
+        }
+    }
 
-	static public function dice(faces:Int) {
-		return Std.random(faces) + 1;
-	}
+    static public function dice(faces:Int) {
+        return Std.random(faces) + 1;
+    }
 }

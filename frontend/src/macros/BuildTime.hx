@@ -3,27 +3,27 @@ package macros;
 import haxe.macro.Context;
 
 class BuildTime {
-	public static macro function get_build_age() {
-		var buildTime = Date.now();
+    public static macro function get_build_age() {
+        var buildTime = Date.now();
 
-		var code = '{
+        var code = '{
       var runTime = Math.floor(Date.now().getTime() / 1000);
       var age = runTime - ${buildTime.getTime() / 1000};
       age;
     }';
 
-		return Context.parse(code, Context.currentPos());
-	}
+        return Context.parse(code, Context.currentPos());
+    }
 
-	public static macro function trace_build_age_with_parse() {
-		var buildTime = Date.now();
+    public static macro function trace_build_age_with_parse() {
+        var buildTime = Date.now();
 
-		var code = '{
+        var code = '{
       var runTime = Math.floor(Date.now().getTime() / 1000);
       var age = runTime - ${buildTime.getTime() / 1000};
       trace("Last build: ${buildTime.toString()} ("+age+" seconds ago)");
     }';
 
-		return Context.parse(code, Context.currentPos());
-	}
+        return Context.parse(code, Context.currentPos());
+    }
 }

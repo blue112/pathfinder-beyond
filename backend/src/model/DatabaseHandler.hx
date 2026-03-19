@@ -5,73 +5,73 @@ import jsasync.IJSAsync;
 import js.Node;
 
 class DatabaseHandler implements IJSAsync {
-	static var connection:Mysql;
+    static var connection:Mysql;
 
-	// Append only, no modification
-	static var migrations:Array<String> = [
-		'CREATE TABLE fiche_events(id INT AUTO_INCREMENT, fiche_id INT, event_type VARCHAR(50), event_params BLOB, PRIMARY KEY(id))',
-		'ALTER TABLE fiche_events MODIFY fiche_id VARCHAR(36)',
-		'CREATE TABLE fiche(fiche_id VARCHAR(36), characterName VARCHAR(50), PRIMARY KEY(fiche_id))',
-		'CREATE TABLE dice_rolls(roll_id INT AUTO_INCREMENT, fiche_id VARCHAR(36), field_name VARCHAR(50), faces_count INT, result INT, ts_ms BIGINT, PRIMARY KEY(roll_id))',
-		'ALTER TABLE fiche_events ADD ts_ms BIGINT',
-		'CREATE TABLE fiche_notes(note_id INT AUTO_INCREMENT, fiche_id VARCHAR(36), note_order INT, last_edit_ts_ms BIGINT, content TEXT, PRIMARY KEY(note_id))',
-		'ALTER TABLE dice_rolls ADD modifier INT',
-		'CREATE TABLE campaign(campaign_id VARCHAR(36), name VARCHAR(50), PRIMARY KEY(campaign_id))',
-		'CREATE TABLE campaign_fiche(campaign_id VARCHAR(36), fiche_id VARCHAR(50), PRIMARY KEY(campaign_id, fiche_id))',
-		'CREATE TABLE campaign_events(id INT AUTO_INCREMENT, campaign_id VARCHAR(36), event_type VARCHAR(50), event_params BLOB, ts_ms BIGINT, PRIMARY KEY(id))',
-	];
+    // Append only, no modification
+    static var migrations:Array<String> = [
+        'CREATE TABLE fiche_events(id INT AUTO_INCREMENT, fiche_id INT, event_type VARCHAR(50), event_params BLOB, PRIMARY KEY(id))',
+        'ALTER TABLE fiche_events MODIFY fiche_id VARCHAR(36)',
+        'CREATE TABLE fiche(fiche_id VARCHAR(36), characterName VARCHAR(50), PRIMARY KEY(fiche_id))',
+        'CREATE TABLE dice_rolls(roll_id INT AUTO_INCREMENT, fiche_id VARCHAR(36), field_name VARCHAR(50), faces_count INT, result INT, ts_ms BIGINT, PRIMARY KEY(roll_id))',
+        'ALTER TABLE fiche_events ADD ts_ms BIGINT',
+        'CREATE TABLE fiche_notes(note_id INT AUTO_INCREMENT, fiche_id VARCHAR(36), note_order INT, last_edit_ts_ms BIGINT, content TEXT, PRIMARY KEY(note_id))',
+        'ALTER TABLE dice_rolls ADD modifier INT',
+        'CREATE TABLE campaign(campaign_id VARCHAR(36), name VARCHAR(50), PRIMARY KEY(campaign_id))',
+        'CREATE TABLE campaign_fiche(campaign_id VARCHAR(36), fiche_id VARCHAR(50), PRIMARY KEY(campaign_id, fiche_id))',
+        'CREATE TABLE campaign_events(id INT AUTO_INCREMENT, campaign_id VARCHAR(36), event_type VARCHAR(50), event_params BLOB, ts_ms BIGINT, PRIMARY KEY(id))',
+    ];
 
-	@:jsasync static public function init() {
-		connection = Mysql.createPool({
-			connectionLimit: 2,
-			host: "mysql",
-			database: "pfb",
-			user: "pfb",
-			password: Node.process.env.get("DB_PASSWORD"),
-		});
-		checkMigration().jsawait();
-	}
+    @:jsasync static public function init() {
+        connection = Mysql.createPool({
+            connectionLimit: 2,
+            host: "mysql",
+            database: "pfb",
+            user: "pfb",
+            password: Node.process.env.get("DB_PASSWORD"),
+        });
+        checkMigration().jsawait();
+    }
 
-	@:jsasync static public function execInsert(query:String, ?parameters:Array<Dynamic>):Promise<Dynamic> {
-		var results = connection.execute(query, parameters).jsawait();
-		return results[0].insertId;
-	}
+    @:jsasync static public function execInsert(query:String, ?parameters:Array<Dynamic>):Promise<Dynamic> {
+        var results = connection.execute(query, parameters).jsawait();
+        return results[0].insertId;
+    }
 
-	@:jsasync static public function exec(query:String, ?parameters:Array<Dynamic>):Promise<Array<Dynamic>> {
-		var results = connection.execute(query, parameters).jsawait();
-		return results[0];
-	}
+    @:jsasync static public function exec(query:String, ?parameters:Array<Dynamic>):Promise<Array<Dynamic>> {
+        var results = connection.execute(query, parameters).jsawait();
+        return results[0];
+    }
 
-	@:jsasync static function runMigration(migration:String, id:Int) {
-		trace('Running migration $id: $migration');
+    @:jsasync static function runMigration(migration:String, id:Int) {
+        trace('Running migration $id: $migration');
 
-		exec(migration);
-		exec("INSERT INTO migrations VALUES(?)", [id]);
-	}
+        exec(migration);
+        exec("INSERT INTO migrations VALUES(?)", [id]);
+    }
 
-	@:jsasync static function runMigrations(start:Int) {
-		trace('Running migrations starting from ${start} (${migrations.length - start} to execute)');
-		var toRun = migrations.slice(start);
-		for (i in 0...toRun.length) {
-			runMigration(toRun[i], start + i).jsawait();
-		}
-	}
+    @:jsasync static function runMigrations(start:Int) {
+        trace('Running migrations starting from ${start} (${migrations.length - start} to execute)');
+        var toRun = migrations.slice(start);
+        for (i in 0...toRun.length) {
+            runMigration(toRun[i], start + i).jsawait();
+        }
+    }
 
-	@:jsasync static function checkMigration() {
-		try {
-			var results = exec("SELECT id FROM migrations ORDER BY id DESC LIMIT 1").jsawait();
-			if (results.length == 0) {
-				runMigrations(0);
-				return;
-			}
-			var lastRun = results[0].id + 1;
-			if (lastRun < migrations.length) {
-				runMigrations(lastRun);
-			}
-		} catch (e:Dynamic) {
-			trace("Error");
-			exec("CREATE TABLE migrations(id INT, PRIMARY KEY(id))").jsawait();
-			checkMigration();
-		}
-	}
+    @:jsasync static function checkMigration() {
+        try {
+            var results = exec("SELECT id FROM migrations ORDER BY id DESC LIMIT 1").jsawait();
+            if (results.length == 0) {
+                runMigrations(0);
+                return;
+            }
+            var lastRun = results[0].id + 1;
+            if (lastRun < migrations.length) {
+                runMigrations(lastRun);
+            }
+        } catch (e:Dynamic) {
+            trace("Error");
+            exec("CREATE TABLE migrations(id INT, PRIMARY KEY(id))").jsawait();
+            checkMigration();
+        }
+    }
 }

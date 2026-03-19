@@ -7,35 +7,35 @@ import express.Express;
 import jsasync.IJSAsync;
 
 class Server implements IJSAsync {
-	@:jsasync static function initAndMigrate() {
-		DatabaseHandler.init().jsawait();
-		DataMigrations.run().jsawait();
-	}
+    @:jsasync static function initAndMigrate() {
+        DatabaseHandler.init().jsawait();
+        DataMigrations.run().jsawait();
+    }
 
-	static function main() {
-		initAndMigrate();
-		var app = new express.Express();
-		js.Node.require('express-ws')(app);
-		app.use(Express.json({inflate: false}));
-		app.use(HaxeBody.middleware);
-		app.use(Express.serveStatic("static"));
-		app.use("/api/fiche", FicheRouter.getRouter());
-		app.use("/api/campaign", CampaignRouter.getRouter());
-		app.ws("/api/ws", (ws, req) -> {
-			new WebsocketClient(ws, req.ip);
-		});
-		app.use("/", serveIndex);
-		app.listen(8000, () -> {
-			trace('Started, listing on :8000');
-		});
-	}
+    static function main() {
+        initAndMigrate();
+        var app = new express.Express();
+        js.Node.require('express-ws')(app);
+        app.use(Express.json({inflate: false}));
+        app.use(HaxeBody.middleware);
+        app.use(Express.serveStatic("static"));
+        app.use("/api/fiche", FicheRouter.getRouter());
+        app.use("/api/campaign", CampaignRouter.getRouter());
+        app.ws("/api/ws", (ws, req) -> {
+            new WebsocketClient(ws, req.ip);
+        });
+        app.use("/", serveIndex);
+        app.listen(8000, () -> {
+            trace('Started, listing on :8000');
+        });
+    }
 
-	@:jsasync static function serveIndex(req:Request, res:Response, next:Next) {
-		var tplFile = Fs.readFile("templates/index.html").jsawait().toString();
-		var tpl = new Template(tplFile);
-		var context = {
-			time: Date.now().getTime()
-		};
-		res.end(tpl.execute(context));
-	}
+    @:jsasync static function serveIndex(req:Request, res:Response, next:Next) {
+        var tplFile = Fs.readFile("templates/index.html").jsawait().toString();
+        var tpl = new Template(tplFile);
+        var context = {
+            time: Date.now().getTime()
+        };
+        res.end(tpl.execute(context));
+    }
 }

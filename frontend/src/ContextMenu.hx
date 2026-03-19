@@ -4,50 +4,50 @@ import js.Browser;
 import js.html.Element;
 
 class ContextMenu {
-	var menu:MenuElement;
+    var menu:MenuElement;
 
-	public var onClose:Void->Void;
+    public var onClose:Void->Void;
 
-	public function new(parentElement:Element, menuElements:Array<String>, onChoice:Int->Bool) {
-		menu = Browser.document.createMenuElement();
-		menu.innerHTML = "<ul></ul>";
-		for (i in 0...menuElements.length) {
-			var li = Browser.document.createLIElement();
-			li.innerText = menuElements[i];
-			li.addEventListener('click', (e:MouseEvent) -> {
-				var shouldClose = onChoice(i);
-				if (shouldClose) {
-					close();
-				}
-				e.stopPropagation();
-			});
-			menu.querySelector("ul").appendChild(li);
-		}
-		var rect = parentElement.getBoundingClientRect();
-		menu.style.left = rect.left + "px";
-		menu.style.top = rect.bottom + "px";
-		Browser.document.body.appendChild(menu);
+    public function new(parentElement:Element, menuElements:Array<String>, onChoice:Int->Bool) {
+        menu = Browser.document.createMenuElement();
+        menu.innerHTML = "<ul></ul>";
+        for (i in 0...menuElements.length) {
+            var li = Browser.document.createLIElement();
+            li.innerText = menuElements[i];
+            li.addEventListener('click', (e:MouseEvent) -> {
+                var shouldClose = onChoice(i);
+                if (shouldClose) {
+                    close();
+                }
+                e.stopPropagation();
+            });
+            menu.querySelector("ul").appendChild(li);
+        }
+        var rect = parentElement.getBoundingClientRect();
+        menu.style.left = rect.left + "px";
+        menu.style.top = rect.bottom + "px";
+        Browser.document.body.appendChild(menu);
 
-		haxe.Timer.delay(() -> {
-			Browser.document.body.addEventListener("click", onClick);
-		}, 1);
-	}
+        haxe.Timer.delay(() -> {
+            Browser.document.body.addEventListener("click", onClick);
+        }, 1);
+    }
 
-	function close() {
-		Browser.document.body.removeChild(menu);
-		Browser.document.body.removeEventListener("click", onClick);
-		if (onClose != null)
-			onClose();
-	}
+    function close() {
+        Browser.document.body.removeChild(menu);
+        Browser.document.body.removeEventListener("click", onClick);
+        if (onClose != null)
+            onClose();
+    }
 
-	function onClick(e:MouseEvent) {
-		var t:Element = cast e.target;
-		while (t != null && t != Browser.document.body) {
-			if (t == menu)
-				return;
+    function onClick(e:MouseEvent) {
+        var t:Element = cast e.target;
+        while (t != null && t != Browser.document.body) {
+            if (t == menu)
+                return;
 
-			t = t.parentElement;
-		}
-		close();
-	}
+            t = t.parentElement;
+        }
+        close();
+    }
 }

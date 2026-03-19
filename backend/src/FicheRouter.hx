@@ -12,164 +12,164 @@ import express.Request;
 import express.Router;
 
 class FicheRouter implements IJSAsync {
-	static public function getRouter() {
-		var router = new Router();
-		router.post("/createFiche", onCreateFiche);
-		router.get("/:ficheId", checkFicheExists, getFiche);
-		router.delete("/:ficheId/:eventId", checkFicheExists, onDelEvent);
-		router.post("/:ficheId/roll", checkFicheExists, onDiceRoll);
-		router.get("/:ficheId/rolls", checkFicheExists, fetchDiceRolls);
-		router.get("/:ficheId/notes", checkFicheExists, fetchNotes);
-		router.post("/:ficheId/notes", checkFicheExists, onInsertNote);
-		router.put("/:ficheId/notes/:noteId", checkFicheExists, onUpdateNote);
-		router.put("/debug/:ficheId/push", checkFicheExists, onPushEvent);
-		return router;
-	}
+    static public function getRouter() {
+        var router = new Router();
+        router.post("/createFiche", onCreateFiche);
+        router.get("/:ficheId", checkFicheExists, getFiche);
+        router.delete("/:ficheId/:eventId", checkFicheExists, onDelEvent);
+        router.post("/:ficheId/roll", checkFicheExists, onDiceRoll);
+        router.get("/:ficheId/rolls", checkFicheExists, fetchDiceRolls);
+        router.get("/:ficheId/notes", checkFicheExists, fetchNotes);
+        router.post("/:ficheId/notes", checkFicheExists, onInsertNote);
+        router.put("/:ficheId/notes/:noteId", checkFicheExists, onUpdateNote);
+        router.put("/debug/:ficheId/push", checkFicheExists, onPushEvent);
+        return router;
+    }
 
-	@:jsasync static public function checkFicheExists(req:Request, res:Response, next:Next) {
-		var fiche_id = (req.params : Dynamic).ficheId;
-		var fiche = DatabaseHandler.exec("SELECT * FROM fiche WHERE fiche_id = ?", [fiche_id]).jsawait();
-		if (fiche.length == 0) {
-			res.status(404).end("Not found");
-			return;
-		}
+    @:jsasync static public function checkFicheExists(req:Request, res:Response, next:Next) {
+        var fiche_id = (req.params : Dynamic).ficheId;
+        var fiche = DatabaseHandler.exec("SELECT * FROM fiche WHERE fiche_id = ?", [fiche_id]).jsawait();
+        if (fiche.length == 0) {
+            res.status(404).end("Not found");
+            return;
+        }
 
-		req.fiche = fiche[0];
+        req.fiche = fiche[0];
 
-		next.call();
-	}
+        next.call();
+    }
 
-	@:jsasync static public function fetchDiceRolls(req:Request, res:Response, next:Next) {
-		var fiche_id = req.fiche.fiche_id;
-		var rolls = DiceRoll.fetch(fiche_id).jsawait();
+    @:jsasync static public function fetchDiceRolls(req:Request, res:Response, next:Next) {
+        var fiche_id = req.fiche.fiche_id;
+        var rolls = DiceRoll.fetch(fiche_id).jsawait();
 
-		return res.json(rolls.map(r -> r.toPublic()));
-	}
+        return res.json(rolls.map(r -> r.toPublic()));
+    }
 
-	@:jsasync static public function onUpdateNote(req:Request, res:Response, next:Next) {
-		var fiche_id = req.fiche.fiche_id;
-		var note_id = (req.params : Dynamic).noteId;
-		var content = (req.body : Dynamic).content;
-		if (content == null || content.length > 50000) {
-			res.status(400).json({error: "Invalid content"});
-			return;
-		}
-		if (content.length == 0) {
-			// Delete instead
-			DatabaseHandler.execInsert("DELETE FROM fiche_notes WHERE fiche_id = ? AND note_id = ?", [fiche_id, note_id]).jsawait();
-		} else {
-			DatabaseHandler.execInsert("UPDATE fiche_notes SET last_edit_ts_ms = ?, content = ? WHERE fiche_id = ? AND note_id = ?",
-				[Date.now().getTime(), content, fiche_id, note_id])
-				.jsawait();
-		}
+    @:jsasync static public function onUpdateNote(req:Request, res:Response, next:Next) {
+        var fiche_id = req.fiche.fiche_id;
+        var note_id = (req.params : Dynamic).noteId;
+        var content = (req.body : Dynamic).content;
+        if (content == null || content.length > 50000) {
+            res.status(400).json({error: "Invalid content"});
+            return;
+        }
+        if (content.length == 0) {
+            // Delete instead
+            DatabaseHandler.execInsert("DELETE FROM fiche_notes WHERE fiche_id = ? AND note_id = ?", [fiche_id, note_id]).jsawait();
+        } else {
+            DatabaseHandler.execInsert("UPDATE fiche_notes SET last_edit_ts_ms = ?, content = ? WHERE fiche_id = ? AND note_id = ?",
+                [Date.now().getTime(), content, fiche_id, note_id])
+                .jsawait();
+        }
 
-		res.json({success: true});
-	}
+        res.json({success: true});
+    }
 
-	@:jsasync static public function onInsertNote(req:Request, res:Response, next:Next) {
-		var fiche_id = req.fiche.fiche_id;
-		var content = (req.body : Dynamic).content;
-		if (content == null || content.length > 50000 || content.length == 0) {
-			res.status(400).json({error: "Invalid content"});
-			return;
-		}
+    @:jsasync static public function onInsertNote(req:Request, res:Response, next:Next) {
+        var fiche_id = req.fiche.fiche_id;
+        var content = (req.body : Dynamic).content;
+        if (content == null || content.length > 50000 || content.length == 0) {
+            res.status(400).json({error: "Invalid content"});
+            return;
+        }
 
-		var id = DatabaseHandler.execInsert("INSERT INTO fiche_notes(fiche_id, last_edit_ts_ms, content) VALUES(?, ?, ?)",
-			[fiche_id, Date.now().getTime(), content])
-			.jsawait();
-		res.json({success: true, id: id});
-	}
+        var id = DatabaseHandler.execInsert("INSERT INTO fiche_notes(fiche_id, last_edit_ts_ms, content) VALUES(?, ?, ?)",
+            [fiche_id, Date.now().getTime(), content])
+            .jsawait();
+        res.json({success: true, id: id});
+    }
 
-	@:jsasync static public function fetchNotes(req:Request, res:Response, next:Next) {
-		var fiche_id = req.fiche.fiche_id;
-		var notes = DatabaseHandler.exec("SELECT * FROM fiche_notes WHERE fiche_id = ?", [fiche_id]).jsawait();
-		var outNotes:Array<FicheNote> = notes.map(n -> {
-			last_edit: n.last_edit_ts_ms,
-			order: n.note_order,
-			id: n.note_id,
-			content: n.content,
-		});
-		res.hx(outNotes);
-	}
+    @:jsasync static public function fetchNotes(req:Request, res:Response, next:Next) {
+        var fiche_id = req.fiche.fiche_id;
+        var notes = DatabaseHandler.exec("SELECT * FROM fiche_notes WHERE fiche_id = ?", [fiche_id]).jsawait();
+        var outNotes:Array<FicheNote> = notes.map(n -> {
+            last_edit: n.last_edit_ts_ms,
+            order: n.note_order,
+            id: n.note_id,
+            content: n.content,
+        });
+        res.hx(outNotes);
+    }
 
-	@:jsasync static public function onDiceRoll(req:Request, res:Response, next:Next) {
-		var body:{faceCount:Int, fieldName:String, mod:Int} = cast req.body;
-		if (!Std.isOfType(body.faceCount, Int) || body.faceCount > 100 || body.faceCount < 2) {
-			res.status(400).json({error: "Invalid dice"});
-			return;
-		}
-		if (!Std.isOfType(body.mod, Int) || body.mod > 100 || body.mod < -100) {
-			res.status(400).json({error: "Invalid modifier"});
-			return;
-		}
-		if (!Std.isOfType(body.fieldName, String) || body.fieldName.length > 50 || body.fieldName.length < 2) {
-			res.status(400).json({error: "Invalid field"});
-			return;
-		}
+    @:jsasync static public function onDiceRoll(req:Request, res:Response, next:Next) {
+        var body:{faceCount:Int, fieldName:String, mod:Int} = cast req.body;
+        if (!Std.isOfType(body.faceCount, Int) || body.faceCount > 100 || body.faceCount < 2) {
+            res.status(400).json({error: "Invalid dice"});
+            return;
+        }
+        if (!Std.isOfType(body.mod, Int) || body.mod > 100 || body.mod < -100) {
+            res.status(400).json({error: "Invalid modifier"});
+            return;
+        }
+        if (!Std.isOfType(body.fieldName, String) || body.fieldName.length > 50 || body.fieldName.length < 2) {
+            res.status(400).json({error: "Invalid field"});
+            return;
+        }
 
-		var fiche_id = req.fiche.fiche_id;
+        var fiche_id = req.fiche.fiche_id;
 
-		var roll = new DiceRoll(fiche_id, body.fieldName, body.faceCount, body.mod);
-		roll.roll();
-		var inserted = roll.insert().jsawait();
-		res.json({result: roll.result, roll_id: inserted});
+        var roll = new DiceRoll(fiche_id, body.fieldName, body.faceCount, body.mod);
+        roll.roll();
+        var inserted = roll.insert().jsawait();
+        res.json({result: roll.result, roll_id: inserted});
 
-		WebsocketClient.notifyRoll(fiche_id, roll.toPublic());
-	}
+        WebsocketClient.notifyRoll(fiche_id, roll.toPublic());
+    }
 
-	@:jsasync static public function getFiche(req:Request, res:Response, next:Next) {
-		var fiche_id = req.fiche.fiche_id;
+    @:jsasync static public function getFiche(req:Request, res:Response, next:Next) {
+        var fiche_id = req.fiche.fiche_id;
 
-		var events:Array<FicheEventTs> = FicheEvent.getEvents(fiche_id).jsawait();
+        var events:Array<FicheEventTs> = FicheEvent.getEvents(fiche_id).jsawait();
 
-		res.hx(events);
-	}
+        res.hx(events);
+    }
 
-	@:jsasync static public function onDelEvent(req:Request, res:Response, next:Next) {
-		var ficheId = req.fiche.fiche_id;
-		var eventId = (req.params : Dynamic).eventId;
-		DatabaseHandler.exec("DELETE FROM fiche_events WHERE fiche_id = ? AND id = ?", [ficheId, eventId]).jsawait();
-		res.json({success: true});
-	}
+    @:jsasync static public function onDelEvent(req:Request, res:Response, next:Next) {
+        var ficheId = req.fiche.fiche_id;
+        var eventId = (req.params : Dynamic).eventId;
+        DatabaseHandler.exec("DELETE FROM fiche_events WHERE fiche_id = ? AND id = ?", [ficheId, eventId]).jsawait();
+        res.json({success: true});
+    }
 
-	@:jsasync static public function onPushEvent(req:Request, res:Response, next:Next) {
-		var ficheId = req.fiche.fiche_id;
+    @:jsasync static public function onPushEvent(req:Request, res:Response, next:Next) {
+        var ficheId = req.fiche.fiche_id;
 
-		var event:Dynamic = req.body;
-		if (!Std.isOfType(event, FicheEventType)) {
-			res.end("Invalid event");
-			return;
-		}
+        var event:Dynamic = req.body;
+        if (!Std.isOfType(event, FicheEventType)) {
+            res.end("Invalid event");
+            return;
+        }
 
-		var fe = new FicheEvent(ficheId, event);
-		fe.insert().jsawait();
-		res.json({"success": true});
+        var fe = new FicheEvent(ficheId, event);
+        fe.insert().jsawait();
+        res.json({"success": true});
 
-		// Notify
-		WebsocketClient.notifySubs(ficheId, fe.toPublic());
-	}
+        // Notify
+        WebsocketClient.notifySubs(ficheId, fe.toPublic());
+    }
 
-	@:jsasync static public function onCreateFiche(req:Request, res:Response, next:Next) {
-		var fiche:BasicFicheData;
-		try {
-			fiche = cast req.body;
-			for (i in GetAllFields.getNames(BasicFicheData)) {
-				if (Reflect.getProperty(fiche, i) == null) {
-					res.status(400).end('Invalid field $i');
-					return;
-				}
-			}
-		} catch (e:Dynamic) {
-			trace('Error when creating fiche: $e');
-			res.status(400).end();
-			return;
-		}
+    @:jsasync static public function onCreateFiche(req:Request, res:Response, next:Next) {
+        var fiche:BasicFicheData;
+        try {
+            fiche = cast req.body;
+            for (i in GetAllFields.getNames(BasicFicheData)) {
+                if (Reflect.getProperty(fiche, i) == null) {
+                    res.status(400).end('Invalid field $i');
+                    return;
+                }
+            }
+        } catch (e:Dynamic) {
+            trace('Error when creating fiche: $e');
+            res.status(400).end();
+            return;
+        }
 
-		var ficheId = untyped Crypto.randomUUID();
-		DatabaseHandler.exec("INSERT INTO fiche(fiche_id, characterName) VALUES(?, ?)", [ficheId, fiche.characterName]).jsawait();
-		var fe = new FicheEvent(ficheId, CREATE(fiche));
-		fe.insert().jsawait();
+        var ficheId = untyped Crypto.randomUUID();
+        DatabaseHandler.exec("INSERT INTO fiche(fiche_id, characterName) VALUES(?, ?)", [ficheId, fiche.characterName]).jsawait();
+        var fe = new FicheEvent(ficheId, CREATE(fiche));
+        fe.insert().jsawait();
 
-		res.json({ficheId: ficheId});
-	}
+        res.json({ficheId: ficheId});
+    }
 }
