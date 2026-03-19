@@ -332,15 +332,24 @@ class Fiche implements IJSAsync {
 			SAVING_THROW(SavingThrow.createByName(parent.dataset.id.split("-")[1].toUpperCase()));
 		} else if (parent.dataset.id == "attack") WEAPON_ATTACK else if (parent.dataset.id == "damage") WEAPON_DAMAGE else null;
 
+		var savingThrowNote:Null<String> = null;
+		switch (expModEnum) {
+			case SAVING_THROW(st):
+				var noteMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, SAVING_THROW_NOTE(st)));
+				if (noteMods.length > 0)
+					savingThrowNote = noteMods[0].why;
+			case _:
+		}
+
 		if (expModEnum != null) {
 			var expMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, expModEnum));
 			if (expMods.length > 0) {
 				new ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})')), (choice) -> {
 					if (choice == 0)
-						doDiceRoll([modInt], parent.dataset.id)
+						doDiceRoll([modInt], parent.dataset.id, savingThrowNote)
 					else {
 						var mod = expMods[choice - 1];
-						doDiceRoll([modInt, mod.mod], parent.dataset.id);
+						doDiceRoll([modInt, mod.mod], parent.dataset.id, savingThrowNote);
 					}
 				});
 				return null;
@@ -351,12 +360,12 @@ class Fiche implements IJSAsync {
 		if (additionalMod != null && additionalMod != 0)
 			mods.push(additionalMod);
 
-		return doDiceRoll(mods, parent.dataset.id).jsawait();
+		return doDiceRoll(mods, parent.dataset.id, savingThrowNote).jsawait();
 	}
 
-	@:jsasync public function doDiceRoll(mods:Array<Int>, id:String) {
+	@:jsasync public function doDiceRoll(mods:Array<Int>, id:String, ?note:String) {
 		var apiResult = Api.rollDice(fiche_id, 20, mods.fold((m, r) -> m + r, 0), id).jsawait();
-		Dice.roll(mods, apiResult.result);
+		Dice.roll(mods, apiResult.result, 20, note);
 		return apiResult.result;
 	}
 
@@ -891,6 +900,13 @@ class Fiche implements IJSAsync {
 				return "ST not found";
 			}
 			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: SAVING_THROW(st), mod: param2.parseInt(), why: param3}));
+			return "Ok";
+		} else if (what == "expsavingnote") {
+			var st = SavingThrow.createByName(param1.toUpperCase());
+			if (st == null) {
+				return "ST not found";
+			}
+			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: SAVING_THROW_NOTE(st), mod: 0, why: param2}));
 			return "Ok";
 		} else if (what == "expattackmod") {
 			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: WEAPON_ATTACK, mod: param1.parseInt(), why: param2}));

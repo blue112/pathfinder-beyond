@@ -134,6 +134,7 @@ enum Field {
 	MAX_HP;
 	WEAPON_ATTACK;
 	WEAPON_DAMAGE;
+	SAVING_THROW_NOTE(st:SavingThrow);
 }
 
 typedef ExceptionalSkillModifier = {

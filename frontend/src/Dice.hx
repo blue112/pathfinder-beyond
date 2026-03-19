@@ -4,7 +4,7 @@ import js.Browser;
 
 @:expose("Dice")
 class Dice {
-	static public function roll(mods:Array<Int>, result:Int, numFaces:Int = 20) {
+	static public function roll(mods:Array<Int>, result:Int, numFaces:Int = 20, ?note:String) {
 		var initialNumFaces = numFaces;
 		var resultOnDice = result;
 
@@ -75,6 +75,12 @@ class Dice {
 			if (cls != null) {
 				backdrop.classList.add(cls);
 				d20Tray.classList.add(cls);
+			}
+			if (note != null) {
+				var noteP = Browser.document.createParagraphElement();
+				noteP.className = "roll-note";
+				noteP.innerText = note;
+				d20Tray.appendChild(noteP);
 			}
 		}, 1000);
 	}

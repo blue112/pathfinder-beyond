@@ -95,6 +95,13 @@ body.rolling {
         display: block;
         color: #80ff00;
     }
+
+    p.roll-note {
+        margin-top: 8px;
+        font-size: 0.85em;
+        font-style: italic;
+        color: #aaa;
+    }
 }
 
 @keyframes roll {

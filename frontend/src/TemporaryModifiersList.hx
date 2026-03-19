@@ -46,6 +46,7 @@ class TemporaryModifiersList extends Popup implements IJSAsync {
 				case WEAPON_ATTACK: 'Jet d\'attaque';
 				case WEAPON_DAMAGE: 'Jet de dommage';
 				case MAX_HP: "PV maximums";
+				case SAVING_THROW_NOTE(st): 'Note (${st.savingThrowToString()})';
 			}
 			fieldName = fieldName.charAt(0).toUpperCase() + fieldName.substr(1);
 			elem.innerHTML = '<a class="del">[Supprimer]</a> <strong>$fieldName</strong> - ${mod.mod.asMod()} (${mod.why.htmlEscape()})';
