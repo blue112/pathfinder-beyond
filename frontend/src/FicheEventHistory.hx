@@ -16,6 +16,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 
         var currentMods = [];
         var currentItems = [];
+        var currentSpells:Array<Spell> = [];
         var currentProtections:Array<Protection> = [];
         var currentWeapons:Array<Weapon> = [];
         this.fiche_id = fiche_id;
@@ -89,6 +90,12 @@ class FicheEventHistory extends Popup implements IJSAsync {
                 case REMOVE_INVENTORY_ITEM(item_n):
                     var item = currentItems.splice(item_n, 1)[0];
                     'Suppression d\'un objet de l\'inventaire: ${item.name.htmlEscape()}';
+                case ADD_SPELL(spell):
+                    currentSpells.push(Reflect.copy(spell));
+                    'Ajout d\'un sort: ${spell.name.htmlEscape()} (niv.${spell.level}, ${spell.school.spellSchoolToString()})';
+                case REMOVE_SPELL(index):
+                    var spell = currentSpells.splice(index, 1)[0];
+                    'Suppression d\'un sort: ${spell.name.htmlEscape()}';
                 case ADD_EXCEPTIONAL_MODIFIER(mod):
                     'Ajout d\'un modificateur exceptionnel sur ${mod.mod.asMod()} (${mod.why.htmlEscape()})';
             }

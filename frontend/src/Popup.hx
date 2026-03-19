@@ -26,7 +26,7 @@ class Popup {
     }
 
     public function inputValue(name:String):String {
-        return (cast getContent().querySelector('[name=$name]') : Dynamic).value;
+        return ((cast getContent().querySelector('[name=$name]') : Dynamic).value : String).trim();
     }
 
     public function close() {

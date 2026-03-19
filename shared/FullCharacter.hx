@@ -27,6 +27,7 @@ class FullCharacter {
     public var inventory:Array<InventoryItem>;
     public var damageResistances:Map<DamageType, Int>;
     public var speed_mod:Int;
+    public var spells:Array<Spell>;
 
     public function new() {
         this.skillRanks = [];
@@ -46,6 +47,7 @@ class FullCharacter {
         this.bank_po = 0;
         this.damageResistances = new Map();
         this.speed_mod = 0;
+        this.spells = [];
     }
 
     function updateHP() {
@@ -142,6 +144,10 @@ class FullCharacter {
                 inventory[item].priority = priority;
             case REMOVE_INVENTORY_ITEM(item):
                 inventory.splice(item, 1);
+            case ADD_SPELL(spell):
+                spells.push(Reflect.copy(spell));
+            case REMOVE_SPELL(index):
+                spells.splice(index, 1);
         }
     }
 

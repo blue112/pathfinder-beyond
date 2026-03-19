@@ -123,6 +123,13 @@ class Fiche implements IJSAsync {
                     pushEvent(CHANGE_BANK_MONEY(value));
             });
         });
+        var spellsBtn = mainElem.querySelector(".spells-btn");
+        spellsBtn.addEventListener("click", () -> {
+            new elems.SpellListPopup(character.spells,
+                (spell) -> pushEvent(ADD_SPELL(spell)),
+                (index) -> pushEvent(REMOVE_SPELL(index))
+            );
+        });
     }
 
     function bindLevelActions() {

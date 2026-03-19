@@ -1,29 +1,5 @@
 import RulesSkills.SkillType;
 
-enum DamageType {
-    // Physical
-    BLUDGEONING;
-    PIERCING;
-    SLASHING;
-    // Energy
-    ACID;
-    COLD;
-    ELECTRICITY;
-    FIRE;
-    SONIC;
-    FORCE;
-    // Positive / Negative energy
-    POSITIVE;
-    NEGATIVE;
-    // Alignment
-    CHAOTIC;
-    EVIL;
-    GOOD;
-    LAWFUL;
-    // Fallback
-    UNTYPED;
-}
-
 // Name matters, order does not
 enum FicheEventType {
     CREATE(data:BasicFicheData);
@@ -56,7 +32,102 @@ enum FicheEventType {
     REMOVE_INVENTORY_ITEM(item:Int);
     CHANGE_ITEM_NAME(item:Int, newName:String);
     CHANGE_ITEM_PRIORITY(item:Int, priority:Int);
+    ADD_SPELL(spell:Spell);
+    REMOVE_SPELL(index:Int);
 }
+
+enum DamageType {
+    // Physical
+    BLUDGEONING;
+    PIERCING;
+    SLASHING;
+    // Energy
+    ACID;
+    COLD;
+    ELECTRICITY;
+    FIRE;
+    SONIC;
+    FORCE;
+    // Positive / Negative energy
+    POSITIVE;
+    NEGATIVE;
+    // Alignment
+    CHAOTIC;
+    EVIL;
+    GOOD;
+    LAWFUL;
+    // Fallback
+    UNTYPED;
+}
+
+enum SpellSchool {
+    ABJURATION;
+    CONJURATION;
+    DIVINATION;
+    ENCHANTMENT;
+    EVOCATION;
+    ILLUSION;
+    NECROMANCY;
+    TRANSMUTATION;
+    UNIVERSAL;
+}
+
+enum SpellComponent {
+    VERBAL;
+    SOMATIC;
+    MATERIAL;
+}
+
+enum SpellSaveEffect {
+    HALF_DAMAGE;
+    NEGATES;
+    REVEALS;
+}
+
+// n is a string to support NLS formulas (e.g. "NLS/2")
+enum SpellCastingTime {
+    STANDARD_ACTION;
+    FULL_ACTION;
+    N_ROUNDS(n:String);
+    N_MINUTES(n:String);
+}
+
+enum SpellDuration {
+    INSTANTANEOUS;
+    N_ROUNDS(n:String);
+    N_MINUTES(n:String);
+    CONCENTRATION;
+}
+
+// cases is a string to support NLS formulas
+enum SpellRange {
+    PERSONAL;
+    TOUCH;
+    CLOSE;
+    MEDIUM;
+    LONG;
+    SPECIFIC(cases:String);
+}
+
+typedef Spell = {
+    var name:String;
+    var shortDescription:Null<String>;
+    var school:SpellSchool;
+    var level:Int;
+    var usesPerDay:Null<Int>;
+    var savingThrowType:Null<SavingThrow>;
+    var saveEffect:Null<SpellSaveEffect>;
+    var spellResistance:Bool;
+    var targets:String;
+    var castingTime:SpellCastingTime;
+    var duration:SpellDuration;
+    var canEndVoluntarily:Bool;
+    var components:Array<SpellComponent>;
+    var areaOfEffect:Null<String>;
+    var range:SpellRange;
+    var longDescription:String;
+    var ?priority:Int;
+};
 
 typedef FicheEventTs = {
     var type:FicheEventType;

@@ -153,4 +153,63 @@ class ProtocolUtil {
             case ALIGNEMENT_CM: "Chaotique/Mauvais";
         }
     }
+
+    static public function spellSchoolToString(s:SpellSchool):String {
+        return switch (s) {
+            case ABJURATION: "Abjuration";
+            case CONJURATION: "Invocation";
+            case DIVINATION: "Divination";
+            case ENCHANTMENT: "Enchantement";
+            case EVOCATION: "Évocation";
+            case ILLUSION: "Illusion";
+            case NECROMANCY: "Nécromancie";
+            case TRANSMUTATION: "Transmutation";
+            case UNIVERSAL: "Universel";
+        }
+    }
+
+    static public function spellComponentToString(c:SpellComponent):String {
+        return switch (c) {
+            case VERBAL: "Verbale";
+            case SOMATIC: "Gestuelle";
+            case MATERIAL: "Matérielle";
+        }
+    }
+
+    static public function spellSaveEffectToString(e:SpellSaveEffect):String {
+        return switch (e) {
+            case HALF_DAMAGE: "1/2 dégâts";
+            case NEGATES: "Annule";
+            case REVEALS: "Dévoile";
+        }
+    }
+
+    static public function spellCastingTimeToString(ct:SpellCastingTime):String {
+        return switch (ct) {
+            case STANDARD_ACTION: "Action simple";
+            case FULL_ACTION: "Action complexe";
+            case N_ROUNDS(n): '${n} round(s)';
+            case N_MINUTES(n): '${n} minute(s)';
+        }
+    }
+
+    static public function spellDurationToString(d:SpellDuration):String {
+        return switch (d) {
+            case INSTANTANEOUS: "Instantanée";
+            case N_ROUNDS(n): '${n} round(s)';
+            case N_MINUTES(n): '${n} minute(s)';
+            case CONCENTRATION: "Concentration";
+        }
+    }
+
+    static public function spellRangeToString(r:SpellRange):String {
+        return switch (r) {
+            case PERSONAL: "Personnelle";
+            case TOUCH: "Contact";
+            case CLOSE: "Courte";
+            case MEDIUM: "Moyenne";
+            case LONG: "Longue";
+            case SPECIFIC(cases): '${cases} case(s)';
+        }
+    }
 }

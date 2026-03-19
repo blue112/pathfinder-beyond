@@ -1,0 +1,234 @@
+@use "variables";
+@use "sass:color";
+
+// Sorts button on the fiche grid
+section.spells-section {
+    .spells-btn {
+        display: block;
+        text-align: center;
+        font-weight: bold;
+        padding: 10px;
+        border: 3px solid variables.$redColor;
+        cursor: pointer;
+        background: color.adjust($color: variables.$backgroundColor, $lightness: -10%);
+
+        &:hover {
+            background: color.adjust($color: variables.$backgroundColor, $lightness: -5%);
+        }
+    }
+}
+
+// Add spell popup
+.popup.spell {
+    .main {
+        top: 5%;
+        height: 90%;
+        width: 85%;
+        left: 7.5%;
+
+        .content {
+            overflow-y: auto;
+        }
+    }
+
+    .spell-form {
+        display: flex;
+        flex-direction: column;
+        padding: 0 20px;
+    }
+
+    .spell-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid #eee;
+
+        > label:first-child {
+            min-width: 200px;
+            font-weight: bold;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        input[type=text],
+        input[type=number],
+        select {
+            flex: 1;
+            padding: 5px 8px;
+            font-size: 0.95em;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        textarea {
+            flex: 1;
+            padding: 5px 8px;
+            font-size: 0.95em;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            resize: vertical;
+        }
+
+        .sub-input {
+            flex: 0 0 auto;
+            width: 130px;
+
+            &.hidden {
+                display: none;
+            }
+        }
+
+        .hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #888;
+            color: white;
+            font-size: 0.8em;
+            cursor: help;
+            flex-shrink: 0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+
+            label.inline {
+                font-weight: normal;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .spell-row-full {
+        flex-direction: column;
+        align-items: flex-start;
+
+        > label:first-child {
+            margin-bottom: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+
+    .actions {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        text-align: center;
+
+        a.validate {
+            display: inline-block;
+            padding: 8px 30px;
+            background: variables.$redColor;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+
+            &:hover {
+                opacity: 0.85;
+            }
+        }
+    }
+}
+
+// Spell list popup
+.popup.spell-list {
+    .main {
+        top: 10%;
+        height: 80%;
+        width: 70%;
+        left: 15%;
+
+        .content {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px 20px;
+        }
+    }
+
+    ul.spell-list-ul {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 15px;
+
+        li {
+            display: grid;
+            grid-template-columns: 55px 130px 1fr 30px;
+            gap: 6px;
+            margin-bottom: 6px;
+
+            > span,
+            > a {
+                padding: 6px 10px;
+                border: 1px solid #ccc;
+                background: #fafafa;
+            }
+
+            .spell-level {
+                text-align: center;
+                font-size: 0.8em;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f0ece0;
+                border-color: #b8ae98;
+            }
+
+            .spell-school {
+                font-style: italic;
+                color: #666;
+                font-size: 0.85em;
+                display: flex;
+                align-items: center;
+                border-color: #b8ae98;
+            }
+
+            .spell-name {
+                font-family: serif;
+                border-color: #b8ae98;
+            }
+
+            a.delete {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #999;
+                cursor: pointer;
+                border-color: #ccc;
+                font-size: 1.1em;
+
+                &:hover {
+                    color: variables.$redColor;
+                    border-color: variables.$redColor;
+                }
+            }
+        }
+    }
+
+    .add-new {
+        display: block;
+        text-align: center;
+        font-weight: bold;
+        padding: 10px;
+        border: 2px solid variables.$redColor;
+        cursor: pointer;
+        background: #faf8f4;
+
+        &:hover {
+            background: #f0ece0;
+        }
+    }
+}
