@@ -28,6 +28,8 @@ class FullCharacter {
     public var damageResistances:Map<DamageType, Int>;
     public var speed_mod:Int;
     public var spells:Array<Spell>;
+    public var preparedSpells:Array<PreparedSpell>;
+    public var preparationLocked:Bool;
 
     public function new() {
         this.skillRanks = [];
@@ -48,6 +50,8 @@ class FullCharacter {
         this.damageResistances = new Map();
         this.speed_mod = 0;
         this.spells = [];
+        this.preparedSpells = [];
+        this.preparationLocked = false;
     }
 
     function updateHP() {
@@ -148,6 +152,22 @@ class FullCharacter {
                 spells.push(Reflect.copy(spell));
             case REMOVE_SPELL(index):
                 spells.splice(index, 1);
+            case PREPARE_SPELL(spellIndex, slotLevel):
+                if (!preparationLocked) preparedSpells.push({spellIndex: spellIndex, slotLevel: slotLevel});
+            case UNPREPARE_SPELL(spellIndex):
+                if (!preparationLocked) {
+                    var idx = -1;
+                    for (i in 0...preparedSpells.length) {
+                        if (preparedSpells[i].spellIndex == spellIndex) idx = i;
+                    }
+                    if (idx >= 0) preparedSpells.splice(idx, 1);
+                }
+            case FINISH_SPELL_PREPARATION:
+                preparationLocked = true;
+            case NEW_DAY:
+                preparedSpells = [];
+                preparationLocked = false;
+                current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
         }
     }
 

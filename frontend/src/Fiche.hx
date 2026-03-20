@@ -25,6 +25,7 @@ class Fiche implements IJSAsync {
 
     var mainElem:DivElement;
     var ws:WsTalker;
+    var currentSpellPopup:Null<elems.SpellListPopup>;
 
     public function new(fiche_id:String) {
         mainElem = Browser.document.createDivElement();
@@ -124,10 +125,7 @@ class Fiche implements IJSAsync {
             });
         });
         mainElem.querySelector(".spells-btn").addEventListener("click", () -> {
-            new elems.SpellListPopup(character.spells,
-                (spell) -> pushEvent(ADD_SPELL(spell)),
-                (index) -> pushEvent(REMOVE_SPELL(index))
-            );
+            new elems.SpellListPopup(character, pushEvent, (p) -> { currentSpellPopup = p; });
         });
     }
 
@@ -280,6 +278,11 @@ class Fiche implements IJSAsync {
                 } else {
                     rollFreeDice(FreeDiceDialog.diceForIndex(choice));
                 }
+            });
+        });
+        mainElem.querySelector("a.new-day").addEventListener("click", () -> {
+            new YesNoAlert("Nouveau jour", 'Confirmer le début d\'un nouveau jour ? Les sorts préparés seront réinitialisés et le personnage récupère ${character.level} PV.', () -> {
+                pushEvent(NEW_DAY);
             });
         });
     }
@@ -607,6 +610,7 @@ class Fiche implements IJSAsync {
     }
 
     private function updateFiche() {
+        if (currentSpellPopup != null) currentSpellPopup.render();
         updateBasics();
         var spellsSection = mainElem.querySelector("section.spells-section");
         if (character.basics.characterClass.canCastSpells()) {

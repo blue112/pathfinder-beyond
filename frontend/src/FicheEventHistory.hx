@@ -96,6 +96,14 @@ class FicheEventHistory extends Popup implements IJSAsync {
                 case REMOVE_SPELL(index):
                     var spell = currentSpells.splice(index, 1)[0];
                     'Suppression d\'un sort: ${spell.name.htmlEscape()}';
+                case PREPARE_SPELL(spellIndex, slotLevel):
+                    'Préparation d\'un sort: ${currentSpells[spellIndex].name.htmlEscape()} (emplacement niv.$slotLevel)';
+                case UNPREPARE_SPELL(spellIndex):
+                    'Dépréparation d\'un sort: ${currentSpells[spellIndex].name.htmlEscape()}';
+                case FINISH_SPELL_PREPARATION:
+                    'Fin de la phase de préparation des sorts';
+                case NEW_DAY:
+                    'Nouveau jour';
                 case ADD_EXCEPTIONAL_MODIFIER(mod):
                     'Ajout d\'un modificateur exceptionnel sur ${mod.mod.asMod()} (${mod.why.htmlEscape()})';
             }

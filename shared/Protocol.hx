@@ -34,6 +34,10 @@ enum FicheEventType {
     CHANGE_ITEM_PRIORITY(item:Int, priority:Int);
     ADD_SPELL(spell:Spell);
     REMOVE_SPELL(index:Int);
+    PREPARE_SPELL(spellIndex:Int, slotLevel:Int);
+    UNPREPARE_SPELL(spellIndex:Int);
+    FINISH_SPELL_PREPARATION;
+    NEW_DAY;
 }
 
 enum DamageType {
@@ -108,6 +112,11 @@ enum SpellRange {
     LONG;
     SPECIFIC(cases:String);
 }
+
+typedef PreparedSpell = {
+    var spellIndex:Int;
+    var slotLevel:Int;
+};
 
 typedef Spell = {
     var name:String;

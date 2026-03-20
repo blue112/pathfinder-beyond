@@ -8,9 +8,54 @@ using Lambda;
 class Rules {
     static public function canCastSpells(cls:CharacterClass):Bool {
         return switch (cls) {
-            case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | MAGICIEN | PRETRE: true;
-            case ROUBLARD | METAMORPHE: false;
+            case CONJURATEUR | MAGICIEN | PRETRE: true;
+            case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE: false;
         };
+    }
+
+    static public function needsSpellPreparation(cls:CharacterClass):Bool {
+        return switch (cls) {
+            case MAGICIEN | PRETRE: true;
+            case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE: false;
+        };
+    }
+
+    // Returns the primary casting ability modifier for a preparation caster.
+    static public function getCastingModifier(cls:CharacterClass, char:FullCharacter):Int {
+        return switch (cls) {
+            case MAGICIEN: char.characteristicsMod.int;
+            case PRETRE: char.characteristicsMod.wis;
+            case CONJURATEUR: char.characteristicsMod.cha;
+            case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE: 0;
+        };
+    }
+
+    // Returns bonus spell slots from a high casting ability.
+    // Pattern per spell level (1-9): floor((mod - level) / 4) + 1 when mod >= level, else 0.
+    // Level 0 (cantrips) never gets a bonus.
+    static public function getBonusSpellSlots(mod:Int):Array<Int> {
+        return [for (level in 0...10) if (level == 0 || mod < level) 0 else Std.int((mod - level) / 4) + 1];
+    }
+
+    // Base spell slots per spell level (index 0–9) by character level (index 0–19).
+    static var spellSlotBase = [
+        [3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // L0
+        [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // L1
+        [0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // L2
+        [0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // L3
+        [0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4], // L4
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4], // L5
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4], // L6
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4], // L7
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 4], // L8
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], // L9
+    ];
+
+    // Returns total spell slots per spell level (indices 0–9), including ability bonus.
+    static public function getSpellSlots(cls:CharacterClass, char:FullCharacter):Array<Int> {
+        if (!needsSpellPreparation(cls)) return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var bonus = getBonusSpellSlots(getCastingModifier(cls, char));
+        return [for (L in 0...10) spellSlotBase[L][char.level - 1] + bonus[L]];
     }
 
     static var bbaTables = [
