@@ -162,6 +162,12 @@ class FullCharacter {
                     }
                     if (idx >= 0) preparedSpells.splice(idx, 1);
                 }
+            case CAST_SPELL(spellIndex):
+                var idx = -1;
+                for (i in 0...preparedSpells.length) {
+                    if (preparedSpells[i].spellIndex == spellIndex) idx = i;
+                }
+                if (idx >= 0) preparedSpells.splice(idx, 1);
             case FINISH_SPELL_PREPARATION:
                 preparationLocked = true;
             case NEW_DAY:

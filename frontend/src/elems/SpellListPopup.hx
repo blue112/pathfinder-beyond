@@ -118,7 +118,7 @@ class SpellListPopup extends Popup {
             }
             nameCell.addEventListener("click", () -> {
                 close();
-                new SpellDetailPopup(spell, () -> new SpellListPopup(character, pushEvent, register));
+                new SpellDetailPopup(spell, originalIndex, character, pushEvent, () -> new SpellListPopup(character, pushEvent, register));
             });
             li.appendChild(nameCell);
 

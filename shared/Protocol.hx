@@ -36,6 +36,7 @@ enum FicheEventType {
     REMOVE_SPELL(index:Int);
     PREPARE_SPELL(spellIndex:Int, slotLevel:Int);
     UNPREPARE_SPELL(spellIndex:Int);
+    CAST_SPELL(spellIndex:Int);
     FINISH_SPELL_PREPARATION;
     NEW_DAY;
 }

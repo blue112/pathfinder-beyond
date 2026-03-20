@@ -9,7 +9,7 @@ using ProtocolUtil;
 class SpellDetailPopup extends Popup {
     var onBack:Void->Void;
 
-    public function new(spell:Spell, onBack:Void->Void) {
+    public function new(spell:Spell, spellIndex:Int, character:FullCharacter, pushEvent:FicheEventType->Void, onBack:Void->Void) {
         super(spell.name);
         this.onBack = onBack;
         mainElem.classList.add("spell-detail");
@@ -59,7 +59,22 @@ class SpellDetailPopup extends Popup {
             content.insertBefore(descBlock, content.querySelector(".actions"));
         }
 
-        content.querySelector("a.cast-btn").addEventListener("click", close);
+        var castBtn:js.html.AnchorElement = cast content.querySelector("a.cast-btn");
+        var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
+        if (preparedCount == 0) {
+            castBtn.classList.add("disabled");
+        } else {
+            var usageSpan = Browser.document.createSpanElement();
+            usageSpan.className = "cast-usage";
+            usageSpan.innerText = '($preparedCount usage${if (preparedCount > 1) "s" else ""} restant${if (preparedCount > 1) "s" else ""})';
+            castBtn.appendChild(usageSpan);
+            castBtn.addEventListener("click", () -> {
+                new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? L\'emplacement de sort sera consommé.', () -> {
+                    pushEvent(CAST_SPELL(spellIndex));
+                    close();
+                });
+            });
+        }
     }
 
     override public function close() {

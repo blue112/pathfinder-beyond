@@ -100,6 +100,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
                     'Préparation d\'un sort: ${currentSpells[spellIndex].name.htmlEscape()} (emplacement niv.$slotLevel)';
                 case UNPREPARE_SPELL(spellIndex):
                     'Dépréparation d\'un sort: ${currentSpells[spellIndex].name.htmlEscape()}';
+                case CAST_SPELL(spellIndex):
+                    'Sort lancé: ${currentSpells[spellIndex].name.htmlEscape()}';
                 case FINISH_SPELL_PREPARATION:
                     'Fin de la phase de préparation des sorts';
                 case NEW_DAY:
