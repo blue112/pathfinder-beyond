@@ -212,4 +212,13 @@ class ProtocolUtil {
             case SPECIFIC(cases): '${cases} case(s)';
         }
     }
+
+    static public function spellDiceTypeToString(t:SpellDiceType):String {
+        return switch (t) {
+            case CARACTERISTIC(c): caracToString(c, false);
+            case CONTACT: "Contact";
+            case NLS: "NLS";
+            case MANUAL(formula): formula;
+        }
+    }
 }

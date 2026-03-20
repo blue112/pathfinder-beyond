@@ -148,13 +148,13 @@ class FullCharacter {
                 inventory[item].priority = priority;
             case REMOVE_INVENTORY_ITEM(item):
                 inventory.splice(item, 1);
-            case ADD_SPELL(spell):
+            case SPELL_EVENT(ADD_SPELL(spell)):
                 spells.push(Reflect.copy(spell));
-            case REMOVE_SPELL(index):
+            case SPELL_EVENT(REMOVE_SPELL(index)):
                 spells.splice(index, 1);
-            case PREPARE_SPELL(spellIndex, slotLevel):
+            case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel)):
                 if (!preparationLocked) preparedSpells.push({spellIndex: spellIndex, slotLevel: slotLevel});
-            case UNPREPARE_SPELL(spellIndex):
+            case SPELL_EVENT(UNPREPARE_SPELL(spellIndex)):
                 if (!preparationLocked) {
                     var idx = -1;
                     for (i in 0...preparedSpells.length) {
@@ -162,13 +162,18 @@ class FullCharacter {
                     }
                     if (idx >= 0) preparedSpells.splice(idx, 1);
                 }
-            case CAST_SPELL(spellIndex):
+            case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)):
+                if (spells[spellIndex].dices == null) spells[spellIndex].dices = [];
+                spells[spellIndex].dices.push(dice);
+            case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, diceIndex)):
+                spells[spellIndex].dices.splice(diceIndex, 1);
+            case SPELL_EVENT(CAST_SPELL(spellIndex)):
                 var idx = -1;
                 for (i in 0...preparedSpells.length) {
                     if (preparedSpells[i].spellIndex == spellIndex) idx = i;
                 }
                 if (idx >= 0) preparedSpells.splice(idx, 1);
-            case FINISH_SPELL_PREPARATION:
+            case SPELL_EVENT(FINISH_SPELL_PREPARATION):
                 preparationLocked = true;
             case NEW_DAY:
                 preparedSpells = [];

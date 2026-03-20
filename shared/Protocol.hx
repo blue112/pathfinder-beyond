@@ -32,12 +32,7 @@ enum FicheEventType {
     REMOVE_INVENTORY_ITEM(item:Int);
     CHANGE_ITEM_NAME(item:Int, newName:String);
     CHANGE_ITEM_PRIORITY(item:Int, priority:Int);
-    ADD_SPELL(spell:Spell);
-    REMOVE_SPELL(index:Int);
-    PREPARE_SPELL(spellIndex:Int, slotLevel:Int);
-    UNPREPARE_SPELL(spellIndex:Int);
-    CAST_SPELL(spellIndex:Int);
-    FINISH_SPELL_PREPARATION;
+    SPELL_EVENT(event:SpellEventType);
     NEW_DAY;
 }
 
@@ -114,9 +109,32 @@ enum SpellRange {
     SPECIFIC(cases:String);
 }
 
+enum SpellEventType {
+    ADD_SPELL(spell:Spell);
+    REMOVE_SPELL(index:Int);
+    PREPARE_SPELL(spellIndex:Int, slotLevel:Int);
+    UNPREPARE_SPELL(spellIndex:Int);
+    CAST_SPELL(spellIndex:Int);
+    ADD_SPELL_DICE(spellIndex:Int, dice:SpellDice);
+    REMOVE_SPELL_DICE(spellIndex:Int, diceIndex:Int);
+    FINISH_SPELL_PREPARATION;
+}
+
 typedef PreparedSpell = {
     var spellIndex:Int;
     var slotLevel:Int;
+};
+
+enum SpellDiceType {
+    CARACTERISTIC(c:Characteristic);
+    CONTACT;
+    NLS;
+    MANUAL(formula:String);
+}
+
+typedef SpellDice = {
+    var diceType:SpellDiceType;
+    var reason:String;
 };
 
 typedef Spell = {
@@ -137,6 +155,7 @@ typedef Spell = {
     var range:SpellRange;
     var longDescription:String;
     var ?priority:Int;
+    var ?dices:Array<SpellDice>;
 };
 
 typedef FicheEventTs = {

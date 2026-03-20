@@ -18,8 +18,9 @@ section.spells-section {
     }
 }
 
-// Add spell popup
-.popup.spell {
+// Add spell popup + add dice dialog (shared form layout)
+.popup.spell,
+.popup.spell-dice-dialog {
     .main {
         top: 5%;
         height: 90%;
@@ -400,6 +401,56 @@ section.spells-section {
 
         dd {
             white-space: pre-wrap;
+        }
+    }
+
+    .spell-dices {
+        margin-top: 15px;
+        padding: 10px 15px;
+        border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        h3 {
+            margin: 0 0 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .spell-dice-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            border: 1px solid #b8ae98;
+            background: #f0ece0;
+            font-size: 0.9em;
+
+            .spell-dice-del {
+                cursor: pointer;
+                color: #aaa;
+                margin-left: 10px;
+
+                &:hover {
+                    color: variables.$redColor;
+                }
+            }
+        }
+
+        .add-dice-btn {
+            align-self: flex-start;
+            font-size: 0.85em;
+            color: #888;
+            cursor: pointer;
+            padding: 3px 8px;
+            border: 1px dashed #bbb;
+
+            &:hover {
+                color: variables.$redColor;
+                border-color: variables.$redColor;
+            }
         }
     }
 

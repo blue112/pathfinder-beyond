@@ -53,11 +53,46 @@ class SpellDetailPopup extends Popup {
         if (spell.usesPerDay != null) addRow("Utilisations / jour", Std.string(spell.usesPerDay));
 
         if (spell.longDescription != "") {
-            var descBlock:js.html.Element = cast Browser.document.createElement("div");
+            var descBlock = Browser.document.createDivElement();
             descBlock.className = "spell-long-desc";
             descBlock.innerText = spell.longDescription;
             content.insertBefore(descBlock, content.querySelector(".actions"));
         }
+
+        var dicesSection = Browser.document.createDivElement();
+        dicesSection.className = "spell-dices";
+        var dicesLabel:js.html.Element = cast Browser.document.createElement("h3");
+        dicesLabel.innerText = "Dés associés au sort";
+        dicesSection.appendChild(dicesLabel);
+        var spellDices = if (spell.dices != null) spell.dices else [];
+        for (di in 0...spellDices.length) {
+            var d = spellDices[di];
+            var row = Browser.document.createDivElement();
+            row.className = "spell-dice-item";
+            var label = Browser.document.createSpanElement();
+            label.innerText = '${d.reason} : ${d.diceType.spellDiceTypeToString()}';
+            var del = Browser.document.createAnchorElement();
+            del.className = "spell-dice-del";
+            del.innerText = "×";
+            del.addEventListener("click", () -> {
+                pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di)));
+                dicesSection.removeChild(row);
+            });
+            row.appendChild(label);
+            row.appendChild(del);
+            dicesSection.appendChild(row);
+        }
+        var addDiceBtn = Browser.document.createAnchorElement();
+        addDiceBtn.className = "add-dice-btn";
+        addDiceBtn.innerText = "+ Ajouter un dé";
+        addDiceBtn.addEventListener("click", () -> {
+            new elems.SpellDiceDialog(spell.name, (dice) -> {
+                pushEvent(SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)));
+                close();
+            });
+        });
+        dicesSection.appendChild(addDiceBtn);
+        content.insertBefore(dicesSection, content.querySelector(".actions"));
 
         var castBtn:js.html.AnchorElement = cast content.querySelector("a.cast-btn");
         var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
@@ -70,7 +105,7 @@ class SpellDetailPopup extends Popup {
             castBtn.appendChild(usageSpan);
             castBtn.addEventListener("click", () -> {
                 new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? L\'emplacement de sort sera consommé.', () -> {
-                    pushEvent(CAST_SPELL(spellIndex));
+                    pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
                     close();
                 });
             });

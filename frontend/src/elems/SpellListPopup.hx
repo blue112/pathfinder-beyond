@@ -73,7 +73,7 @@ class SpellListPopup extends Popup {
                 endBtn.innerText = "Terminer la préparation";
                 endBtn.addEventListener("click", () -> {
                     new YesNoAlert("Terminer la préparation", "Confirmer la fin de la préparation des sorts ? Vous ne pourrez plus modifier vos sorts préparés jusqu'au prochain nouveau jour.", () -> {
-                        pushEvent(FINISH_SPELL_PREPARATION);
+                        pushEvent(SPELL_EVENT(FINISH_SPELL_PREPARATION));
                     });
                 });
                 content.appendChild(endBtn);
@@ -135,7 +135,7 @@ class SpellListPopup extends Popup {
                 minusBtn.className = "prep-btn minus";
                 minusBtn.innerText = "−";
                 minusBtn.addEventListener("click", () -> {
-                    if (prepCount > 0) pushEvent(UNPREPARE_SPELL(originalIndex));
+                    if (prepCount > 0) pushEvent(SPELL_EVENT(UNPREPARE_SPELL(originalIndex)));
                 });
 
                 var plusBtn = Browser.document.createAnchorElement();
@@ -149,7 +149,7 @@ class SpellListPopup extends Popup {
                             break;
                         }
                     }
-                    if (targetSlot >= 0) pushEvent(PREPARE_SPELL(originalIndex, targetSlot));
+                    if (targetSlot >= 0) pushEvent(SPELL_EVENT(PREPARE_SPELL(originalIndex, targetSlot)));
                 });
 
                 prepControls.appendChild(countSpan);
@@ -164,7 +164,7 @@ class SpellListPopup extends Popup {
             deleteBtn.innerText = "×";
             deleteBtn.addEventListener("click", () -> {
                 new YesNoAlert("Effacer un sort", 'Supprimer le sort "${spell.name}" ?', () -> {
-                    pushEvent(REMOVE_SPELL(originalIndex));
+                    pushEvent(SPELL_EVENT(REMOVE_SPELL(originalIndex)));
                     close();
                 });
             });
@@ -177,7 +177,7 @@ class SpellListPopup extends Popup {
         addBtn.className = "add-new";
         addBtn.innerText = "Ajouter un sort";
         addBtn.addEventListener("click", () -> {
-            new SpellDialog((spell) -> pushEvent(ADD_SPELL(spell)));
+            new SpellDialog((spell) -> pushEvent(SPELL_EVENT(ADD_SPELL(spell))));
         });
         content.appendChild(addBtn);
     }
