@@ -35,8 +35,9 @@ class SpellDetailPopup extends Popup {
             dl.appendChild(dd);
         }
 
+        var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
         addRow("École", spell.school.spellSchoolToString());
-        addRow("Niveau", Std.string(spell.level));
+        if (!isPower) addRow("Niveau", Std.string(spell.level));
         if (spell.shortDescription != null) addRow("Description courte", spell.shortDescription);
         addRow("Temps d'incantation", spell.castingTime.spellCastingTimeToString());
         var durationStr = spell.duration.spellDurationToString();
@@ -95,20 +96,40 @@ class SpellDetailPopup extends Popup {
         content.insertBefore(dicesSection, content.querySelector(".actions"));
 
         var castBtn:js.html.AnchorElement = cast content.querySelector("a.cast-btn");
-        var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
-        if (preparedCount == 0) {
-            castBtn.classList.add("disabled");
-        } else {
-            var usageSpan = Browser.document.createSpanElement();
-            usageSpan.className = "cast-usage";
-            usageSpan.innerText = '($preparedCount usage${if (preparedCount > 1) "s" else ""} restant${if (preparedCount > 1) "s" else ""})';
-            castBtn.appendChild(usageSpan);
-            castBtn.addEventListener("click", () -> {
-                new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? L\'emplacement de sort sera consommé.', () -> {
-                    pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                    close();
+        if (isPower) {
+            castBtn.innerText = "Utiliser le pouvoir";
+            var usedCount = character.usedPowers.exists(spellIndex) ? character.usedPowers.get(spellIndex) : 0;
+            var remaining = spell.usesPerDay - usedCount;
+            if (remaining == 0) {
+                castBtn.classList.add("disabled");
+            } else {
+                var usageSpan = Browser.document.createSpanElement();
+                usageSpan.className = "cast-usage";
+                usageSpan.innerText = '($remaining utilisation${if (remaining > 1) "s" else ""} restante${if (remaining > 1) "s" else ""})';
+                castBtn.appendChild(usageSpan);
+                castBtn.addEventListener("click", () -> {
+                    new YesNoAlert("Utiliser le pouvoir", 'Confirmer l\'utilisation de "${spell.name}" ?', () -> {
+                        pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+                        close();
+                    });
                 });
-            });
+            }
+        } else {
+            var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
+            if (preparedCount == 0) {
+                castBtn.classList.add("disabled");
+            } else {
+                var usageSpan = Browser.document.createSpanElement();
+                usageSpan.className = "cast-usage";
+                usageSpan.innerText = '($preparedCount usage${if (preparedCount > 1) "s" else ""} restant${if (preparedCount > 1) "s" else ""})';
+                castBtn.appendChild(usageSpan);
+                castBtn.addEventListener("click", () -> {
+                    new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? L\'emplacement de sort sera consommé.', () -> {
+                        pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+                        close();
+                    });
+                });
+            }
         }
     }
 

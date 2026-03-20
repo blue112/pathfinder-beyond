@@ -44,13 +44,11 @@ class SpellListPopup extends Popup {
             return (if (a.priority == null) 0 else a.priority) - (if (b.priority == null) 0 else b.priority);
         });
 
-        if (needsPrep) {
-            if (!character.preparationLocked) {
-                var header = Browser.document.createParagraphElement();
-                header.className = "prep-phase-header";
-                header.innerText = "Phase de préparation";
-                content.appendChild(header);
-            }
+        if (needsPrep && !character.preparationLocked) {
+            var header = Browser.document.createParagraphElement();
+            header.className = "prep-phase-header";
+            header.innerText = "Phase de préparation";
+            content.appendChild(header);
 
             var slotSummary = Browser.document.createDivElement();
             slotSummary.className = "spell-slot-summary";
@@ -67,7 +65,7 @@ class SpellListPopup extends Popup {
             }
             content.appendChild(slotSummary);
 
-            if (allFull && !character.preparationLocked) {
+            if (allFull) {
                 var endBtn = Browser.document.createAnchorElement();
                 endBtn.className = "end-prep-btn";
                 endBtn.innerText = "Terminer la préparation";
@@ -80,28 +78,39 @@ class SpellListPopup extends Popup {
             }
         }
 
-        var showAvailable = needsPrep && character.preparationLocked;
+        var hasPowers = spells.filter(s -> s.usesPerDay != null && s.usesPerDay > 0).length > 0;
+        var showAvailable = (needsPrep && character.preparationLocked) || hasPowers;
+        var inPrep = needsPrep && !character.preparationLocked;
         var ul = Browser.document.createUListElement();
-        ul.className = if (needsPrep && !character.preparationLocked) "spell-list-ul has-prep"
+        ul.className = if (inPrep && hasPowers) "spell-list-ul has-prep has-available"
+            else if (inPrep) "spell-list-ul has-prep"
             else if (showAvailable) "spell-list-ul has-available"
             else "spell-list-ul";
         content.appendChild(ul);
 
         for (spell in sorted) {
             var originalIndex = spells.indexOf(spell);
+            var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
             var li = Browser.document.createLIElement();
 
             if (showAvailable) {
-                var count = preparedSpells.filter(p -> p.spellIndex == originalIndex).length;
                 var availSpan = Browser.document.createSpanElement();
-                availSpan.className = 'spell-available ${if (count > 0) "has-charges" else "empty"}';
-                availSpan.innerText = '×$count';
+                if (isPower) {
+                    var usedCount = character.usedPowers.exists(originalIndex) ? character.usedPowers.get(originalIndex) : 0;
+                    var remaining = spell.usesPerDay - usedCount;
+                    availSpan.className = 'spell-available ${if (remaining > 0) "has-charges" else "empty"}';
+                    availSpan.innerText = '×$remaining';
+                } else {
+                    var count = preparedSpells.filter(p -> p.spellIndex == originalIndex).length;
+                    availSpan.className = 'spell-available ${if (count > 0) "has-charges" else "empty"}';
+                    availSpan.innerText = '×$count';
+                }
                 li.appendChild(availSpan);
             }
 
             var levelSpan = Browser.document.createSpanElement();
             levelSpan.className = "spell-level";
-            levelSpan.innerText = 'Niv.${spell.level}';
+            levelSpan.innerText = if (isPower) "Pouvoir" else 'Niv.${spell.level}';
             li.appendChild(levelSpan);
 
             var nameCell = Browser.document.createSpanElement();
@@ -122,7 +131,7 @@ class SpellListPopup extends Popup {
             });
             li.appendChild(nameCell);
 
-            if (needsPrep && !character.preparationLocked) {
+            if (inPrep && !isPower) {
                 var prepCount = preparedSpells.filter(p -> p.spellIndex == originalIndex).length;
                 var prepControls = Browser.document.createSpanElement();
                 prepControls.className = "spell-prep-controls";

@@ -30,6 +30,7 @@ class FullCharacter {
     public var spells:Array<Spell>;
     public var preparedSpells:Array<PreparedSpell>;
     public var preparationLocked:Bool;
+    public var usedPowers:Map<Int, Int>;
 
     public function new() {
         this.skillRanks = [];
@@ -52,6 +53,7 @@ class FullCharacter {
         this.spells = [];
         this.preparedSpells = [];
         this.preparationLocked = false;
+        this.usedPowers = new Map();
     }
 
     function updateHP() {
@@ -168,16 +170,21 @@ class FullCharacter {
             case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, diceIndex)):
                 spells[spellIndex].dices.splice(diceIndex, 1);
             case SPELL_EVENT(CAST_SPELL(spellIndex)):
-                var idx = -1;
-                for (i in 0...preparedSpells.length) {
-                    if (preparedSpells[i].spellIndex == spellIndex) idx = i;
+                if (spells[spellIndex].usesPerDay != null) {
+                    usedPowers.set(spellIndex, (usedPowers.exists(spellIndex) ? usedPowers.get(spellIndex) : 0) + 1);
+                } else {
+                    var idx = -1;
+                    for (i in 0...preparedSpells.length) {
+                        if (preparedSpells[i].spellIndex == spellIndex) idx = i;
+                    }
+                    if (idx >= 0) preparedSpells.splice(idx, 1);
                 }
-                if (idx >= 0) preparedSpells.splice(idx, 1);
             case SPELL_EVENT(FINISH_SPELL_PREPARATION):
                 preparationLocked = true;
             case NEW_DAY:
                 preparedSpells = [];
                 preparationLocked = false;
+                usedPowers = new Map();
                 current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
         }
     }
