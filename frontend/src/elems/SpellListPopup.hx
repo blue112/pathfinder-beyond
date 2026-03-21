@@ -185,8 +185,9 @@ class SpellListPopup extends Popup {
         var addBtn = Browser.document.createAnchorElement();
         addBtn.className = "add-new";
         addBtn.innerText = "Ajouter un sort";
+        var maxSpellLevel = Rules.getMaxSpellLevel(character.basics.characterClass, character);
         addBtn.addEventListener("click", () -> {
-            new SpellDialog((spell) -> pushEvent(SPELL_EVENT(ADD_SPELL(spell))));
+            new SpellDialog(character.basics.characterClass, maxSpellLevel, (spell) -> pushEvent(SPELL_EVENT(ADD_SPELL(spell))));
         });
         content.appendChild(addBtn);
     }

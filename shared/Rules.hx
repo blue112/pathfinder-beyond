@@ -51,11 +51,31 @@ class Rules {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], // L9
     ];
 
+    // Returns the highest spell level the character has base slots for (ignoring ability bonuses).
+    static public function getMaxSpellLevel(cls:CharacterClass, char:FullCharacter):Int {
+        if (!needsSpellPreparation(cls)) return 0;
+        var charIdx = char.level - 1;
+        var max = 0;
+        for (L in 0...10) if (spellSlotBase[L][charIdx] > 0) max = L;
+        return max;
+    }
+
     // Returns total spell slots per spell level (indices 0–9), including ability bonus.
+    // Bonus slots for levels not yet unlocked are folded into the highest unlocked level.
     static public function getSpellSlots(cls:CharacterClass, char:FullCharacter):Array<Int> {
         if (!needsSpellPreparation(cls)) return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         var bonus = getBonusSpellSlots(getCastingModifier(cls, char));
-        return [for (L in 0...10) spellSlotBase[L][char.level - 1] + bonus[L]];
+        var charIdx = char.level - 1;
+        var maxLevel = getMaxSpellLevel(cls, char);
+        var slots = [for (L in 0...10) spellSlotBase[L][charIdx]];
+        for (L in 0...10) {
+            if (slots[L] > 0) {
+                slots[L] += bonus[L];
+            } else if (bonus[L] > 0) {
+                slots[maxLevel] += bonus[L];
+            }
+        }
+        return slots;
     }
 
     static var bbaTables = [

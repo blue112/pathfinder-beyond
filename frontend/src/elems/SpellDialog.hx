@@ -5,16 +5,25 @@ import js.html.InputElement;
 import js.html.SelectElement;
 import Protocol;
 import ProtocolUtil;
+import jsasync.IJSAsync;
 
 using ProtocolUtil;
+using jsasync.JSAsyncTools;
 
-class SpellDialog extends Popup {
-    public function new(onChoice:Spell->Void) {
+class SpellDialog extends Popup implements IJSAsync {
+    public function new(characterClass:CharacterClass, maxSpellLevel:Int, onChoice:Spell->Void) {
         super("Ajouter un sort");
         mainElem.classList.add("spell");
 
         getContent().innerHTML = '
         <div class="spell-form">
+            <div class="spell-row spell-search-row">
+                <label>Rechercher</label>
+                <div class="spell-search-wrap">
+                    <input type="text" name="spell-search" placeholder="Nom du sort..." autocomplete="off" />
+                    <ul class="spell-suggestions hidden"></ul>
+                </div>
+            </div>
             <div class="spell-row">
                 <label>Nom *</label>
                 <input type="text" name="name" />
@@ -177,6 +186,70 @@ class SpellDialog extends Popup {
                 canEndRow.classList.add("hidden");
             } else {
                 canEndRow.classList.remove("hidden");
+            }
+        });
+
+        // Autocomplete setup
+        var clsName = switch (characterClass) {
+            case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED: "conjurateur";
+            case MAGICIEN: "magicien";
+            case PRETRE: "pretre";
+            case ROUBLARD | METAMORPHE: "magicien"; // fallback, shouldn't be reached
+        };
+        var searchInput:InputElement = cast getContent().querySelector('input[name=spell-search]');
+        var suggestions = getContent().querySelector('ul.spell-suggestions');
+        var spellIndex:Array<Dynamic> = [];
+
+        Api.getSpells(clsName, maxSpellLevel).then(index -> {
+            spellIndex = index;
+        });
+
+        function selectSpell(name:String) {
+            searchInput.value = name;
+            suggestions.classList.add("hidden");
+            Api.getSpellDetail(clsName, name).then(spell -> {
+                setValue("name", spell.name);
+                setValue("level", Std.string(spell.level));
+                if (spell.school != null) setValue("school", spell.school);
+                if (spell.shortDesc != null) setValue("short-description", spell.shortDesc);
+                if (spell.description != null) setValue("long-description", spell.description);
+                var comps:Array<String> = if (spell.components != null) spell.components else [];
+                var compVerbal:InputElement = cast getContent().querySelector('input[name=comp-verbal]');
+                var compSomatic:InputElement = cast getContent().querySelector('input[name=comp-somatic]');
+                var compMaterial:InputElement = cast getContent().querySelector('input[name=comp-material]');
+                compVerbal.checked = comps.indexOf("VERBAL") >= 0;
+                compSomatic.checked = comps.indexOf("SOMATIC") >= 0;
+                compMaterial.checked = comps.indexOf("MATERIAL") >= 0;
+                if (spell.savingThrow != null) {
+                    stSelect.value = spell.savingThrow;
+                    saveEffectRow.classList.remove("hidden");
+                    if (spell.saveEffect != null) setValue("save-effect", spell.saveEffect);
+                }
+                var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
+                srInput.checked = spell.spellResistance == true;
+                if (spell.target != null) setValue("targets", spell.target);
+            });
+        }
+
+        searchInput.addEventListener("input", () -> {
+            var query = searchInput.value.toLowerCase().trim();
+            suggestions.innerHTML = "";
+            if (query.length < 2) {
+                suggestions.classList.add("hidden");
+                return;
+            }
+            var matches = [for (s in spellIndex) if ((s.name : String).toLowerCase().indexOf(query) >= 0) s];
+            if (matches.length == 0) {
+                suggestions.classList.add("hidden");
+                return;
+            }
+            if (matches.length > 10) matches = matches.slice(0, 10);
+            suggestions.classList.remove("hidden");
+            for (s in matches) {
+                var li = Browser.document.createLIElement();
+                li.innerText = '${(s.name : String)} (niv. ${(s.level : Int)})';
+                li.addEventListener("click", () -> selectSpell(s.name));
+                suggestions.appendChild(li);
             }
         });
 

@@ -120,6 +120,20 @@ enum SpellEventType {
     FINISH_SPELL_PREPARATION;
 }
 
+// Spell data as returned by the spell index JSON (enum fields stored as strings)
+typedef SpellEntry = {
+    var name:String;
+    var level:Int;
+    var school:String;
+    var components:Array<String>;
+    var spellResistance:Bool;
+    var ?shortDesc:String;
+    var ?description:String;
+    var ?savingThrow:String;
+    var ?saveEffect:String;
+    var ?target:String;
+};
+
 typedef PreparedSpell = {
     var spellIndex:Int;
     var slotLevel:Int;

@@ -29,6 +29,10 @@ class Popup {
         return ((cast getContent().querySelector('[name=$name]') : Dynamic).value : String).trim();
     }
 
+    public function setValue(name:String, value:String) {
+        (cast getContent().querySelector('[name=$name]') : Dynamic).value = value;
+    }
+
     public function close() {
         Browser.document.body.removeChild(mainElem);
     }

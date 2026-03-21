@@ -21,6 +21,14 @@ class Api implements IJSAsync {
         return r.json().jsawait();
     }
 
+    @:jsasync static public function getSpells(cls:String, maxLevel:Int):Promise<Array<SpellEntry>> {
+        return loadJson('/spells/$cls/$maxLevel').jsawait();
+    }
+
+    @:jsasync static public function getSpellDetail(cls:String, name:String):Promise<SpellEntry> {
+        return loadJson('/spells/$cls/detail/${StringTools.urlEncode(name)}').jsawait();
+    }
+
     @:jsasync static public function getRolls(ficheId:String):Promise<Array<PublicDiceRoll>> {
         var r = Browser.window.fetch('/api/fiche/$ficheId/rolls').jsawait();
         var j = r.json().jsawait();
