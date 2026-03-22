@@ -23,7 +23,8 @@ class SpellDiceDialog extends Popup {
                 <select name="dice-type">
                     <option value="MANUAL">Manuel</option>
                     <option value="NLS">NLS</option>
-                    <option value="CONTACT">Contact</option>
+                    <option value="CONTACT_MELEE">Contact au corps à corps</option>
+                    <option value="CONTACT_RANGED">Contact à distance</option>
                     <option value="CARACTERISTIC">Caractéristique</option>
                 </select>
             </div>
@@ -68,8 +69,10 @@ class SpellDiceDialog extends Popup {
             var typeStr = typeSelect.value;
             var diceType = if (typeStr == "CARACTERISTIC") {
                 CARACTERISTIC(Type.createEnum(Characteristic, inputValue("dice-carac")));
-            } else if (typeStr == "CONTACT") {
-                CONTACT;
+            } else if (typeStr == "CONTACT_MELEE") {
+                CONTACT_MELEE;
+            } else if (typeStr == "CONTACT_RANGED") {
+                CONTACT_RANGED;
             } else if (typeStr == "NLS") {
                 NLS;
             } else {

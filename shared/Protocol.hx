@@ -142,7 +142,8 @@ typedef PreparedSpell = {
 
 enum SpellDiceType {
     CARACTERISTIC(c:Characteristic);
-    CONTACT;
+    CONTACT_MELEE;
+    CONTACT_RANGED;
     NLS;
     MANUAL(formula:String);
 }

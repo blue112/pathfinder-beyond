@@ -216,7 +216,8 @@ class ProtocolUtil {
     static public function spellDiceTypeToString(t:SpellDiceType):String {
         return switch (t) {
             case CARACTERISTIC(c): caracToString(c, false);
-            case CONTACT: "Contact";
+            case CONTACT_MELEE: "Contact au corps à corps";
+            case CONTACT_RANGED: "Contact à distance";
             case NLS: "NLS";
             case MANUAL(formula): formula;
         }
