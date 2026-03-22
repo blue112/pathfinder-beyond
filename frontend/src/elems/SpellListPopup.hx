@@ -12,6 +12,7 @@ class SpellListPopup extends Popup {
     var character:FullCharacter;
     var pushEvent:FicheEventType->Void;
     var register:(Null<SpellListPopup>)->Void;
+    var editingPriorities:Bool = false;
 
     public function new(character:FullCharacter, pushEvent:FicheEventType->Void, register:(Null<SpellListPopup>)->Void) {
         super("Sorts");
@@ -19,6 +20,17 @@ class SpellListPopup extends Popup {
         this.pushEvent = pushEvent;
         this.register = register;
         mainElem.classList.add("spell-list");
+
+        var editBtn = Browser.document.createAnchorElement();
+        editBtn.className = "edit-priorities-btn";
+        editBtn.innerText = "Priorités";
+        editBtn.addEventListener("click", () -> {
+            editingPriorities = !editingPriorities;
+            editBtn.classList.toggle("active", editingPriorities);
+            render();
+        });
+        mainElem.querySelector(".main").appendChild(editBtn);
+
         register(this);
         render();
     }
@@ -39,10 +51,17 @@ class SpellListPopup extends Popup {
 
         var sorted = spells.copy();
         sorted.sort((a, b) -> {
-            var lvlDiff = a.level - b.level;
-            if (lvlDiff != 0) return lvlDiff;
+            var aPower = a.usesPerDay != null && a.usesPerDay > 0;
+            var bPower = b.usesPerDay != null && b.usesPerDay > 0;
+            if (aPower != bPower) return if (aPower) -1 else 1;
+            if (!aPower) {
+                var lvlDiff = a.level - b.level;
+                if (lvlDiff != 0) return lvlDiff;
+            }
             return (if (a.priority == null) 0 else a.priority) - (if (b.priority == null) 0 else b.priority);
         });
+
+        var isSpontaneous = character.basics.characterClass.canCastSpells() && !needsPrep;
 
         if (needsPrep && !character.preparationLocked) {
             var header = Browser.document.createParagraphElement();
@@ -78,14 +97,30 @@ class SpellListPopup extends Popup {
             }
         }
 
+        if (isSpontaneous) {
+            var slotSummary = Browser.document.createDivElement();
+            slotSummary.className = "spell-slot-summary";
+            for (spellLevel in 1...10) {
+                if (slots[spellLevel] == 0) continue;
+                var used = character.usedSlots.exists(spellLevel) ? character.usedSlots.get(spellLevel) : 0;
+                var remaining = slots[spellLevel] - used;
+                var badge = Browser.document.createSpanElement();
+                badge.className = 'slot-badge ${if (remaining > 0) "full" else "incomplete"}';
+                badge.innerText = 'Niv.$spellLevel : $remaining/${slots[spellLevel]}';
+                slotSummary.appendChild(badge);
+            }
+            content.appendChild(slotSummary);
+        }
+
         var hasPowers = spells.filter(s -> s.usesPerDay != null && s.usesPerDay > 0).length > 0;
         var showAvailable = (needsPrep && character.preparationLocked) || hasPowers;
         var inPrep = needsPrep && !character.preparationLocked;
-        var ul = Browser.document.createUListElement();
-        ul.className = if (inPrep && hasPowers) "spell-list-ul has-prep has-available"
+        var ulClass = if (inPrep && hasPowers) "spell-list-ul has-prep has-available"
             else if (inPrep) "spell-list-ul has-prep"
             else if (showAvailable) "spell-list-ul has-available"
             else "spell-list-ul";
+        var ul = Browser.document.createUListElement();
+        ul.className = if (editingPriorities) '$ulClass has-priority' else ulClass;
         content.appendChild(ul);
 
         for (spell in sorted) {
@@ -100,10 +135,22 @@ class SpellListPopup extends Popup {
                     var remaining = spell.usesPerDay - usedCount;
                     availSpan.className = 'spell-available ${if (remaining > 0) "has-charges" else "empty"}';
                     availSpan.innerText = '×$remaining';
+                } else if (isSpontaneous) {
+                    if (spell.level == 0) {
+                        availSpan.className = "spell-available has-charges";
+                        availSpan.innerText = "∞";
+                    } else {
+                        availSpan.className = "spell-available";
+                    }
                 } else {
                     var count = preparedSpells.filter(p -> p.spellIndex == originalIndex).length;
-                    availSpan.className = 'spell-available ${if (count > 0) "has-charges" else "empty"}';
-                    availSpan.innerText = '×$count';
+                    if (spell.level == 0 && count > 0) {
+                        availSpan.className = "spell-available has-charges";
+                        availSpan.innerText = "∞";
+                    } else {
+                        availSpan.className = 'spell-available ${if (count > 0) "has-charges" else "empty"}';
+                        availSpan.innerText = '×$count';
+                    }
                 }
                 li.appendChild(availSpan);
             }
@@ -165,6 +212,24 @@ class SpellListPopup extends Popup {
                 prepControls.appendChild(minusBtn);
                 prepControls.appendChild(plusBtn);
                 li.appendChild(prepControls);
+            }
+
+            if (editingPriorities) {
+                var priorityCell = Browser.document.createSpanElement();
+                priorityCell.className = "spell-priority-edit";
+                var input = Browser.document.createInputElement();
+                input.type = "number";
+                input.value = Std.string(if (spell.priority == null) 0 else spell.priority);
+                var validateBtn = Browser.document.createAnchorElement();
+                validateBtn.className = "priority-validate-btn";
+                validateBtn.innerText = "✓";
+                validateBtn.addEventListener("click", () -> {
+                    var val = Std.parseInt(input.value);
+                    pushEvent(SPELL_EVENT(SET_SPELL_PRIORITY(originalIndex, val)));
+                });
+                priorityCell.appendChild(input);
+                priorityCell.appendChild(validateBtn);
+                li.appendChild(priorityCell);
             }
 
             var deleteBtn = Browser.document.createAnchorElement();

@@ -106,6 +106,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
                     'Dé retiré de ${currentSpells[spellIndex].name.htmlEscape()}';
                 case SPELL_EVENT(CAST_SPELL(spellIndex)):
                     'Sort lancé: ${currentSpells[spellIndex].name.htmlEscape()}';
+                case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority)):
+                    'Priorité du sort ${currentSpells[spellIndex].name.htmlEscape()} modifiée : $priority';
                 case SPELL_EVENT(FINISH_SPELL_PREPARATION):
                     'Fin de la phase de préparation des sorts';
                 case NEW_DAY:

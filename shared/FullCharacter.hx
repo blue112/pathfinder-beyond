@@ -31,6 +31,7 @@ class FullCharacter {
     public var preparedSpells:Array<PreparedSpell>;
     public var preparationLocked:Bool;
     public var usedPowers:Map<Int, Int>;
+    public var usedSlots:Map<Int, Int>;
 
     public function new() {
         this.skillRanks = [];
@@ -54,6 +55,7 @@ class FullCharacter {
         this.preparedSpells = [];
         this.preparationLocked = false;
         this.usedPowers = new Map();
+        this.usedSlots = new Map();
     }
 
     function updateHP() {
@@ -170,21 +172,29 @@ class FullCharacter {
             case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, diceIndex)):
                 spells[spellIndex].dices.splice(diceIndex, 1);
             case SPELL_EVENT(CAST_SPELL(spellIndex)):
-                if (spells[spellIndex].usesPerDay != null) {
+                var spell = spells[spellIndex];
+                if (spell.usesPerDay != null) {
                     usedPowers.set(spellIndex, (usedPowers.exists(spellIndex) ? usedPowers.get(spellIndex) : 0) + 1);
-                } else {
+                } else if (spell.level == 0) {
+                    // Cantrips are unlimited — no slot consumed
+                } else if (basics.characterClass.needsSpellPreparation()) {
                     var idx = -1;
                     for (i in 0...preparedSpells.length) {
                         if (preparedSpells[i].spellIndex == spellIndex) idx = i;
                     }
                     if (idx >= 0) preparedSpells.splice(idx, 1);
+                } else {
+                    usedSlots.set(spell.level, (usedSlots.exists(spell.level) ? usedSlots.get(spell.level) : 0) + 1);
                 }
+            case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority)):
+                spells[spellIndex].priority = priority;
             case SPELL_EVENT(FINISH_SPELL_PREPARATION):
                 preparationLocked = true;
             case NEW_DAY:
                 preparedSpells = [];
                 preparationLocked = false;
                 usedPowers = new Map();
+                usedSlots = new Map();
                 current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
         }
     }

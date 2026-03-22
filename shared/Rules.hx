@@ -37,7 +37,7 @@ class Rules {
         return [for (level in 0...10) if (level == 0 || mod < level) 0 else Std.int((mod - level) / 4) + 1];
     }
 
-    // Base spell slots per spell level (index 0–9) by character level (index 0–19).
+    // Base spell slots for preparation casters (Magicien/Pretre): spell level (0–9) × char level (1–20).
     static var spellSlotBase = [
         [3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // L0
         [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // L1
@@ -51,23 +51,43 @@ class Rules {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], // L9
     ];
 
+    // Base spell slots for the Conjurateur (6-level spontaneous caster, PF1e Summoner table).
+    static var spellSlotBaseConjurateur = [
+        [4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // L0
+        [2, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // L1
+        [0, 0, 0, 2, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6], // L2
+        [0, 0, 0, 0, 0, 0, 2, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6], // L3
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6], // L4
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 4, 4, 4, 5, 5], // L5
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 4, 5], // L6
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // L7
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // L8
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // L9
+    ];
+
+    static function getBaseSlots(cls:CharacterClass, charIdx:Int):Array<Int> {
+        return switch (cls) {
+            case MAGICIEN | PRETRE: [for (L in 0...10) spellSlotBase[L][charIdx]];
+            case CONJURATEUR: [for (L in 0...10) spellSlotBaseConjurateur[L][charIdx]];
+            case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        };
+    }
+
     // Returns the highest spell level the character has base slots for (ignoring ability bonuses).
     static public function getMaxSpellLevel(cls:CharacterClass, char:FullCharacter):Int {
-        if (!needsSpellPreparation(cls)) return 0;
-        var charIdx = char.level - 1;
+        var base = getBaseSlots(cls, char.level - 1);
         var max = 0;
-        for (L in 0...10) if (spellSlotBase[L][charIdx] > 0) max = L;
+        for (L in 0...10) if (base[L] > 0) max = L;
         return max;
     }
 
     // Returns total spell slots per spell level (indices 0–9), including ability bonus.
     // Bonus slots for levels not yet unlocked are folded into the highest unlocked level.
     static public function getSpellSlots(cls:CharacterClass, char:FullCharacter):Array<Int> {
-        if (!needsSpellPreparation(cls)) return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        if (!canCastSpells(cls)) return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         var bonus = getBonusSpellSlots(getCastingModifier(cls, char));
-        var charIdx = char.level - 1;
+        var slots = getBaseSlots(cls, char.level - 1);
         var maxLevel = getMaxSpellLevel(cls, char);
-        var slots = [for (L in 0...10) spellSlotBase[L][charIdx]];
         for (L in 0...10) {
             if (slots[L] > 0) {
                 slots[L] += bonus[L];

@@ -3,8 +3,11 @@ package elems;
 import js.Browser;
 import Protocol;
 import ProtocolUtil;
+import Rules;
+import Protocol;
 
 using ProtocolUtil;
+using Rules;
 
 class SpellDetailPopup extends Popup {
     var onBack:Void->Void;
@@ -47,7 +50,14 @@ class SpellDetailPopup extends Popup {
         if (spell.targets != "") addRow("Cibles", spell.targets);
         if (spell.areaOfEffect != null) addRow("Zone d'effet", spell.areaOfEffect);
         if (spell.savingThrowType != null) {
-            addRow("Jet de sauvegarde", spell.savingThrowType.savingThrowToString());
+            var dcStr = if (isPower) {
+                if (spell.savingThrowDC != null) 'DD ${spell.savingThrowDC}' else null;
+            } else {
+                var mod = Rules.getCastingModifier(character.basics.characterClass, character);
+                'DD ${10 + spell.level + mod}';
+            };
+            var stLabel = spell.savingThrowType.savingThrowToString();
+            addRow("Jet de sauvegarde", if (dcStr != null) '$stLabel ($dcStr)' else stLabel);
             if (spell.saveEffect != null) addRow("Résultat de sauvegarde", spell.saveEffect.spellSaveEffectToString());
         }
         addRow("Résistance à la magie", if (spell.spellResistance) "Oui" else "Non");
@@ -95,6 +105,7 @@ class SpellDetailPopup extends Popup {
         dicesSection.appendChild(addDiceBtn);
         content.insertBefore(dicesSection, content.querySelector(".actions"));
 
+        var isSpontaneous = character.basics.characterClass.canCastSpells() && !character.basics.characterClass.needsSpellPreparation();
         var castBtn:js.html.AnchorElement = cast content.querySelector("a.cast-btn");
         if (isPower) {
             castBtn.innerText = "Utiliser le pouvoir";
@@ -109,6 +120,40 @@ class SpellDetailPopup extends Popup {
                 castBtn.appendChild(usageSpan);
                 castBtn.addEventListener("click", () -> {
                     new YesNoAlert("Utiliser le pouvoir", 'Confirmer l\'utilisation de "${spell.name}" ?', () -> {
+                        pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+                        close();
+                    });
+                });
+            }
+        } else if (spell.level == 0) {
+            var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
+            var canCast = isSpontaneous || preparedCount > 0;
+            if (!canCast) {
+                castBtn.classList.add("disabled");
+            } else {
+                var usageSpan = Browser.document.createSpanElement();
+                usageSpan.className = "cast-usage";
+                usageSpan.innerText = "(illimité)";
+                castBtn.appendChild(usageSpan);
+                castBtn.addEventListener("click", () -> {
+                    new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ?', () -> {
+                        pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+                        close();
+                    });
+                });
+            }
+        } else if (isSpontaneous) {
+            var slots = Rules.getSpellSlots(character.basics.characterClass, character);
+            var remaining = slots[spell.level] - (character.usedSlots.exists(spell.level) ? character.usedSlots.get(spell.level) : 0);
+            if (remaining == 0) {
+                castBtn.classList.add("disabled");
+            } else {
+                var usageSpan = Browser.document.createSpanElement();
+                usageSpan.className = "cast-usage";
+                usageSpan.innerText = '($remaining emplacement${if (remaining > 1) "s" else ""} restant${if (remaining > 1) "s" else ""})';
+                castBtn.appendChild(usageSpan);
+                castBtn.addEventListener("click", () -> {
+                    new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? Un emplacement de niveau ${spell.level} sera consommé.', () -> {
                         pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
                         close();
                     });

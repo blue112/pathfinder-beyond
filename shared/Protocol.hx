@@ -118,6 +118,7 @@ enum SpellEventType {
     ADD_SPELL_DICE(spellIndex:Int, dice:SpellDice);
     REMOVE_SPELL_DICE(spellIndex:Int, diceIndex:Int);
     FINISH_SPELL_PREPARATION;
+    SET_SPELL_PRIORITY(spellIndex:Int, priority:Null<Int>);
 }
 
 // Spell data as returned by the spell index JSON (enum fields stored as strings)
@@ -169,6 +170,7 @@ typedef Spell = {
     var range:SpellRange;
     var longDescription:String;
     var ?priority:Int;
+    var ?savingThrowDC:String;
     var ?dices:Array<SpellDice>;
 };
 

@@ -116,6 +116,10 @@ class SpellDialog extends Popup implements IJSAsync {
                     <option value="REVEALS">Dévoile</option>
                 </select>
             </div>
+            <div class="spell-row saving-throw-dc-row">
+                <label>DD du jet de sauvegarde</label>
+                <input type="text" name="saving-throw-dc" placeholder="ex: 10 + NLS/2 + CHA" />
+            </div>
             <div class="spell-row">
                 <label>Résistance à la magie</label>
                 <input type="checkbox" name="spell-resistance" />
@@ -164,8 +168,20 @@ class SpellDialog extends Popup implements IJSAsync {
         var durationSelect:SelectElement = cast getContent().querySelector('select[name=duration]');
         var durationN:InputElement = cast getContent().querySelector('input[name=duration-n]');
         var saveEffectRow = getContent().querySelector('.save-effect-row');
+        var savingThrowDCRow = getContent().querySelector('.saving-throw-dc-row');
         var stSelect:SelectElement = cast getContent().querySelector('select[name=saving-throw]');
+        var usesPerDayInput:InputElement = cast getContent().querySelector('input[name=uses-per-day]');
         saveEffectRow.classList.add("hidden");
+        savingThrowDCRow.classList.add("hidden");
+
+        usesPerDayInput.addEventListener("input", () -> {
+            var val = Std.parseInt(usesPerDayInput.value);
+            if (val != null && val > 0) {
+                savingThrowDCRow.classList.remove("hidden");
+            } else {
+                savingThrowDCRow.classList.add("hidden");
+            }
+        });
         stSelect.addEventListener("change", () -> {
             if (stSelect.value == "") {
                 saveEffectRow.classList.add("hidden");
@@ -231,14 +247,18 @@ class SpellDialog extends Popup implements IJSAsync {
             });
         }
 
+        function normalize(s:String):String {
+            return js.Syntax.code("{0}.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase()", s);
+        }
+
         searchInput.addEventListener("input", () -> {
-            var query = searchInput.value.toLowerCase().trim();
+            var query = normalize(searchInput.value.trim());
             suggestions.innerHTML = "";
             if (query.length < 2) {
                 suggestions.classList.add("hidden");
                 return;
             }
-            var matches = [for (s in spellIndex) if ((s.name : String).toLowerCase().indexOf(query) >= 0) s];
+            var matches = spellIndex.filter(s -> normalize(s.name).indexOf(query) >= 0);
             if (matches.length == 0) {
                 suggestions.classList.add("hidden");
                 return;
@@ -247,7 +267,7 @@ class SpellDialog extends Popup implements IJSAsync {
             suggestions.classList.remove("hidden");
             for (s in matches) {
                 var li = Browser.document.createLIElement();
-                li.innerText = '${(s.name : String)} (niv. ${(s.level : Int)})';
+                li.innerText = '${s.name} (niv. ${s.level})';
                 li.addEventListener("click", () -> selectSpell(s.name));
                 suggestions.appendChild(li);
             }
@@ -290,6 +310,7 @@ class SpellDialog extends Popup implements IJSAsync {
             var shortDescVal = inputValue("short-description");
             var usesVal = inputValue("uses-per-day");
             var aoeVal = inputValue("area-of-effect");
+            var dcVal = inputValue("saving-throw-dc");
 
             var spell:Spell = {
                 name: inputValue("name"),
@@ -309,6 +330,7 @@ class SpellDialog extends Popup implements IJSAsync {
                 range: range,
                 longDescription: inputValue("long-description"),
                 priority: Std.parseInt(inputValue("priority")),
+                savingThrowDC: if (dcVal == "") null else dcVal,
             };
 
             onChoice(spell);
