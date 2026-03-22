@@ -93,13 +93,28 @@ class SpellDetailPopup extends Popup {
             row.appendChild(del);
             dicesSection.appendChild(row);
         }
+        var currentDiceCount = spellDices.length;
         var addDiceBtn = Browser.document.createAnchorElement();
         addDiceBtn.className = "add-dice-btn";
         addDiceBtn.innerText = "+ Ajouter un dé";
         addDiceBtn.addEventListener("click", () -> {
             new elems.SpellDiceDialog(spell.name, (dice) -> {
+                var di = currentDiceCount++;
                 pushEvent(SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)));
-                close();
+                var row = Browser.document.createDivElement();
+                row.className = "spell-dice-item";
+                var label = Browser.document.createSpanElement();
+                label.innerText = '${dice.reason} : ${dice.diceType.spellDiceTypeToString()}';
+                var del = Browser.document.createAnchorElement();
+                del.className = "spell-dice-del";
+                del.innerText = "×";
+                del.addEventListener("click", () -> {
+                    pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di)));
+                    dicesSection.removeChild(row);
+                });
+                row.appendChild(label);
+                row.appendChild(del);
+                dicesSection.insertBefore(row, addDiceBtn);
             });
         });
         dicesSection.appendChild(addDiceBtn);
