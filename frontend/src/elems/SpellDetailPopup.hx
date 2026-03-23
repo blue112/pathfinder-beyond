@@ -59,7 +59,8 @@ class SpellDetailPopup extends Popup {
                 if (spell.savingThrowDC != null) 'DD ${spell.savingThrowDC}' else null;
             } else {
                 var mod = Rules.getCastingModifier(character.basics.characterClass, character);
-                'DD ${10 + spell.level + mod}';
+                var racialBonus = Rules.getRacialSpellDCBonus(character.basics.race, spell.school);
+                'DD ${10 + spell.level + mod + racialBonus}';
             };
             var stLabel = spell.savingThrowType.savingThrowToString();
             addRow("Jet de sauvegarde", if (dcStr != null) '$stLabel ($dcStr)' else stLabel);

@@ -30,6 +30,11 @@ class Rules {
         };
     }
 
+    static public function getRacialSpellDCBonus(race:CharacterRace, school:SpellSchool):Int {
+        if (race == GNOME && school == ILLUSION) return 1;
+        return 0;
+    }
+
     // Returns bonus spell slots from a high casting ability.
     // Pattern per spell level (1-9): floor((mod - level) / 4) + 1 when mod >= level, else 0.
     // Level 0 (cantrips) never gets a bonus.
