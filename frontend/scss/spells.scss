@@ -62,6 +62,17 @@ section.spells-section {
             border-radius: 3px;
         }
 
+        &.spell-search-row {
+            background: #f0f4ff;
+            border-bottom: 2px solid #7a9ec2;
+            padding: 10px 0;
+            margin-bottom: 4px;
+
+            > label:first-child {
+                color: #3a6a9a;
+            }
+        }
+
         &.spell-search-row .spell-search-wrap {
             position: relative;
             flex: 1;
@@ -69,6 +80,9 @@ section.spells-section {
             input[type=text] {
                 width: 100%;
                 box-sizing: border-box;
+                border-color: #7a9ec2;
+                background: #fff;
+                font-size: 1em;
             }
 
             .spell-suggestions {
