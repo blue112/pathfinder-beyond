@@ -558,8 +558,12 @@ class Fiche implements IJSAsync {
         var expCA = character.exceptionalModifiers.filter(m -> m.on.match(AC));
         if (expCA.length > 0) {
             mainElem.querySelector('.ac').classList.add('exp');
-            mainElem.querySelector('.ac .exp')
-                .innerHTML = '<strong>${expCA[0].why.htmlEscape()}</strong> : ${expCA[0].mod.asMod()} = ${mod + expCA[0].mod}'; // Fixme multiple CA mod
+            var expEl = mainElem.querySelector('.ac .exp');
+            expEl.innerHTML = "";
+            var whyEl:js.html.Element = cast Browser.document.createElement("strong");
+            whyEl.innerText = expCA[0].why;
+            expEl.appendChild(whyEl);
+            expEl.appendChild(Browser.document.createTextNode(' : ${expCA[0].mod.asMod()} = ${mod + expCA[0].mod}')); // Fixme multiple CA mod
         }
 
         acDiv.innerText = mod.string();
@@ -682,8 +686,21 @@ class Fiche implements IJSAsync {
             var p = character.protections[i];
             var armorDiv = Browser.document.createDivElement();
             armorDiv.classList.add("armor");
-            armorDiv.innerHTML = '<div class="actions-hover"><a class="plus">+</a></div><span class="name">${p.name.htmlEscape()}</span><span class="ac">${p.armor.asMod()} CA</span>';
-            var plus = armorDiv.querySelector(".actions-hover .plus");
+            var actionsHover = Browser.document.createDivElement();
+            actionsHover.className = "actions-hover";
+            var plus = Browser.document.createAnchorElement();
+            plus.className = "plus";
+            plus.innerText = "+";
+            actionsHover.appendChild(plus);
+            armorDiv.appendChild(actionsHover);
+            var nameSpan = Browser.document.createSpanElement();
+            nameSpan.className = "name";
+            nameSpan.innerText = p.name;
+            armorDiv.appendChild(nameSpan);
+            var acSpan = Browser.document.createSpanElement();
+            acSpan.className = "ac";
+            acSpan.innerText = '${p.armor.asMod()} CA';
+            armorDiv.appendChild(acSpan);
             plus.addEventListener("click", () -> {
                 new ContextMenu(armorDiv, ["Supprimer la protection"], (choice) -> {
                     if (choice == 0)
@@ -714,9 +731,22 @@ class Fiche implements IJSAsync {
             ";
 
             var iconPath = skill.characteristic.characteristicToIconPath();
-        var caracName = skill.characteristic.caracToString(false);
-        var classSkillSuffix = if (skill.classSkill) " <ins title='Compétence de classe'>(C)</ins>" else "";
-        skillDiv.querySelector(".label").innerHTML = '<img src="$iconPath" class="carac-icon" title="$caracName" alt="$caracName"> ${skill.label}$classSkillSuffix';
+            var caracName = skill.characteristic.caracToString(false);
+            var labelDiv = skillDiv.querySelector(".label");
+            var img = Browser.document.createImageElement();
+            img.src = iconPath;
+            img.className = "carac-icon";
+            img.title = caracName;
+            img.alt = caracName;
+            labelDiv.appendChild(img);
+            labelDiv.appendChild(Browser.document.createTextNode(' ${skill.label}'));
+            if (skill.classSkill) {
+                var ins:js.html.Element = cast Browser.document.createElement("ins");
+                ins.title = "Compétence de classe";
+                ins.innerText = "(C)";
+                labelDiv.appendChild(Browser.document.createTextNode(' '));
+                labelDiv.appendChild(ins);
+            }
             var mod = skill.mod + character.getTempMods([SKILL(skill.name)]).sum();
             if (skill.canUse)
                 skillDiv.querySelector(".mod").innerText = mod.asMod();

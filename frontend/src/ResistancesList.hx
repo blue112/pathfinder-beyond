@@ -14,9 +14,17 @@ class ResistancesList extends Popup {
         for (damageType in resistances.keys()) {
             hasAny = true;
             var elem = Browser.document.createLIElement();
-            elem.innerHTML = '<a class="del">[Supprimer]</a> <strong>${damageType.damageTypeToString()}</strong>: ${resistances.get(damageType)}';
+            var delBtn = Browser.document.createAnchorElement();
+            delBtn.className = "del";
+            delBtn.innerText = "[Supprimer]";
+            var nameEl:js.html.Element = cast Browser.document.createElement("strong");
+            nameEl.innerText = damageType.damageTypeToString();
+            elem.appendChild(delBtn);
+            elem.appendChild(Browser.document.createTextNode(' '));
+            elem.appendChild(nameEl);
+            elem.appendChild(Browser.document.createTextNode(': ${resistances.get(damageType)}'));
             list.appendChild(elem);
-            elem.querySelector(".del").addEventListener("click", () -> {
+            delBtn.addEventListener("click", () -> {
                 new YesNoAlert("Retirer une résistance", 'Supprimer la résistance ${damageType.damageTypeToString()} ?', () -> {
                     Api.pushEvent(fiche_id, REMOVE_DAMAGE_RESISTANCE(damageType));
                     resistances.remove(damageType);

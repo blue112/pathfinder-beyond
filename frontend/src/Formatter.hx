@@ -8,12 +8,22 @@ class Formatter {
         return if (withSpace) '+ 0' else '+0';
     }
 
-    static public function dicerollToString(roll:PublicDiceRoll) {
+    static public function appendDiceroll(roll:PublicDiceRoll, parent:js.html.Element) {
         if (roll.mod != null && roll.mod != 0) {
             var mod = ' ${roll.mod.asMod(true)}';
-            return '1d${roll.faces}$mod : (<strong>${roll.result}</strong>$mod) = <strong>${roll.result + roll.mod}</strong>';
+            parent.appendChild(js.Browser.document.createTextNode('1d${roll.faces}$mod : ('));
+            var r1:js.html.Element = cast js.Browser.document.createElement("strong");
+            r1.innerText = Std.string(roll.result);
+            parent.appendChild(r1);
+            parent.appendChild(js.Browser.document.createTextNode('$mod) = '));
+            var r2:js.html.Element = cast js.Browser.document.createElement("strong");
+            r2.innerText = Std.string(roll.result + roll.mod);
+            parent.appendChild(r2);
+        } else {
+            parent.appendChild(js.Browser.document.createTextNode('1d${roll.faces} : '));
+            var r:js.html.Element = cast js.Browser.document.createElement("strong");
+            r.innerText = Std.string(roll.result);
+            parent.appendChild(r);
         }
-
-        return '1d${roll.faces} : <strong>${roll.result}</strong>';
     }
 }

@@ -49,9 +49,17 @@ class TemporaryModifiersList extends Popup implements IJSAsync {
                 case SAVING_THROW_NOTE(st): 'Note (${st.savingThrowToString()})';
             }
             fieldName = fieldName.charAt(0).toUpperCase() + fieldName.substr(1);
-            elem.innerHTML = '<a class="del">[Supprimer]</a> <strong>$fieldName</strong> - ${mod.mod.asMod()} (${mod.why.htmlEscape()})';
+            var delBtn = Browser.document.createAnchorElement();
+            delBtn.className = "del";
+            delBtn.innerText = "[Supprimer]";
+            var nameEl:js.html.Element = cast Browser.document.createElement("strong");
+            nameEl.innerText = fieldName;
+            elem.appendChild(delBtn);
+            elem.appendChild(Browser.document.createTextNode(' '));
+            elem.appendChild(nameEl);
+            elem.appendChild(Browser.document.createTextNode(' - ${mod.mod.asMod()} (${mod.why})'));
             list.appendChild(elem);
-            elem.querySelector(".del").addEventListener("click", () -> {
+            delBtn.addEventListener("click", () -> {
                 new YesNoAlert("Retirer un modificateur temporaire", 'Supprimer le modificateur temporaire sur ${fieldName} ?', () -> {
                     Api.pushEvent(fiche_id, REMOVE_TEMPORARY_MODIFIER(n));
                     mods.splice(n, 1);

@@ -28,7 +28,15 @@ class DiceRollHistory extends Popup implements IJSAsync {
             if (fieldLabel == null)
                 fieldLabel = 'FIXME(${i.field_name})';
 
-            elem.innerHTML = '<small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> <strong>${fieldLabel}</strong> ${i.dicerollToString()}';
+            var timeEl:js.html.Element = cast Browser.document.createElement("small");
+            timeEl.innerText = '[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]';
+            var nameEl:js.html.Element = cast Browser.document.createElement("strong");
+            nameEl.innerText = fieldLabel;
+            elem.appendChild(timeEl);
+            elem.appendChild(Browser.document.createTextNode(' '));
+            elem.appendChild(nameEl);
+            elem.appendChild(Browser.document.createTextNode(' '));
+            i.appendDiceroll(elem);
             list.appendChild(elem);
         }
 
