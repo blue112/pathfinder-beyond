@@ -19,6 +19,13 @@ class Popup {
 
         popup.querySelector(".close").addEventListener("click", close);
         popup.querySelector(".backdrop").addEventListener("click", close);
+        popup.querySelector(".main").addEventListener("keydown", (e:js.html.KeyboardEvent) -> {
+            if (e.key != "Enter") return;
+            var target:js.html.Element = cast e.target;
+            if (target.tagName.toLowerCase() == "textarea") return;
+            var validateBtn = mainElem.querySelector("a.validate");
+            if (validateBtn != null) validateBtn.click();
+        });
     }
 
     public function getContent() {
