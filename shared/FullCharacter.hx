@@ -207,11 +207,8 @@ class FullCharacter {
         characteristicsMod = cast {};
         for (i in Reflect.fields(characteristics)) {
             var value:Int = Reflect.getProperty(characteristics, i);
-            var mod:Int = Std.int(value / 2) - 5;
-
             var totalTempMod = getTempMods([CHARACTERISTIC(i.parseCarac())]).sum();
-            mod += totalTempMod;
-
+            var mod:Int = Std.int((value + totalTempMod) / 2) - 5;
             Reflect.setProperty(characteristicsMod, i, mod);
         }
     }

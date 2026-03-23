@@ -500,8 +500,11 @@ class Fiche implements IJSAsync {
         for (i in Reflect.fields(character.characteristics)) {
             var value:Int = Reflect.getProperty(character.characteristics, i);
             var mod:Int = Reflect.getProperty(character.characteristicsMod, i);
-            availableFields.get(i).innerText = Std.string(value);
-            var modField = availableFields.get(i).parentElement.querySelector(".mod");
+            var tempMod = character.getTempMods([CHARACTERISTIC(i.parseCarac())]).sum();
+            var valueField = availableFields.get(i);
+            valueField.innerText = Std.string(value + tempMod);
+            character.applyTempModsClass(valueField, [CHARACTERISTIC(i.parseCarac())]);
+            var modField = valueField.parentElement.querySelector(".mod");
 
             character.applyTempModsClass(modField, [CHARACTERISTIC(i.parseCarac())]);
 
