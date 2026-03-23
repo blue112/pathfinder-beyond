@@ -69,11 +69,16 @@ class WeaponDialog extends Popup {
             <label>(si applicable) Munitions</label>
             <input type='string' name='ammo' />
         </div>
+        <div class='input-field'>
+            <label>Nécessite un rechargement</label>
+            <input type='checkbox' name='should-be-reloaded' />
+        </div>
         <div class='actions'>
             <a class='validate'>Valider</a>
         </div>";
 
         mainElem.querySelector("a.validate").addEventListener("click", () -> {
+            var reloadInput:InputElement = cast mainElem.querySelector("input[name=should-be-reloaded]");
             var w:Weapon = {
                 name: (cast mainElem.querySelector("input[name=name]")).value,
                 munitions: (cast mainElem.querySelector("input[name=ammo]")).value,
@@ -97,6 +102,7 @@ class WeaponDialog extends Popup {
                     (cast mainElem.querySelector("input[name=damage-dice]") : InputElement)
                     .value.parseInt()
                 ],
+                shouldBeReloaded: reloadInput.checked,
             };
 
             onChoice(w);

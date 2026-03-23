@@ -7,6 +7,8 @@ enum FicheEventType {
     CHANGE_CARAC(carac:Characteristic, amount:Int);
     ADD_WEAPON(weapon:Weapon);
     REMOVE_WEAPON(index:Int);
+    FIRE_WEAPON(index:Int);
+    RELOAD_WEAPON(index:Int);
     TRAIN_SKILL(skill:SkillType);
     DECREASE_SKILL(skill:SkillType);
     CHANGE_HP(amount:Int);
@@ -216,6 +218,7 @@ typedef Weapon = {
     var damage_types:Array<WeaponDamageType>;
     var range:Null<Int>;
     var munitions:String;
+    var ?shouldBeReloaded:Bool;
 };
 
 enum WeaponDamageType {

@@ -352,6 +352,18 @@ class Fiche implements IJSAsync {
             SAVING_THROW(SavingThrow.createByName(parent.dataset.id.split("-")[1].toUpperCase()));
         } else if (parent.dataset.id == "attack") WEAPON_ATTACK else if (parent.dataset.id == "damage") WEAPON_DAMAGE else null;
 
+        var reloadableWeaponIdx:Null<Int> = null;
+        if (parent.dataset.id == "attack") {
+            var weaponDiv = parent.parentElement;
+            while (weaponDiv != null && !weaponDiv.classList.contains("weapon"))
+                weaponDiv = weaponDiv.parentElement;
+            if (weaponDiv != null) {
+                var widx = Std.parseInt(weaponDiv.dataset.weaponIdx);
+                if (character.weapons[widx] != null && character.weapons[widx].shouldBeReloaded == true)
+                    reloadableWeaponIdx = widx;
+            }
+        }
+
         var savingThrowNote:Null<String> = null;
         if (expModEnum != null) {
             switch (expModEnum) {
@@ -364,12 +376,12 @@ class Fiche implements IJSAsync {
             var expMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, expModEnum));
             if (expMods.length > 0) {
                 new ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})')), (choice) -> {
-                    if (choice == 0)
+                    (if (choice == 0)
                         doDiceRoll([modInt], parent.dataset.id, savingThrowNote)
                     else {
                         var mod = expMods[choice - 1];
                         doDiceRoll([modInt, mod.mod], parent.dataset.id, savingThrowNote);
-                    }
+                    }).then((_) -> if (reloadableWeaponIdx != null) pushEvent(FIRE_WEAPON(reloadableWeaponIdx)));
                 });
                 return null;
             }
@@ -379,7 +391,10 @@ class Fiche implements IJSAsync {
         if (additionalMod != null && additionalMod != 0)
             mods.push(additionalMod);
 
-        return doDiceRoll(mods, parent.dataset.id, savingThrowNote).jsawait();
+        var result = doDiceRoll(mods, parent.dataset.id, savingThrowNote).jsawait();
+        if (reloadableWeaponIdx != null)
+            pushEvent(FIRE_WEAPON(reloadableWeaponIdx));
+        return result;
     }
 
     @:jsasync public function doDiceRoll(mods:Array<Int>, id:String, ?note:String) {
@@ -439,6 +454,7 @@ class Fiche implements IJSAsync {
     private function addWeapon(weapon:Weapon, idx:Int) {
         var divWeapon = Browser.document.createDivElement();
         divWeapon.classList.add("weapon");
+        divWeapon.dataset.weaponIdx = Std.string(idx);
         divWeapon.innerHTML = Resource.getString("weapon.html");
 
         divWeapon.querySelector("h3 span").innerText = weapon.name;
@@ -489,6 +505,21 @@ class Fiche implements IJSAsync {
         makeTempModMenu(plusAttack, plusAttack.parentElement.parentElement, WEAPON_ATTACK);
         var plusDamage = divWeapon.querySelector("[data-id='damage'] a.plus");
         makeTempModMenu(plusDamage, plusDamage.parentElement.parentElement, WEAPON_DAMAGE);
+
+        if (weapon.shouldBeReloaded == true && character.firedWeapons.exists(idx)) {
+            var overlay = Browser.document.createDivElement();
+            overlay.className = "reload-overlay";
+            var reloadBtn = Browser.document.createAnchorElement();
+            reloadBtn.className = "reload-btn";
+            reloadBtn.innerText = "Recharger";
+            reloadBtn.addEventListener("click", () -> {
+                new YesNoAlert("Recharger l'arme", "Recharger l'arme (nécessite une action de mouvement) ?", () -> {
+                    pushEvent(RELOAD_WEAPON(idx));
+                });
+            });
+            overlay.appendChild(reloadBtn);
+            divWeapon.appendChild(overlay);
+        }
 
         mainElem.querySelector(".weapons").appendChild(divWeapon);
 

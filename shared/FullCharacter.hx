@@ -32,6 +32,7 @@ class FullCharacter {
     public var preparationLocked:Bool;
     public var usedPowers:Map<Int, Int>;
     public var usedSlots:Map<Int, Int>;
+    public var firedWeapons:Map<Int, Bool>;
 
     public function new() {
         this.skillRanks = [];
@@ -56,6 +57,7 @@ class FullCharacter {
         this.preparationLocked = false;
         this.usedPowers = new Map();
         this.usedSlots = new Map();
+        this.firedWeapons = new Map();
     }
 
     function updateHP() {
@@ -93,9 +95,21 @@ class FullCharacter {
                 }
                 updateCharacts();
             case ADD_WEAPON(weapon):
+                if (weapon.shouldBeReloaded == null)
+                    weapon.shouldBeReloaded = weapon.name.indexOf("Arbalète") >= 0;
                 weapons.push(weapon);
             case REMOVE_WEAPON(index):
                 weapons.splice(index, 1);
+                var shifted = new Map<Int, Bool>();
+                for (k in firedWeapons.keys()) {
+                    if (k < index) shifted.set(k, true);
+                    if (k > index) shifted.set(k - 1, true);
+                }
+                firedWeapons = shifted;
+            case FIRE_WEAPON(index):
+                firedWeapons.set(index, true);
+            case RELOAD_WEAPON(index):
+                firedWeapons.remove(index);
             case LEVEL_UP(hp_dice):
                 level += 1;
                 hp_dice = Math.min(hp_dice, getHitDice()).int();

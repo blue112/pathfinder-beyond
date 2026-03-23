@@ -46,6 +46,10 @@ class FicheEventHistory extends Popup implements IJSAsync {
                 case REMOVE_WEAPON(n):
                     var w = currentWeapons.splice(n, 1)[0];
                     'Retrait d\'une arme (${w.name.htmlEscape()})';
+                case FIRE_WEAPON(n):
+                    'Tir avec ${currentWeapons[n].name.htmlEscape()}';
+                case RELOAD_WEAPON(n):
+                    'Rechargement de ${currentWeapons[n].name.htmlEscape()}';
                 case TRAIN_SKILL(skill): 'Ajout d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
                 case DECREASE_SKILL(skill): 'Retrait d\'un rang dans une capacité (${RulesSkills.getSkillLabel(skill)})';
                 case CHANGE_HP(amount) if (amount > 0): 'Récupération de points de vie (${amount} pv)';
