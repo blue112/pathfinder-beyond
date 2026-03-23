@@ -588,9 +588,9 @@ class Fiche implements IJSAsync {
             acDiv.classList.remove("temp-mod");
         }
 
-        // Check if we have an exceptional mod
+        // Check if we have an exceptional mod (only on the full AC field)
         var expCA = character.exceptionalModifiers.filter(m -> m.on.match(AC));
-        if (expCA.length > 0) {
+        if (expCA.length > 0 && field == "ac") {
             mainElem.querySelector('.ac').classList.add('exp');
             var expEl = mainElem.querySelector('.ac .exp');
             expEl.innerHTML = "";
