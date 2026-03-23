@@ -56,7 +56,7 @@ class SpellDetailPopup extends Popup {
         addRow("Temps d'incantation", spell.castingTime.spellCastingTimeToString(resolveNls));
         var durationStr = spell.duration.spellDurationToString(resolveNls);
         addRow("Durée", if (spell.canEndVoluntarily) '$durationStr (peut être terminé volontairement)' else durationStr);
-        addRow("Portée", spell.range.spellRangeToString(resolveNls));
+        addRow("Portée", spell.range.spellRangeToString(resolveNls, nls));
         if (spell.components.length > 0) addRow("Composantes", spell.components.map(c -> c.spellComponentToString()).join(", "));
         if (spell.targets != "") addRow("Cibles", spell.targets);
         if (spell.areaOfEffect != null) addRow("Zone d'effet", spell.areaOfEffect);

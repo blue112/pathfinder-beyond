@@ -211,14 +211,14 @@ class ProtocolUtil {
         }
     }
 
-    static public function spellRangeToString(range:SpellRange, ?resolveFormula:String->String):String {
+    static public function spellRangeToString(range:SpellRange, ?resolveFormula:String->String, ?nls:Int):String {
         var r = resolveFormula != null ? resolveFormula : (s -> s);
         return switch (range) {
             case PERSONAL: "Personnelle";
             case TOUCH: "Contact";
-            case CLOSE: "Courte";
-            case MEDIUM: "Moyenne";
-            case LONG: "Longue";
+            case CLOSE: nls != null ? 'Courte (${5 + Std.int(nls / 2)} cases)' : "Courte";
+            case MEDIUM: nls != null ? 'Moyenne (${20 + 2 * nls} cases)' : "Moyenne";
+            case LONG: nls != null ? 'Longue (${80 + 8 * nls} cases)' : "Longue";
             case SPECIFIC(cases): '${r(cases)} case(s)${formulaSuffix(cases, r(cases))}';
         }
     }
