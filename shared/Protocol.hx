@@ -136,6 +136,8 @@ typedef SpellEntry = {
     var ?savingThrow:String;
     var ?saveEffect:String;
     var ?target:String;
+    var ?range:String;
+    var ?duration:String;
 };
 
 typedef PreparedSpell = {

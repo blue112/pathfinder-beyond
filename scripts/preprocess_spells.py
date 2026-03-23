@@ -118,13 +118,21 @@ def convert_spell(spell, level):
     if target:
         entry['target'] = target
 
+    range_val = (spell.get('range') or '').strip()
+    if range_val:
+        entry['range'] = range_val
+
+    duration_val = (spell.get('duration') or '').strip()
+    if duration_val:
+        entry['duration'] = duration_val
+
     return entry
 
 def main():
     src_files = [
-        Path('frontend/src/assets/spells.json'),
-        Path('frontend/src/assets/spells-2.json'),
-        Path('frontend/src/assets/spells-3.json'),
+        Path('scripts/spells.json'),
+        Path('scripts/spells-2.json'),
+        Path('scripts/spells-3.json'),
     ]
     out_dir = Path('backend/static/data')
     out_dir.mkdir(parents=True, exist_ok=True)

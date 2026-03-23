@@ -325,6 +325,61 @@ class SpellDialog extends Popup implements IJSAsync {
                 var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
                 srInput.checked = spell.spellResistance == true;
                 if (spell.target != null) setValue("targets", spell.target);
+                if (spell.range != null) {
+                    var r = spell.range.toLowerCase().trim();
+                    if (r.startsWith("personnelle") || r.startsWith("personelle")) {
+                        setValue("range", "PERSONAL");
+                        rangeSpecific.classList.add("hidden");
+                    } else if (r.startsWith("contact")) {
+                        setValue("range", "TOUCH");
+                        rangeSpecific.classList.add("hidden");
+                    } else if (r.startsWith("courte")) {
+                        setValue("range", "CLOSE");
+                        rangeSpecific.classList.add("hidden");
+                    } else if (r.startsWith("moyenne")) {
+                        setValue("range", "MEDIUM");
+                        rangeSpecific.classList.add("hidden");
+                    } else if (r.startsWith("longue")) {
+                        setValue("range", "LONG");
+                        rangeSpecific.classList.add("hidden");
+                    } else {
+                        setValue("range", "SPECIFIC");
+                        setValue("range-specific", spell.range.trim());
+                        rangeSpecific.classList.remove("hidden");
+                    }
+                }
+                if (spell.duration != null) {
+                    var rawDuration = spell.duration.toLowerCase().trim();
+                    var canEndInput:InputElement = cast getContent().querySelector('input[name=can-end-voluntarily]');
+                    canEndInput.checked = rawDuration.indexOf("(t)") >= 0;
+                    // Strip trailing dismissal marker, e.g. " (T)"
+                    var d = ~/\s*\([^)]*\)\s*$/.replace(rawDuration, "").trim();
+                    var reLevel = ~/^(\d+) (rounds?|min(?:utes?)?)\/niveau$/;
+                    var reFixed = ~/^(\d+) (rounds?|min(?:utes?)?)$/;
+                    if (d == "instantanée" || d == "instantanee") {
+                        setValue("duration", "INSTANTANEOUS");
+                        durationN.classList.add("hidden");
+                        canEndRow.classList.add("hidden");
+                    } else if (d.startsWith("concentration")) {
+                        setValue("duration", "CONCENTRATION");
+                        durationN.classList.add("hidden");
+                        canEndRow.classList.remove("hidden");
+                    } else if (reLevel.match(d)) {
+                        var x = Std.parseInt(reLevel.matched(1));
+                        var isMinutes = reLevel.matched(2).startsWith("min");
+                        setValue("duration", isMinutes ? "N_MINUTES" : "N_ROUNDS");
+                        setValue("duration-n", x == 1 ? "NLS" : '$x*NLS');
+                        durationN.classList.remove("hidden");
+                        canEndRow.classList.remove("hidden");
+                    } else if (reFixed.match(d)) {
+                        var x = reFixed.matched(1);
+                        var isMinutes = reFixed.matched(2).startsWith("min");
+                        setValue("duration", isMinutes ? "N_MINUTES" : "N_ROUNDS");
+                        setValue("duration-n", x);
+                        durationN.classList.remove("hidden");
+                        canEndRow.classList.remove("hidden");
+                    }
+                }
             });
         }
 
