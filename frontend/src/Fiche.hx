@@ -353,15 +353,14 @@ class Fiche implements IJSAsync {
         } else if (parent.dataset.id == "attack") WEAPON_ATTACK else if (parent.dataset.id == "damage") WEAPON_DAMAGE else null;
 
         var savingThrowNote:Null<String> = null;
-        switch (expModEnum) {
-            case SAVING_THROW(st):
-                var noteMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, SAVING_THROW_NOTE(st)));
-                if (noteMods.length > 0)
-                    savingThrowNote = noteMods[0].why;
-            case _:
-        }
-
         if (expModEnum != null) {
+            switch (expModEnum) {
+                case SAVING_THROW(st):
+                    var noteMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, SAVING_THROW_NOTE(st)));
+                    if (noteMods.length > 0)
+                        savingThrowNote = noteMods[0].why;
+                case _:
+            }
             var expMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, expModEnum));
             if (expMods.length > 0) {
                 new ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})')), (choice) -> {

@@ -68,15 +68,17 @@ class SpellDiceDialog extends Popup {
         getContent().querySelector("a.validate").addEventListener("click", () -> {
             var typeStr = typeSelect.value;
             var diceType = if (typeStr == "CARACTERISTIC") {
-                CARACTERISTIC(Type.createEnum(Characteristic, inputValue("dice-carac")));
+                CARACTERISTIC(Characteristic.createByName(inputValue("dice-carac")));
             } else if (typeStr == "CONTACT_MELEE") {
                 CONTACT_MELEE;
             } else if (typeStr == "CONTACT_RANGED") {
                 CONTACT_RANGED;
             } else if (typeStr == "NLS") {
                 NLS;
-            } else {
+            } else if (typeStr == "MANUAL") {
                 MANUAL(inputValue("dice-formula"));
+            } else {
+                throw 'Unknown dice type: $typeStr';
             };
             var reason = inputValue("dice-reason");
             if (reason == "") return;

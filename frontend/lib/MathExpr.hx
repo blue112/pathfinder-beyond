@@ -13,7 +13,7 @@ class MathExpr {
             var start = pos;
             while (pos < s.length && s.charCodeAt(pos) >= '0'.code && s.charCodeAt(pos) <= '9'.code) pos++;
             var n = if (pos > start) Std.parseInt(s.substring(start, pos)) else null;
-            return sign * (n == null ? 0 : n);
+            return sign * (if (n == null) 0 else n);
         }
         function readTerm():Int {
             var v = readNum();
