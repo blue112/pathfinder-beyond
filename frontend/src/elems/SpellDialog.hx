@@ -11,8 +11,8 @@ using ProtocolUtil;
 using jsasync.JSAsyncTools;
 
 class SpellDialog extends Popup implements IJSAsync {
-    public function new(characterClass:CharacterClass, maxSpellLevel:Int, onChoice:Spell->Void) {
-        super("Ajouter un sort");
+    public function new(characterClass:CharacterClass, maxSpellLevel:Int, onChoice:Spell->Void, ?editSpell:Spell) {
+        super(editSpell != null ? 'Modifier un sort : ${editSpell.name}' : "Ajouter un sort");
         mainElem.classList.add("spell");
 
         getContent().innerHTML = '
@@ -204,6 +204,87 @@ class SpellDialog extends Popup implements IJSAsync {
                 canEndRow.classList.remove("hidden");
             }
         });
+
+        // Edit mode: hide search, disable name, pre-populate all fields
+        if (editSpell != null) {
+            getContent().querySelector('.spell-search-row').classList.add("hidden");
+            var nameInput:InputElement = cast getContent().querySelector('input[name=name]');
+            nameInput.disabled = true;
+            setValue("name", editSpell.name);
+            setValue("level", Std.string(editSpell.level));
+            setValue("school", editSpell.school.getName());
+            setValue("short-description", editSpell.shortDescription != null ? editSpell.shortDescription : "");
+            setValue("uses-per-day", editSpell.usesPerDay != null ? Std.string(editSpell.usesPerDay) : "");
+            setValue("targets", editSpell.targets);
+            setValue("area-of-effect", editSpell.areaOfEffect != null ? editSpell.areaOfEffect : "");
+            setValue("priority", Std.string(editSpell.priority));
+            setValue("long-description", editSpell.longDescription);
+            setValue("saving-throw-dc", editSpell.savingThrowDC != null ? editSpell.savingThrowDC : "");
+
+            var compVerbal:InputElement = cast getContent().querySelector('input[name=comp-verbal]');
+            var compSomatic:InputElement = cast getContent().querySelector('input[name=comp-somatic]');
+            var compMaterial:InputElement = cast getContent().querySelector('input[name=comp-material]');
+            compVerbal.checked = editSpell.components.indexOf(VERBAL) >= 0;
+            compSomatic.checked = editSpell.components.indexOf(SOMATIC) >= 0;
+            compMaterial.checked = editSpell.components.indexOf(MATERIAL) >= 0;
+
+            var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
+            srInput.checked = editSpell.spellResistance;
+            var canEndInput:InputElement = cast getContent().querySelector('input[name=can-end-voluntarily]');
+            canEndInput.checked = editSpell.canEndVoluntarily;
+
+            switch (editSpell.range) {
+                case SPECIFIC(cases):
+                    setValue("range", "SPECIFIC");
+                    setValue("range-specific", cases);
+                    rangeSpecific.classList.remove("hidden");
+                default:
+                    setValue("range", editSpell.range.getName());
+            }
+
+            switch (editSpell.castingTime) {
+                case N_ROUNDS(n):
+                    setValue("casting-time", "N_ROUNDS");
+                    setValue("casting-time-n", n);
+                    castingTimeN.classList.remove("hidden");
+                case N_MINUTES(n):
+                    setValue("casting-time", "N_MINUTES");
+                    setValue("casting-time-n", n);
+                    castingTimeN.classList.remove("hidden");
+                default:
+                    setValue("casting-time", editSpell.castingTime.getName());
+            }
+
+            switch (editSpell.duration) {
+                case N_ROUNDS(n):
+                    setValue("duration", "N_ROUNDS");
+                    setValue("duration-n", n);
+                    durationN.classList.remove("hidden");
+                    canEndRow.classList.remove("hidden");
+                case N_MINUTES(n):
+                    setValue("duration", "N_MINUTES");
+                    setValue("duration-n", n);
+                    durationN.classList.remove("hidden");
+                    canEndRow.classList.remove("hidden");
+                case CONCENTRATION:
+                    setValue("duration", "CONCENTRATION");
+                    canEndRow.classList.remove("hidden");
+                case INSTANTANEOUS:
+                    setValue("duration", "INSTANTANEOUS");
+            }
+
+            if (editSpell.savingThrowType != null) {
+                stSelect.value = editSpell.savingThrowType.getName();
+                saveEffectRow.classList.remove("hidden");
+                if (editSpell.saveEffect != null) setValue("save-effect", editSpell.saveEffect.getName());
+            }
+            if (editSpell.usesPerDay != null && editSpell.usesPerDay > 0) {
+                savingThrowDCRow.classList.remove("hidden");
+            }
+            if (editSpell.savingThrowType != null) {
+                savingThrowDCRow.classList.remove("hidden");
+            }
+        }
 
         // Autocomplete setup
         var clsName = switch (characterClass) {

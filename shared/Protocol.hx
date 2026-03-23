@@ -119,6 +119,7 @@ enum SpellEventType {
     REMOVE_SPELL_DICE(spellIndex:Int, diceIndex:Int);
     FINISH_SPELL_PREPARATION;
     SET_SPELL_PRIORITY(spellIndex:Int, priority:Null<Int>);
+    EDIT_SPELL(index:Int, spell:Spell);
 }
 
 // Spell data as returned by the spell index JSON (enum fields stored as strings)

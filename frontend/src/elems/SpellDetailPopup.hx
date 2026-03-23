@@ -16,12 +16,18 @@ class SpellDetailPopup extends Popup {
         this.onBack = onBack;
         mainElem.classList.add("spell-detail");
 
+        var main = mainElem.querySelector(".main");
+
         var backBtn = Browser.document.createAnchorElement();
         backBtn.className = "back";
         backBtn.innerText = "Retour";
         backBtn.addEventListener("click", close);
-        var main = mainElem.querySelector(".main");
         main.insertBefore(backBtn, main.querySelector("h2"));
+
+        var editBtn = Browser.document.createAnchorElement();
+        editBtn.className = "edit-btn";
+        editBtn.innerText = "✎ Modifier";
+        main.insertBefore(editBtn, main.querySelector("h2"));
 
         var content = getContent();
         content.innerHTML = "<dl class='spell-detail-dl'></dl><div class='actions'><a class='cast-btn'>Lancer le sort</a></div>";
@@ -125,6 +131,15 @@ class SpellDetailPopup extends Popup {
         });
         dicesSection.appendChild(addDiceBtn);
         content.insertBefore(dicesSection, content.querySelector(".actions"));
+
+        var maxSpellLevel = Rules.getMaxSpellLevel(character.basics.characterClass, character);
+        editBtn.addEventListener("click", () -> {
+            closeSilent();
+            new elems.SpellDialog(character.basics.characterClass, maxSpellLevel, (edited) -> {
+                pushEvent(SPELL_EVENT(EDIT_SPELL(spellIndex, edited)));
+                new elems.SpellDetailPopup(edited, spellIndex, character, pushEvent, ficheId, onBack);
+            }, spell);
+        });
 
         var isSpontaneous = character.basics.characterClass.canCastSpells() && !character.basics.characterClass.needsSpellPreparation();
         var castBtn:js.html.AnchorElement = cast content.querySelector("a.cast-btn");

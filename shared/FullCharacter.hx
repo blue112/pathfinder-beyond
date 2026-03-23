@@ -186,6 +186,10 @@ class FullCharacter {
                 } else {
                     usedSlots.set(spell.level, (usedSlots.exists(spell.level) ? usedSlots.get(spell.level) : 0) + 1);
                 }
+            case SPELL_EVENT(EDIT_SPELL(index, spell)):
+                var edited = Reflect.copy(spell);
+                edited.dices = spells[index].dices;
+                spells[index] = edited;
             case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority)):
                 spells[spellIndex].priority = priority;
             case SPELL_EVENT(FINISH_SPELL_PREPARATION):
