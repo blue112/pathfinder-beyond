@@ -37,14 +37,20 @@ class SpellDetailPopup extends Popup {
             dl.appendChild(dd);
         }
 
+        var nls = character.level;
+        function resolveNls(s:String):String {
+            if (s.indexOf("NLS") < 0) return s;
+            return Std.string(MathExpr.eval(s.replace("NLS", Std.string(nls))));
+        }
+
         var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
         addRow("École", spell.school.spellSchoolToString());
         if (!isPower) addRow("Niveau", Std.string(spell.level));
         if (spell.shortDescription != null) addRow("Description courte", spell.shortDescription);
-        addRow("Temps d'incantation", spell.castingTime.spellCastingTimeToString());
-        var durationStr = spell.duration.spellDurationToString();
+        addRow("Temps d'incantation", spell.castingTime.spellCastingTimeToString(resolveNls));
+        var durationStr = spell.duration.spellDurationToString(resolveNls);
         addRow("Durée", if (spell.canEndVoluntarily) '$durationStr (peut être terminé volontairement)' else durationStr);
-        addRow("Portée", spell.range.spellRangeToString());
+        addRow("Portée", spell.range.spellRangeToString(resolveNls));
         if (spell.components.length > 0) addRow("Composantes", spell.components.map(c -> c.spellComponentToString()).join(", "));
         if (spell.targets != "") addRow("Cibles", spell.targets);
         if (spell.areaOfEffect != null) addRow("Zone d'effet", spell.areaOfEffect);
@@ -80,7 +86,7 @@ class SpellDetailPopup extends Popup {
             var row = Browser.document.createDivElement();
             row.className = "spell-dice-item";
             var label = Browser.document.createSpanElement();
-            label.innerText = '${d.reason} : ${d.diceType.spellDiceTypeToString()}';
+            label.innerText = '${d.reason} : ${diceDisplayLabel(d.diceType, character.level)}';
             var del = Browser.document.createAnchorElement();
             del.className = "spell-dice-del";
             del.innerText = "×";
@@ -103,7 +109,7 @@ class SpellDetailPopup extends Popup {
                 var row = Browser.document.createDivElement();
                 row.className = "spell-dice-item";
                 var label = Browser.document.createSpanElement();
-                label.innerText = '${dice.reason} : ${dice.diceType.spellDiceTypeToString()}';
+                label.innerText = '${dice.reason} : ${diceDisplayLabel(dice.diceType, character.level)}';
                 var del = Browser.document.createAnchorElement();
                 del.className = "spell-dice-del";
                 del.innerText = "×";
@@ -193,6 +199,20 @@ class SpellDetailPopup extends Popup {
                     });
                 });
             }
+        }
+    }
+
+    static function prettyFormula(s:String):String {
+        return s.replace("+", " + ").replace("-", " - ").replace("*", " × ").replace("/", " / ");
+    }
+
+    static function diceDisplayLabel(diceType:SpellDiceType, nls:Int):String {
+        switch (diceType) {
+            case MANUAL(formula) if (formula.indexOf("NLS") >= 0):
+                var resolved = formula.replace("NLS", Std.string(nls));
+                return '${prettyFormula(resolved)} (${prettyFormula(formula)})';
+            default:
+                return diceType.spellDiceTypeToString();
         }
     }
 

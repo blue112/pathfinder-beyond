@@ -1,5 +1,7 @@
 import Protocol;
 
+using StringTools;
+
 class ProtocolUtil {
     static public function parseCharacterAlignement(align:String):CharacterAlignement {
         var byName = CharacterAlignement.createByName("ALIGNEMENT_" + align.toUpperCase());
@@ -184,32 +186,40 @@ class ProtocolUtil {
         }
     }
 
-    static public function spellCastingTimeToString(ct:SpellCastingTime):String {
+    static function formulaSuffix(original:String, resolved:String):String {
+        return if (resolved == original) ""
+        else ' (${original.replace("+", " + ").replace("-", " - ").replace("*", " × ").replace("/", " / ")})';
+    }
+
+    static public function spellCastingTimeToString(ct:SpellCastingTime, ?resolveFormula:String->String):String {
+        var r = resolveFormula != null ? resolveFormula : (s -> s);
         return switch (ct) {
             case STANDARD_ACTION: "Action simple";
             case FULL_ACTION: "Action complexe";
-            case N_ROUNDS(n): '${n} round(s)';
-            case N_MINUTES(n): '${n} minute(s)';
+            case N_ROUNDS(n): '${r(n)} round(s)${formulaSuffix(n, r(n))}';
+            case N_MINUTES(n): '${r(n)} minute(s)${formulaSuffix(n, r(n))}';
         }
     }
 
-    static public function spellDurationToString(d:SpellDuration):String {
+    static public function spellDurationToString(d:SpellDuration, ?resolveFormula:String->String):String {
+        var r = resolveFormula != null ? resolveFormula : (s -> s);
         return switch (d) {
             case INSTANTANEOUS: "Instantanée";
-            case N_ROUNDS(n): '${n} round(s)';
-            case N_MINUTES(n): '${n} minute(s)';
+            case N_ROUNDS(n): '${r(n)} round(s)${formulaSuffix(n, r(n))}';
+            case N_MINUTES(n): '${r(n)} minute(s)${formulaSuffix(n, r(n))}';
             case CONCENTRATION: "Concentration";
         }
     }
 
-    static public function spellRangeToString(r:SpellRange):String {
-        return switch (r) {
+    static public function spellRangeToString(range:SpellRange, ?resolveFormula:String->String):String {
+        var r = resolveFormula != null ? resolveFormula : (s -> s);
+        return switch (range) {
             case PERSONAL: "Personnelle";
             case TOUCH: "Contact";
             case CLOSE: "Courte";
             case MEDIUM: "Moyenne";
             case LONG: "Longue";
-            case SPECIFIC(cases): '${cases} case(s)';
+            case SPECIFIC(cases): '${r(cases)} case(s)${formulaSuffix(cases, r(cases))}';
         }
     }
 
