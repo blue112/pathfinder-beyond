@@ -1,0 +1,7 @@
+-js test-out.js
+-main Main
+-cp lib
+-cp test
+-lib jsasync
+-D jsasync-no-markers
+-lib hxnodejs

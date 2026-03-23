@@ -5,6 +5,7 @@
 --resource src/assets/campaign.tpl.html@campaign.html
 --resource src/assets/campaign_character.tpl.html@campaign_character.html
 --resource src/assets/welcome.tpl.html@welcome.html
+-cp lib
 -cp src
 -debug
 -lib jsasync

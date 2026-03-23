@@ -466,6 +466,171 @@ section.spells-section {
     }
 }
 
+// Spell cast popup
+.popup.spell-cast {
+    .main {
+        top: 5%;
+        height: 90%;
+        width: 60%;
+        left: 20%;
+
+        .content {
+            overflow-y: auto;
+            padding: 0 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+
+    .cast-long-desc {
+        padding: 12px 15px;
+        background: #fafaf7;
+        border: 1px solid #ddd;
+        white-space: pre-wrap;
+        line-height: 1.6;
+        font-size: 0.95em;
+    }
+
+    .cast-sr-warning {
+        padding: 12px 16px;
+        background: #fff8e1;
+        border: 2px solid #e6a800;
+        border-radius: 3px;
+
+        .cast-sr-question {
+            margin: 0 0 10px;
+            font-weight: bold;
+            color: #7a5500;
+        }
+
+        .cast-sr-btns {
+            display: flex;
+            gap: 10px;
+
+            a {
+                padding: 6px 20px;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 3px;
+                font-size: 0.9em;
+            }
+
+            .cast-sr-yes {
+                background: #e6a800;
+                color: white;
+                &:hover { opacity: 0.85; }
+            }
+
+            .cast-sr-no {
+                border: 1px solid #aaa;
+                color: #555;
+                &:hover { border-color: #555; color: #222; }
+            }
+        }
+
+        .cast-sr-result {
+            margin: 8px 0 0;
+            font-family: monospace;
+            font-size: 1em;
+            color: #7a5500;
+        }
+    }
+
+    .cast-saving-throw {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border: 1px solid #b8ae98;
+        background: #f0ece0;
+        font-size: 0.95em;
+
+        .cast-st-label {
+            font-weight: bold;
+        }
+
+        .cast-st-dc {
+            color: #555;
+        }
+
+        .cast-st-effect {
+            margin-left: auto;
+            font-style: italic;
+            color: #777;
+            font-size: 0.9em;
+        }
+    }
+
+    .cast-dices {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        border: 1px solid #eee;
+        padding: 10px 15px;
+
+        h3 {
+            margin: 0 0 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .cast-dice-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border: 1px solid #b8ae98;
+            background: #f0ece0;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.1s;
+
+            &:hover:not(.disabled) {
+                background: #e4dfd0;
+            }
+
+            &.disabled {
+                opacity: 0.45;
+                cursor: default;
+            }
+
+            &.rolled {
+                border-color: #2a7a2a;
+                background: #e6f4e6;
+            }
+
+            .cast-dice-label {
+                font-weight: bold;
+            }
+
+            .cast-dice-result {
+                font-family: monospace;
+                font-size: 1em;
+                color: #2a4a2a;
+            }
+        }
+    }
+
+    .cast-done-btn {
+        display: block;
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+        border: 2px solid variables.$redColor;
+        color: variables.$redColor;
+        cursor: pointer;
+        background: #faf8f4;
+        margin-top: auto;
+
+        &:hover {
+            background: variables.$redColor;
+            color: white;
+        }
+    }
+}
+
 // Spell detail popup
 .popup.spell-detail {
     .main {

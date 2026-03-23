@@ -4,7 +4,6 @@ import js.Browser;
 import Protocol;
 import ProtocolUtil;
 import Rules;
-import Protocol;
 
 using ProtocolUtil;
 using Rules;
@@ -12,7 +11,7 @@ using Rules;
 class SpellDetailPopup extends Popup {
     var onBack:Void->Void;
 
-    public function new(spell:Spell, spellIndex:Int, character:FullCharacter, pushEvent:FicheEventType->Void, onBack:Void->Void) {
+    public function new(spell:Spell, spellIndex:Int, character:FullCharacter, pushEvent:FicheEventType->Void, ficheId:String, onBack:Void->Void) {
         super(spell.name);
         this.onBack = onBack;
         mainElem.classList.add("spell-detail");
@@ -136,7 +135,8 @@ class SpellDetailPopup extends Popup {
                 castBtn.addEventListener("click", () -> {
                     new YesNoAlert("Utiliser le pouvoir", 'Confirmer l\'utilisation de "${spell.name}" ?', () -> {
                         pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                        close();
+                        closeSilent();
+                        new elems.SpellCastPopup(spell, character, ficheId);
                     });
                 });
             }
@@ -153,7 +153,8 @@ class SpellDetailPopup extends Popup {
                 castBtn.addEventListener("click", () -> {
                     new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ?', () -> {
                         pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                        close();
+                        closeSilent();
+                        new elems.SpellCastPopup(spell, character, ficheId);
                     });
                 });
             }
@@ -170,7 +171,8 @@ class SpellDetailPopup extends Popup {
                 castBtn.addEventListener("click", () -> {
                     new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? Un emplacement de niveau ${spell.level} sera consommé.', () -> {
                         pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                        close();
+                        closeSilent();
+                        new elems.SpellCastPopup(spell, character, ficheId);
                     });
                 });
             }
@@ -186,11 +188,16 @@ class SpellDetailPopup extends Popup {
                 castBtn.addEventListener("click", () -> {
                     new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? L\'emplacement de sort sera consommé.', () -> {
                         pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                        close();
+                        closeSilent();
+                        new elems.SpellCastPopup(spell, character, ficheId);
                     });
                 });
             }
         }
+    }
+
+    function closeSilent() {
+        super.close();
     }
 
     override public function close() {

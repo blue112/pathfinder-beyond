@@ -124,8 +124,9 @@ class Fiche implements IJSAsync {
                     pushEvent(CHANGE_BANK_MONEY(value));
             });
         });
-        mainElem.querySelector(".spells-btn").addEventListener("click", () -> {
-            new elems.SpellListPopup(character, pushEvent, (p) -> { currentSpellPopup = p; });
+        mainElem.querySelector(".spells-btn").addEventListener("click", (e:js.html.MouseEvent) -> {
+            if (!e.shiftKey) return;
+            new elems.SpellListPopup(character, pushEvent, (p) -> { currentSpellPopup = p; }, fiche_id);
         });
     }
 
@@ -611,6 +612,7 @@ class Fiche implements IJSAsync {
 
     private function updateFiche() {
         if (currentSpellPopup != null) currentSpellPopup.render();
+        elems.SpellCastPopup.registerFieldNames(character.spells, fieldsNames);
         updateBasics();
         var spellsSection = mainElem.querySelector("section.spells-section");
         if (character.basics.characterClass.canCastSpells()) {

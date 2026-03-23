@@ -12,13 +12,15 @@ class SpellListPopup extends Popup {
     var character:FullCharacter;
     var pushEvent:FicheEventType->Void;
     var register:(Null<SpellListPopup>)->Void;
+    var ficheId:String;
     var editingPriorities:Bool = false;
 
-    public function new(character:FullCharacter, pushEvent:FicheEventType->Void, register:(Null<SpellListPopup>)->Void) {
+    public function new(character:FullCharacter, pushEvent:FicheEventType->Void, register:(Null<SpellListPopup>)->Void, ficheId:String) {
         super("Sorts");
         this.character = character;
         this.pushEvent = pushEvent;
         this.register = register;
+        this.ficheId = ficheId;
         mainElem.classList.add("spell-list");
 
         var editBtn = Browser.document.createAnchorElement();
@@ -174,7 +176,7 @@ class SpellListPopup extends Popup {
             }
             nameCell.addEventListener("click", () -> {
                 close();
-                new SpellDetailPopup(spell, originalIndex, character, pushEvent, () -> new SpellListPopup(character, pushEvent, register));
+                new SpellDetailPopup(spell, originalIndex, character, pushEvent, ficheId, () -> new SpellListPopup(character, pushEvent, register, ficheId));
             });
             li.appendChild(nameCell);
 
