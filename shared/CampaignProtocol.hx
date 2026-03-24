@@ -60,6 +60,7 @@ enum CampaignEventType {
     ADD_NPC_WEAPON(npcName:String, weapon:NPCWeapon);
     SET_NPC_AC_IN_ENCOUNTER(index:Int, ac:Int);
     SET_NPC_DAMAGE_REDUCTION(npcName:String, damageReduction:NPCDamageReduction);
+    SET_INITIATIVE_IN_ENCOUNTER(index:Int, initiative:Int);
 }
 
 typedef CampaignEventTs = {

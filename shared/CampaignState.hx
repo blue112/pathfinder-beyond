@@ -50,6 +50,9 @@ class CampaignState {
         case SET_NPC_DAMAGE_REDUCTION(npcName, damageReduction):
             var npc = npcs.find(n -> n.name == npcName);
             if (npc != null) npc.damageReduction = damageReduction;
+        case SET_INITIATIVE_IN_ENCOUNTER(index, initiative):
+            encounter[index].initiative = initiative;
+            encounter.sort((a, b) -> b.initiative - a.initiative);
         }
     }
 

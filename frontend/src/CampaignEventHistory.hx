@@ -37,21 +37,24 @@ class CampaignEventHistory extends Popup {
                     currentEncounter = [];
                     'Fin de rencontre';
                 case DAMAGE_NPC_IN_ENCOUNTER(index, amount, damageType):
-                    var entityName = index < currentEncounter.length ? entityToName(currentEncounter[index].entity, ficheNames) : '?';
+                    var entityName = if (index < currentEncounter.length) entityToName(currentEncounter[index].entity, ficheNames) else '?';
                     'Dégâts sur ${entityName.htmlEscape()}: $amount pv (${damageType.damageTypeToString().toLowerCase()})';
                 case HEAL_NPC_IN_ENCOUNTER(index, amount):
-                    var entityName = index < currentEncounter.length ? entityToName(currentEncounter[index].entity, ficheNames) : '?';
+                    var entityName = if (index < currentEncounter.length) entityToName(currentEncounter[index].entity, ficheNames) else '?';
                     'Soins sur ${entityName.htmlEscape()}: $amount pv';
                 case SET_ENCOUNTER_NOTE(index, note):
-                    var entityName = index < currentEncounter.length ? entityToName(currentEncounter[index].entity, ficheNames) : '?';
+                    var entityName = if (index < currentEncounter.length) entityToName(currentEncounter[index].entity, ficheNames) else '?';
                     'Note sur ${entityName.htmlEscape()}: ${note.htmlEscape()}';
                 case SET_NPC_AC_IN_ENCOUNTER(index, ac):
-                    var entityName = index < currentEncounter.length ? entityToName(currentEncounter[index].entity, ficheNames) : '?';
+                    var entityName = if (index < currentEncounter.length) entityToName(currentEncounter[index].entity, ficheNames) else '?';
                     'CA modifiée sur ${entityName.htmlEscape()}: $ac';
                 case SET_NPC_DAMAGE_REDUCTION(npcName, damageReduction):
                     var types = damageReduction.bypassTypes.map(t -> t.damageTypeToString()).join(", ");
                     var rdStr = '${damageReduction.amount}/${if (types == "") "&mdash;" else types}';
                     'RD de ${npcName.htmlEscape()} définie: $rdStr';
+                case SET_INITIATIVE_IN_ENCOUNTER(index, initiative):
+                    var entityName = if (index < currentEncounter.length) entityToName(currentEncounter[index].entity, ficheNames) else '?';
+                    'Initiative modifiée sur ${entityName.htmlEscape()}: $initiative';
             };
             elem.innerHTML = '<a class="del">x</a> <small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> $event';
             list.appendChild(elem);
@@ -71,7 +74,7 @@ class CampaignEventHistory extends Popup {
 
     static function entityToName(entity:EncounterEntityType, ficheNames:StringMap<String>):String {
         return switch (entity) {
-            case CHARACTER(ficheId): ficheNames.exists(ficheId) ? ficheNames.get(ficheId) : ficheId;
+            case CHARACTER(ficheId): if (ficheNames.exists(ficheId)) ficheNames.get(ficheId) else ficheId;
             case NPC(npcName): npcName;
         };
     }

@@ -316,7 +316,13 @@ class Campaign implements IJSAsync {
                 <td class="note"></td>
                 <td><a class="remove-encounter">✕</a></td>
             ';
-            row.querySelector(".initiative").innerText = entry.initiative.string();
+            var initiativeCell = row.querySelector(".initiative");
+            initiativeCell.innerText = entry.initiative.string();
+            initiativeCell.addEventListener("click", () -> {
+                new elems.AmountChoice("Initiative", "Nouvelle valeur d'initiative :", {defaultValue: entry.initiative}, (newInitiative, _) -> {
+                    pushEvent(SET_INITIATIVE_IN_ENCOUNTER(i, newInitiative));
+                });
+            });
             row.querySelector(".hp").innerText = hp;
             var caCell = row.querySelector(".ca");
             caCell.innerText = ac;
