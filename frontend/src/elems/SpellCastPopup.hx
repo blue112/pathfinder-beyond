@@ -221,6 +221,8 @@ class SpellCastPopup extends Popup {
             content.appendChild(dicesSection);
         }
 
+        FreeDiceDialog.appendFreeDiceSection(content, ficheId, character);
+
         var doneBtn = Browser.document.createAnchorElement();
         doneBtn.className = "cast-done-btn";
         doneBtn.innerText = "Terminé";
