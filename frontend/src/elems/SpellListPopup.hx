@@ -164,7 +164,7 @@ class SpellListPopup extends Popup {
 
             if (needsPrep && character.preparationLocked && !showUnprepared && !isPower) {
                 var count = preparedSpells.filter(p -> p.spellIndex == originalIndex).length;
-                if (count == 0 && spell.level > 0) continue;
+                if (count == 0) continue;
             }
 
             var li = Browser.document.createLIElement();
