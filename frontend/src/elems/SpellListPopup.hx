@@ -163,8 +163,7 @@ class SpellListPopup extends Popup {
             var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
 
             if (needsPrep && character.preparationLocked && !showUnprepared && !isPower) {
-                var count = preparedSpells.filter(p -> p.spellIndex == originalIndex).length;
-                if (count == 0) continue;
+                if (!character.lockedPreparedIndices.contains(originalIndex)) continue;
             }
 
             var li = Browser.document.createLIElement();

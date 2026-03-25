@@ -30,6 +30,7 @@ class FullCharacter {
     public var spells:Array<Spell>;
     public var preparedSpells:Array<PreparedSpell>;
     public var preparationLocked:Bool;
+    public var lockedPreparedIndices:Array<Int>;
     public var usedPowers:Map<Int, Int>;
     public var usedSlots:Map<Int, Int>;
     public var firedWeapons:Map<Int, Bool>;
@@ -59,6 +60,7 @@ class FullCharacter {
         this.spells = [];
         this.preparedSpells = [];
         this.preparationLocked = false;
+        this.lockedPreparedIndices = [];
         this.usedPowers = new Map();
         this.usedSlots = new Map();
         this.firedWeapons = new Map();
@@ -213,9 +215,11 @@ class FullCharacter {
                 spells[spellIndex].priority = priority;
             case SPELL_EVENT(FINISH_SPELL_PREPARATION):
                 preparationLocked = true;
+                lockedPreparedIndices = preparedSpells.map(p -> p.spellIndex);
             case NEW_DAY:
                 preparedSpells = [];
                 preparationLocked = false;
+                lockedPreparedIndices = [];
                 usedPowers = new Map();
                 usedSlots = new Map();
                 current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
