@@ -330,12 +330,10 @@ class Fiche implements IJSAsync {
                 var numDice = diceRegex.matched(1).parseInt();
                 var diceType = diceRegex.matched(2).parseInt();
                 var mod = diceRegex.matched(3).parseInt();
-                if (numDice > 1) {
-                    new Alert("Non implémenté", "Plus qu'un seul dé à la fois non implémenté");
-                    return 0;
-                }
-
-                var apiResult = Api.rollDice(fiche_id, diceType, mod, parent.parentElement.dataset.id).jsawait();
+                var dataParent = parent;
+                while (dataParent != null && dataParent.dataset.id == null)
+                    dataParent = dataParent.parentElement;
+                var apiResult = Api.rollDice(fiche_id, diceType, mod, dataParent.dataset.id, numDice).jsawait();
                 Dice.roll([mod], apiResult.result, diceType);
                 return apiResult.result + mod;
             }
@@ -498,7 +496,7 @@ class Fiche implements IJSAsync {
 
         getField(divWeapon, "damage").innerText = [for (d in weapon.damage_dices) '1d' + d].join(" + ") + " " + damage.asMod(true);
 
-        character.applyTempModsClass(getField(divWeapon, "damage").parentElement, [WEAPON_DAMAGE, CHARACTERISTIC(weapon.weaponDamageCharacteristic)]);
+        character.applyTempModsClass(getField(divWeapon, "damage").parentElement.parentElement, [WEAPON_DAMAGE, CHARACTERISTIC(weapon.weaponDamageCharacteristic)]);
         getField(divWeapon, "critical").innerHTML = "Si " + weapon.critical_text.nums.join(",") + ": x" + weapon.critical_text.damageMultiplier;
 
         var plusAttack = divWeapon.querySelector("[data-id='attack'] a.plus");
