@@ -507,8 +507,8 @@ class Fiche implements IJSAsync {
         makeTempModMenu(plusDamage, plusDamage.parentElement.parentElement, WEAPON_DAMAGE);
 
         if (weapon.shouldBeReloaded == true && character.firedWeapons.exists(idx)) {
-            var overlay = Browser.document.createDivElement();
-            overlay.className = "reload-overlay";
+            var attackField = divWeapon.querySelector("[data-id='attack']");
+            attackField.classList.add("weapon-fired");
             var reloadBtn = Browser.document.createAnchorElement();
             reloadBtn.className = "reload-btn";
             reloadBtn.innerText = "Recharger";
@@ -517,8 +517,7 @@ class Fiche implements IJSAsync {
                     pushEvent(RELOAD_WEAPON(idx));
                 });
             });
-            overlay.appendChild(reloadBtn);
-            divWeapon.appendChild(overlay);
+            attackField.appendChild(reloadBtn);
         }
 
         mainElem.querySelector(".weapons").appendChild(divWeapon);

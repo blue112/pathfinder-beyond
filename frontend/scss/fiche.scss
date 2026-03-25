@@ -414,30 +414,30 @@ h3 {
                     display: none;
                 }
 
-                .reload-overlay {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    top: 36px; // below h3
-                    background: rgba(40, 20, 0, 0.4);
-                    backdrop-filter: blur(3px);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 2;
+                .field[data-id="attack"].weapon-fired {
+                    position: relative;
+
+                    .value {
+                        filter: blur(3px);
+                        pointer-events: none;
+                        user-select: none;
+                    }
 
                     .reload-btn {
-                        padding: 8px 20px;
-                        background: #c8a040;
-                        color: #fff;
+                        position: absolute;
+                        inset: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(40, 20, 0, 0.35);
+                        backdrop-filter: blur(2px);
+                        color: #f0c060;
                         font-weight: bold;
-                        font-size: 1em;
+                        font-size: 0.85em;
                         cursor: pointer;
-                        border: 2px solid #f0c060;
 
                         &:hover {
-                            background: #e0b840;
+                            background: rgba(40, 20, 0, 0.55);
                         }
                     }
                 }
