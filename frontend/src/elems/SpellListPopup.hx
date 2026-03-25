@@ -34,6 +34,15 @@ class SpellListPopup extends Popup {
         mainElem.querySelector(".main").appendChild(editBtn);
 
         register(this);
+
+        if (character.basics.characterClass == MAGICIEN && character.favoriteMagicSchool == null) {
+            var schools = [ABJURATION, CONJURATION, DIVINATION, ENCHANTMENT, EVOCATION, ILLUSION, NECROMANCY, TRANSMUTATION];
+            var choices = schools.map(s -> s.spellSchoolToString());
+            new ChoicesDialog("Choisir une école de magie favorite", choices, (i) -> {
+                pushEvent(SET_FAVORITE_MAGIC_SCHOOL(schools[i]));
+            });
+        }
+
         render();
     }
 

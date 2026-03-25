@@ -33,6 +33,7 @@ class FullCharacter {
     public var usedPowers:Map<Int, Int>;
     public var usedSlots:Map<Int, Int>;
     public var firedWeapons:Map<Int, Bool>;
+    public var favoriteMagicSchool:Null<SpellSchool>;
 
     public function new() {
         this.skillRanks = [];
@@ -214,6 +215,8 @@ class FullCharacter {
                 usedPowers = new Map();
                 usedSlots = new Map();
                 current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
+            case SET_FAVORITE_MAGIC_SCHOOL(school):
+                favoriteMagicSchool = school;
         }
     }
 

@@ -118,6 +118,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
                     'Fin de la phase de préparation des sorts';
                 case NEW_DAY:
                     'Nouveau jour';
+                case SET_FAVORITE_MAGIC_SCHOOL(school):
+                    'École favorite définie : ${school.spellSchoolToString()}';
                 case ADD_EXCEPTIONAL_MODIFIER(mod):
                     'Ajout d\'un modificateur exceptionnel sur ${mod.mod.asMod()} (${mod.why.htmlEscape()})';
             }

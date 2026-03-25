@@ -36,6 +36,7 @@ enum FicheEventType {
     CHANGE_ITEM_PRIORITY(item:Int, priority:Int);
     SPELL_EVENT(event:SpellEventType);
     NEW_DAY;
+    SET_FAVORITE_MAGIC_SCHOOL(school:SpellSchool);
 }
 
 enum DamageType {
