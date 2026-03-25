@@ -122,6 +122,10 @@ class FicheEventHistory extends Popup implements IJSAsync {
                     'École favorite définie : ${school.spellSchoolToString()}';
                 case SET_PRIEST_DOMAIN(domain1, domain2):
                     'Domaines définis : ${domain1.priestDomainToString()}, ${domain2.priestDomainToString()}';
+                case ENTER_ANIMAL_FORM:
+                    'Transformation en forme animale';
+                case EXIT_ANIMAL_FORM:
+                    'Retour à la forme normale';
                 case ADD_EXCEPTIONAL_MODIFIER(mod):
                     'Ajout d\'un modificateur exceptionnel sur ${mod.mod.asMod()} (${mod.why.htmlEscape()})';
             }

@@ -35,6 +35,8 @@ class FullCharacter {
     public var firedWeapons:Map<Int, Bool>;
     public var favoriteMagicSchool:Null<SpellSchool>;
     public var priestDomains:Null<Array<PriestDomain>>;
+    public var isInAnimalForm:Bool;
+    var primalSizeCategory:Null<SizeCategory>;
 
     public function new() {
         this.skillRanks = [];
@@ -60,6 +62,7 @@ class FullCharacter {
         this.usedPowers = new Map();
         this.usedSlots = new Map();
         this.firedWeapons = new Map();
+        this.isInAnimalForm = false;
     }
 
     function updateHP() {
@@ -220,6 +223,19 @@ class FullCharacter {
                 favoriteMagicSchool = school;
             case SET_PRIEST_DOMAIN(domain1, domain2):
                 priestDomains = [domain1, domain2];
+            case ENTER_ANIMAL_FORM:
+                characteristics.str += 4;
+                primalSizeCategory = basics.sizeCategory;
+                basics.sizeCategory = SIZE_G;
+                speed_mod += 4;
+                isInAnimalForm = true;
+                updateCharacts();
+            case EXIT_ANIMAL_FORM:
+                characteristics.str -= 4;
+                basics.sizeCategory = primalSizeCategory;
+                speed_mod -= 4;
+                isInAnimalForm = false;
+                updateCharacts();
         }
     }
 

@@ -285,6 +285,16 @@ class Fiche implements IJSAsync {
                 pushEvent(NEW_DAY);
             });
         });
+
+        var animalFormBtn = Browser.document.createAnchorElement();
+        animalFormBtn.className = "animal-form-btn";
+        animalFormBtn.addEventListener("click", () -> {
+            if (character.isInAnimalForm)
+                new YesNoAlert("Forme animale", "Reprendre la forme normale ?", () -> pushEvent(EXIT_ANIMAL_FORM));
+            else
+                new YesNoAlert("Forme animale", "Se transformer en forme animale ? (+2 armure naturelle, +4 FOR, -2 DEX, +4 cases de déplacement, taille G)", () -> pushEvent(ENTER_ANIMAL_FORM));
+        });
+        mainElem.querySelector("section.actions").appendChild(animalFormBtn);
     }
 
     @:jsasync function rollFreeDice(faces:Int) {
@@ -706,6 +716,14 @@ class Fiche implements IJSAsync {
             mainElem.querySelector(".see-temp-mods .count").innerText = character.tempMods.length.string();
         } else {
             mainElem.querySelector(".see-temp-mods .count").innerText = '';
+        }
+
+        var animalFormBtn:js.html.AnchorElement = cast mainElem.querySelector("a.animal-form-btn");
+        var canTransform = character.basics.characterClass == METAMORPHE && character.level >= 4;
+        animalFormBtn.classList.toggle("hidden", !canTransform);
+        if (canTransform) {
+            animalFormBtn.innerText = if (character.isInAnimalForm) "Forme normale" else "Forme animale";
+            animalFormBtn.classList.toggle("active", character.isInAnimalForm);
         }
     }
 

@@ -271,6 +271,7 @@ class Rules {
 
         if (includeArmor) {
             total += char.protections.filter(f -> f.type == ARMOR || f.type == SHIELD || f.type == NATURAL_ARMOR).fold((i, r) -> r + i.armor, 0);
+            if (char.isInAnimalForm) total += 2;
         }
 
         return total;

@@ -38,6 +38,8 @@ enum FicheEventType {
     NEW_DAY;
     SET_FAVORITE_MAGIC_SCHOOL(school:SpellSchool);
     SET_PRIEST_DOMAIN(domain1:PriestDomain, domain2:PriestDomain);
+    ENTER_ANIMAL_FORM;
+    EXIT_ANIMAL_FORM;
 }
 
 enum DamageType {
