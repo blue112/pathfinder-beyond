@@ -14,6 +14,7 @@ class SpellListPopup extends Popup {
     var register:(Null<SpellListPopup>)->Void;
     var ficheId:String;
     var editingPriorities:Bool = false;
+    var showUnprepared:Bool = false;
 
     public function new(character:FullCharacter, pushEvent:FicheEventType->Void, register:(Null<SpellListPopup>)->Void, ficheId:String) {
         super("Sorts");
@@ -32,6 +33,18 @@ class SpellListPopup extends Popup {
             render();
         });
         mainElem.querySelector(".main").appendChild(editBtn);
+
+        if (character.basics.characterClass.needsSpellPreparation()) {
+            var unpreparedBtn = Browser.document.createAnchorElement();
+            unpreparedBtn.className = "show-unprepared-btn";
+            unpreparedBtn.innerText = "Voir les sorts non préparés";
+            unpreparedBtn.addEventListener("click", () -> {
+                showUnprepared = !showUnprepared;
+                unpreparedBtn.classList.toggle("active", showUnprepared);
+                render();
+            });
+            mainElem.querySelector(".main").appendChild(unpreparedBtn);
+        }
 
         register(this);
 
@@ -148,6 +161,12 @@ class SpellListPopup extends Popup {
         for (spell in sorted) {
             var originalIndex = spells.indexOf(spell);
             var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
+
+            if (needsPrep && character.preparationLocked && !showUnprepared && !isPower) {
+                var count = preparedSpells.filter(p -> p.spellIndex == originalIndex).length;
+                if (count == 0 && spell.level > 0) continue;
+            }
+
             var li = Browser.document.createLIElement();
 
             if (showAvailable) {
