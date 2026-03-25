@@ -600,10 +600,13 @@ class Fiche implements IJSAsync {
             mainElem.querySelector('.ac').classList.add('exp');
             var expEl = mainElem.querySelector('.ac .exp');
             expEl.innerHTML = "";
-            var whyEl:js.html.Element = cast Browser.document.createElement("strong");
-            whyEl.innerText = expCA[0].why;
-            expEl.appendChild(whyEl);
-            expEl.appendChild(Browser.document.createTextNode(' : ${expCA[0].mod.asMod()} = ${mod + expCA[0].mod}')); // Fixme multiple CA mod
+            for (e in expCA) {
+                var whyEl:js.html.Element = cast Browser.document.createElement("strong");
+                whyEl.innerText = e.why;
+                expEl.appendChild(whyEl);
+                expEl.appendChild(Browser.document.createTextNode(' : ${e.mod.asMod()} = ${mod + e.mod}'));
+                expEl.appendChild(Browser.document.createElement("br"));
+            }
         }
 
         acDiv.innerText = mod.string();
