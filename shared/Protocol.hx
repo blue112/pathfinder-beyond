@@ -372,4 +372,5 @@ typedef PublicDiceRoll = {
     var result:Int;
     var ts:Float;
     var mod:Int;
+    var ?count:Int;
 };

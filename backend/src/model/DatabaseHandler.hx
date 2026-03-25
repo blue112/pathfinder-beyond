@@ -19,6 +19,7 @@ class DatabaseHandler implements IJSAsync {
         'CREATE TABLE campaign(campaign_id VARCHAR(36), name VARCHAR(50), PRIMARY KEY(campaign_id))',
         'CREATE TABLE campaign_fiche(campaign_id VARCHAR(36), fiche_id VARCHAR(50), PRIMARY KEY(campaign_id, fiche_id))',
         'CREATE TABLE campaign_events(id INT AUTO_INCREMENT, campaign_id VARCHAR(36), event_type VARCHAR(50), event_params BLOB, ts_ms BIGINT, PRIMARY KEY(id))',
+        'ALTER TABLE dice_rolls ADD dice_count INT NOT NULL DEFAULT 1',
     ];
 
     @:jsasync static public function init() {

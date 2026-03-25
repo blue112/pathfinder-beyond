@@ -14,15 +14,19 @@ class DiceRoll implements IJSAsync {
 
     public var ts:Float;
 
-    public function new(fiche_id:String, field_name:String, faces:Int, mod:Int) {
+    public var count:Int;
+
+    public function new(fiche_id:String, field_name:String, faces:Int, mod:Int, count:Int = 1) {
         this.fiche_id = fiche_id;
         this.faces = faces;
         this.field_name = field_name;
         this.mod = mod;
+        this.count = count;
     }
 
     public function roll() {
-        this.result = Std.random(faces) + 1;
+        this.result = 0;
+        for (_ in 0...count) this.result += Std.random(faces) + 1;
         this.ts = Date.now().getTime();
     }
 
@@ -33,6 +37,7 @@ class DiceRoll implements IJSAsync {
             result: result,
             ts: ts,
             mod: mod,
+            count: count,
         };
     }
 
@@ -41,7 +46,7 @@ class DiceRoll implements IJSAsync {
         if (results.length == 0)
             return null;
 
-        var r = new DiceRoll(results[0].fiche_id, results[0].field_name, results[0].faces_count, results[0].modifier);
+        var r = new DiceRoll(results[0].fiche_id, results[0].field_name, results[0].faces_count, results[0].modifier, results[0].dice_count);
         r.result = results[0].result;
         r.ts = results[0].ts_ms;
         return r;
@@ -52,7 +57,7 @@ class DiceRoll implements IJSAsync {
 
         var out = [];
         for (i in results) {
-            var r = new DiceRoll(i.fiche_id, i.field_name, i.faces_count, i.modifier);
+            var r = new DiceRoll(i.fiche_id, i.field_name, i.faces_count, i.modifier, i.dice_count);
             r.result = i.result;
             r.ts = i.ts_ms;
             out.push(r);
@@ -62,7 +67,7 @@ class DiceRoll implements IJSAsync {
     }
 
     public function insert() {
-        return DatabaseHandler.execInsert("INSERT INTO dice_rolls(fiche_id, field_name, ts_ms, faces_count, result, modifier) VALUES(?, ?, ?, ?, ?, ?)",
-            [fiche_id, field_name, ts, faces, result, mod]);
+        return DatabaseHandler.execInsert("INSERT INTO dice_rolls(fiche_id, field_name, ts_ms, faces_count, result, modifier, dice_count) VALUES(?, ?, ?, ?, ?, ?, ?)",
+            [fiche_id, field_name, ts, faces, result, mod, count]);
     }
 }

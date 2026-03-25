@@ -200,15 +200,15 @@ class SpellCastPopup extends Popup {
                                 item.classList.add("rolled");
                                 return;
                             }
-                            if (parsed.count > 1) {
-                                new Alert("Non implémenté", "Plus d'un dé à la fois n'est pas encore supporté.");
-                                return;
-                            }
                             var fieldId = 'sort-${spell.name}';
-                            Api.rollDice(ficheId, parsed.faces, parsed.flatMod, fieldId).then(res -> {
-                                Dice.roll([parsed.flatMod], res.result, parsed.faces);
+                            Api.rollDice(ficheId, parsed.faces, parsed.flatMod, fieldId, parsed.count).then(res -> {
+                                var diceStr = '${parsed.count}d${parsed.faces}';
                                 var total = res.result + parsed.flatMod;
-                                resultSpan.innerText = '1d${parsed.faces} (${res.result}) + ${parsed.flatMod} = $total';
+                                resultSpan.innerText = if (parsed.flatMod != 0) {
+                                    '$diceStr (${res.result}) + ${parsed.flatMod} = $total';
+                                } else {
+                                    '$diceStr = ${res.result}';
+                                };
                                 item.classList.add("rolled");
                             });
                     }

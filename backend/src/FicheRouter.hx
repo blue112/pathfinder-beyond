@@ -93,7 +93,7 @@ class FicheRouter implements IJSAsync {
     }
 
     @:jsasync static public function onDiceRoll(req:Request, res:Response, next:Next) {
-        var body:{faceCount:Int, fieldName:String, mod:Int} = cast req.body;
+        var body:{faceCount:Int, fieldName:String, mod:Int, ?diceCount:Int} = cast req.body;
         if (!Std.isOfType(body.faceCount, Int) || body.faceCount > 100 || body.faceCount < 2) {
             res.status(400).json({error: "Invalid dice"});
             return;
@@ -106,10 +106,15 @@ class FicheRouter implements IJSAsync {
             res.status(400).json({error: "Invalid field"});
             return;
         }
+        var diceCount = if (body.diceCount != null) body.diceCount else 1;
+        if (!Std.isOfType(diceCount, Int) || diceCount < 1 || diceCount > 20) {
+            res.status(400).json({error: "Invalid dice count"});
+            return;
+        }
 
         var fiche_id = req.fiche.fiche_id;
 
-        var roll = new DiceRoll(fiche_id, body.fieldName, body.faceCount, body.mod);
+        var roll = new DiceRoll(fiche_id, body.fieldName, body.faceCount, body.mod, diceCount);
         roll.roll();
         var inserted = roll.insert().jsawait();
         res.json({result: roll.result, roll_id: inserted});
