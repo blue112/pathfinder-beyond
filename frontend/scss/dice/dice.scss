@@ -31,7 +31,7 @@ body.rolling {
         height: 100%;
         top: 0;
         left: 0;
-        z-index: 99;
+        z-index: 299;
         background: rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(10px);
 
@@ -52,7 +52,7 @@ body.rolling {
 .dice-tray {
     display: none;
     position: fixed;
-    z-index: 100;
+    z-index: 300;
     top: 0;
     left: 0;
     width: 100%;
