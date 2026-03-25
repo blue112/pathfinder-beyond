@@ -100,7 +100,8 @@ class Rules {
                 slots[maxLevel] += bonus[L];
             }
         }
-        if (cls == MAGICIEN && char.favoriteMagicSchool != null) {
+        if ((cls == MAGICIEN && char.favoriteMagicSchool != null)
+         || (cls == PRETRE && char.priestDomains != null)) {
             for (L in 1...10) {
                 if (slots[L] > 0) slots[L]++;
             }

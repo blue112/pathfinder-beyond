@@ -1,6 +1,9 @@
 @use "variables";
 
 .popup.alert {
+    .backdrop {
+        z-index: 199;
+    }
     .main {
         position: fixed;
         top: 50%;
@@ -10,7 +13,7 @@
         left: 15%;
         background: white;
         border: 2px solid black;
-        z-index: 2;
+        z-index: 200;
 
         h2 {
             margin: 20px 0;
@@ -85,6 +88,25 @@
             font-style: italic;
             padding: 10px 15px 0;
             margin: 0;
+        }
+    }
+
+    &.select-choice {
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 15px;
+        }
+        select.choice-select {
+            font-size: 1em;
+            padding: 6px 8px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+        }
+        a.validate {
+            align-self: flex-end;
         }
     }
 

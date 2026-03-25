@@ -37,10 +37,21 @@ class SpellListPopup extends Popup {
 
         if (character.basics.characterClass == MAGICIEN && character.favoriteMagicSchool == null) {
             var schools = [ABJURATION, CONJURATION, DIVINATION, ENCHANTMENT, EVOCATION, ILLUSION, NECROMANCY, TRANSMUTATION];
-            var choices = schools.map(s -> s.spellSchoolToString());
-            new ChoicesDialog("Choisir une école de magie favorite", choices, (i) -> {
-                pushEvent(SET_FAVORITE_MAGIC_SCHOOL(schools[i]));
-            });
+            new SelectChoicePopup("Choisir une école de magie favorite",
+                schools.map(s -> {value: s.getName(), label: s.spellSchoolToString()}),
+                1,
+                (vals) -> pushEvent(SET_FAVORITE_MAGIC_SCHOOL(SpellSchool.createByName(vals[0])))
+            );
+        }
+
+        if (character.basics.characterClass == PRETRE && character.priestDomains == null) {
+            var domainOptions = PriestDomain.createAll().map(d -> {value: d.getName(), label: d.priestDomainToString()});
+            domainOptions.sort((a, b) -> a.label < b.label ? -1 : 1);
+            new SelectChoicePopup("Choisir deux domaines",
+                domainOptions,
+                2,
+                (vals) -> pushEvent(SET_PRIEST_DOMAIN(PriestDomain.createByName(vals[0]), PriestDomain.createByName(vals[1])))
+            );
         }
 
         render();

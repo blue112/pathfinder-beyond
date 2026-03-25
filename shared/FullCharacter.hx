@@ -34,6 +34,7 @@ class FullCharacter {
     public var usedSlots:Map<Int, Int>;
     public var firedWeapons:Map<Int, Bool>;
     public var favoriteMagicSchool:Null<SpellSchool>;
+    public var priestDomains:Null<Array<PriestDomain>>;
 
     public function new() {
         this.skillRanks = [];
@@ -217,6 +218,8 @@ class FullCharacter {
                 current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
             case SET_FAVORITE_MAGIC_SCHOOL(school):
                 favoriteMagicSchool = school;
+            case SET_PRIEST_DOMAIN(domain1, domain2):
+                priestDomains = [domain1, domain2];
         }
     }
 

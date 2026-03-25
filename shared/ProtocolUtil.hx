@@ -156,6 +156,45 @@ class ProtocolUtil {
         }
     }
 
+    static public function priestDomainToString(d:PriestDomain):String {
+        return switch (d) {
+            case AIR:         "Air";
+            case ANIMAL:      "Animal";
+            case ARTIFICE:    "Artifice";
+            case CHAOS:       "Chaos";
+            case CHARM:       "Charme";
+            case COMMUNITY:   "Communauté";
+            case DARKNESS:    "Ténèbres";
+            case DEATH:       "Mort";
+            case DESTRUCTION: "Destruction";
+            case EARTH:       "Terre";
+            case EVIL:        "Mal";
+            case FIRE:        "Feu";
+            case GLORY:       "Gloire";
+            case GOOD:        "Bien";
+            case HEALING:     "Guérison";
+            case KNOWLEDGE:   "Connaissance";
+            case LAW:         "Loi";
+            case LIBERATION:  "Libération";
+            case LUCK:        "Chance";
+            case MADNESS:     "Folie";
+            case MAGIC:       "Magie";
+            case NOBILITY:    "Noblesse";
+            case PLANT:       "Plantes";
+            case PROTECTION:  "Protection";
+            case REPOSE:      "Repos";
+            case RUNE:        "Rune";
+            case STRENGTH:    "Vigueur";
+            case SUN:         "Soleil";
+            case TRAVEL:      "Voyage";
+            case TRICKERY:    "Tromperie";
+            case VOID:        "Vide";
+            case WAR:         "Guerre";
+            case WATER:       "Eau";
+            case WEATHER:     "Météores";
+        }
+    }
+
     static public function spellSchoolToString(s:SpellSchool):String {
         return switch (s) {
             case ABJURATION: "Abjuration";

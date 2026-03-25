@@ -120,6 +120,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
                     'Nouveau jour';
                 case SET_FAVORITE_MAGIC_SCHOOL(school):
                     'École favorite définie : ${school.spellSchoolToString()}';
+                case SET_PRIEST_DOMAIN(domain1, domain2):
+                    'Domaines définis : ${domain1.priestDomainToString()}, ${domain2.priestDomainToString()}';
                 case ADD_EXCEPTIONAL_MODIFIER(mod):
                     'Ajout d\'un modificateur exceptionnel sur ${mod.mod.asMod()} (${mod.why.htmlEscape()})';
             }

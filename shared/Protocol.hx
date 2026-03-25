@@ -37,6 +37,7 @@ enum FicheEventType {
     SPELL_EVENT(event:SpellEventType);
     NEW_DAY;
     SET_FAVORITE_MAGIC_SCHOOL(school:SpellSchool);
+    SET_PRIEST_DOMAIN(domain1:PriestDomain, domain2:PriestDomain);
 }
 
 enum DamageType {
@@ -61,6 +62,43 @@ enum DamageType {
     LAWFUL;
     // Fallback
     UNTYPED;
+}
+
+enum PriestDomain {
+    AIR;
+    ANIMAL;
+    ARTIFICE;
+    CHAOS;
+    CHARM;
+    COMMUNITY;
+    DARKNESS;
+    DEATH;
+    DESTRUCTION;
+    EARTH;
+    EVIL;
+    FIRE;
+    GLORY;
+    GOOD;
+    HEALING;
+    KNOWLEDGE;
+    LAW;
+    LIBERATION;
+    LUCK;
+    MADNESS;
+    MAGIC;
+    NOBILITY;
+    PLANT;
+    PROTECTION;
+    REPOSE;
+    RUNE;
+    STRENGTH;
+    SUN;
+    TRAVEL;
+    TRICKERY;
+    VOID;
+    WAR;
+    WATER;
+    WEATHER;
 }
 
 enum SpellSchool {
