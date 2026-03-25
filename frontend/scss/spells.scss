@@ -371,6 +371,14 @@ section.spells-section {
                 border-color: #b8ae98;
             }
 
+            .spell-available {
+                .si-icon {
+                    font-size: 0.95em;
+                    color: #4a9e6a;
+                    margin-right: 2px;
+                }
+            }
+
             .spell-name-cell {
                 display: flex;
                 align-items: center;
@@ -803,7 +811,10 @@ section.spells-section {
 
     .actions {
         margin-top: 20px;
-        text-align: center;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
 
         a.cast-btn {
             display: inline-block;
@@ -825,6 +836,7 @@ section.spells-section {
                 font-size: 0.8em;
                 opacity: 0.7;
             }
+
 
             &.disabled {
                 background: #aaa;

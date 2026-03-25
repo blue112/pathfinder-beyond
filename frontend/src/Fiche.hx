@@ -124,8 +124,7 @@ class Fiche implements IJSAsync {
                     pushEvent(CHANGE_BANK_MONEY(value));
             });
         });
-        mainElem.querySelector(".spells-btn").addEventListener("click", (e:js.html.MouseEvent) -> {
-            if (!e.shiftKey) return;
+        mainElem.querySelector(".spells-btn").addEventListener("click", (_) -> {
             new elems.SpellListPopup(character, pushEvent, (p) -> { currentSpellPopup = p; }, fiche_id);
         });
     }

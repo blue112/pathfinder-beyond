@@ -299,4 +299,41 @@ class Rules {
     static public function dice(faces:Int) {
         return Std.random(faces) + 1;
     }
+
+    static var healSpells:Map<Int, {name:String, formula:String}> = [
+        1 => {name: "Soins légers",              formula: "1d8+NLS"},
+        2 => {name: "Soins modérés",             formula: "2d8+NLS"},
+        3 => {name: "Soins importants",          formula: "3d8+NLS"},
+        4 => {name: "Soins intensifs",           formula: "4d8+NLS"},
+        5 => {name: "Soins légers de groupe",    formula: "1d8+NLS"},
+        6 => {name: "Soins modérés de groupe",   formula: "2d8+NLS"},
+        7 => {name: "Soins importants de groupe",formula: "3d8+NLS"},
+        8 => {name: "Soins intensifs de groupe", formula: "4d8+NLS"},
+    ];
+
+    static public function getSpontaneousHealSpell(level:Int):Null<Spell> {
+        var entry = healSpells.get(level);
+        if (entry == null) return null;
+        return {
+            name: entry.name,
+            shortDescription: null,
+            school: CONJURATION,
+            level: level,
+            usesPerDay: null,
+            savingThrowType: null,
+            saveEffect: null,
+            spellResistance: false,
+            targets: "Créature touchée",
+            castingTime: STANDARD_ACTION,
+            duration: INSTANTANEOUS,
+            canEndVoluntarily: false,
+            components: [VERBAL, SOMATIC],
+            areaOfEffect: null,
+            range: TOUCH,
+            longDescription: "En posant les mains sur une créature vivante, le personnage lui transmet de l'énergie positive et lui rend 1d8 points de vie +1 par niveau de lanceur de sorts (jusqu'à un maximum de +5).
+
+Comme les morts-vivants sont animés d'énergie négative, ce sort leur inflige des dégâts au lieu de les soigner. Un jet de Volonté réussi leur permet toutefois de ne subir que la moitié des dégâts et ils peuvent appliquer leur résistance à la magie.",
+            dices: [{diceType: MANUAL(entry.formula), reason: "Soins"}],
+        };
+    }
 }

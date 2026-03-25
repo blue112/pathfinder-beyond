@@ -215,6 +215,25 @@ class SpellDetailPopup extends Popup {
                     });
                 });
             }
+
+            var healSpell = Rules.getSpontaneousHealSpell(spell.level);
+            if (character.basics.characterClass == PRETRE && spell.level > 0 && healSpell != null) {
+                var siBtn = Browser.document.createAnchorElement();
+                siBtn.className = "cast-btn si-btn";
+                siBtn.innerText = 'Invocation spontanée (${healSpell.name})';
+                if (preparedCount == 0) {
+                    siBtn.classList.add("disabled");
+                } else {
+                    siBtn.addEventListener("click", () -> {
+                        new YesNoAlert("Invocation spontanée", 'Remplacer "${spell.name}" par "${healSpell.name}" ? L\'emplacement de sort sera consommé.', () -> {
+                            pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+                            closeSilent();
+                            new elems.SpellCastPopup(healSpell, character, ficheId);
+                        });
+                    });
+                }
+                content.querySelector(".actions").appendChild(siBtn);
+            }
         }
     }
 

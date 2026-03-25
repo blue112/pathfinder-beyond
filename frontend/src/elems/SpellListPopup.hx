@@ -160,7 +160,14 @@ class SpellListPopup extends Popup {
                         availSpan.innerText = "∞";
                     } else {
                         availSpan.className = 'spell-available ${if (count > 0) "has-charges" else "empty"}';
-                        availSpan.innerText = '×$count';
+                        if (character.basics.characterClass == PRETRE && spell.level > 0 && Rules.getSpontaneousHealSpell(spell.level) != null) {
+                            var siIcon = Browser.document.createSpanElement();
+                            siIcon.className = "si-icon";
+                            siIcon.title = "Invocation spontanée disponible";
+                            siIcon.innerText = "✚";
+                            availSpan.appendChild(siIcon);
+                        }
+                        availSpan.appendChild(Browser.document.createTextNode('×$count'));
                     }
                 }
                 li.appendChild(availSpan);
