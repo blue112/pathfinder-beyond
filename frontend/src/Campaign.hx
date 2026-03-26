@@ -244,7 +244,7 @@ class Campaign implements IJSAsync {
             row.querySelector(".npc-rd").innerText = damageReductionStr;
             row.querySelector(".npc-notes").innerText = notes;
             nameCell.addEventListener("click", () -> {
-                new ContextMenu(cast nameCell, ["Ajouter une arme", "Définir la RD"], (choice) -> {
+                new ContextMenu(cast nameCell, ["Ajouter une arme", "Définir la RD", "Supprimer"], (choice) -> {
                     if (choice == 0) {
                         new elems.NPCWeaponDialog((weapon) -> {
                             pushEvent(ADD_NPC_WEAPON(npc.name, weapon));
@@ -252,6 +252,10 @@ class Campaign implements IJSAsync {
                     } else if (choice == 1) {
                         new elems.NPCDamageReductionDialog(npc.damageReduction, (damageReduction) -> {
                             pushEvent(SET_NPC_DAMAGE_REDUCTION(npc.name, damageReduction));
+                        });
+                    } else if (choice == 2) {
+                        new elems.YesNoAlert("Supprimer un PNJ", 'Supprimer "${npc.name}" de la base de données ?', () -> {
+                            pushEvent(REMOVE_NPC(npc.name));
                         });
                     }
                     return true;

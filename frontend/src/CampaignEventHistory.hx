@@ -23,6 +23,7 @@ class CampaignEventHistory extends Popup {
             var elem = Browser.document.createLIElement();
             var event = switch (i.type) {
                 case ADD_NPC(npc): 'Ajout d\'un PNJ: ${npc.name.htmlEscape()}';
+                case REMOVE_NPC(npcName): 'Suppression du PNJ: ${npcName.htmlEscape()}';
                 case ADD_NPC_WEAPON(npcName, weapon): 'Ajout d\'une arme à ${npcName.htmlEscape()}: ${weapon.name.htmlEscape()}';
                 case ADD_TO_ENCOUNTER(entity, initiative):
                     currentEncounter.push({entity: entity, initiative: initiative});

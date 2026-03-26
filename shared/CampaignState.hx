@@ -14,6 +14,8 @@ class CampaignState {
             case ADD_NPC(npc):
                 npc.weapons = [];
                 npcs.push(npc);
+            case REMOVE_NPC(npcName):
+                npcs = npcs.filter(n -> n.name != npcName);
             case ADD_NPC_WEAPON(npcName, weapon):
                 var npc = npcs.find(n -> n.name == npcName);
                 if (npc != null) npc.weapons.push(weapon);

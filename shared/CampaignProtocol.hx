@@ -51,6 +51,7 @@ typedef EncounterEntry = {
 
 enum CampaignEventType {
     ADD_NPC(npc:NPCInfo);
+    REMOVE_NPC(npcName:String);
     ADD_TO_ENCOUNTER(entity:EncounterEntityType, initiative:Int);
     REMOVE_FROM_ENCOUNTER(index:Int);
     CLEAR_ENCOUNTER;
