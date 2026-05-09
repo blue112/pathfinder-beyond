@@ -6,296 +6,306 @@ using ProtocolUtil;
 using Std;
 
 class FullCharacter {
-    public var basics:BasicFicheData;
+	public var basics:BasicFicheData;
 
-    public var characteristics:Characteristics;
-    public var characteristicsMod:Characteristics;
-    public var skillRanks:Array<SkillType>;
-    public var current_hp:Int;
-    public var max_hp_modifier:Int;
-    public var levelUpDices:Array<Int>;
-    public var level:Int;
-    public var additionalClassSkills:Array<SkillType>;
-    public var skillModifiers:Map<SkillType, Int>;
-    public var savingThrowModifiers:Map<SavingThrow, Int>;
-    public var exceptionalModifiers:Array<TemporaryModifier>;
-    public var protections:Array<Protection>;
-    public var weapons:Array<Weapon>;
-    public var tempMods:Array<TemporaryModifier>;
-    public var money_po:Float;
-    public var bank_po:Float;
-    public var inventory:Array<InventoryItem>;
-    public var damageResistances:Map<DamageType, Int>;
-    public var speed_mod:Int;
-    public var spells:Array<Spell>;
-    public var preparedSpells:Array<PreparedSpell>;
-    public var preparationLocked:Bool;
-    public var lockedPreparedIndices:Array<Int>;
-    public var usedPowers:Map<Int, Int>;
-    public var usedSlots:Map<Int, Int>;
-    public var firedWeapons:Map<Int, Bool>;
-    public var favoriteMagicSchool:Null<SpellSchool>;
-    public var priestDomains:Null<Array<PriestDomain>>;
-    public var isInAnimalForm:Bool;
-    var primalSizeCategory:Null<SizeCategory>;
+	public var characteristics:Characteristics;
+	public var characteristicsMod:Characteristics;
+	public var skillRanks:Array<SkillType>;
+	public var current_hp:Int;
+	public var max_hp_modifier:Int;
+	public var levelUpDices:Array<Int>;
+	public var level:Int;
+	public var additionalClassSkills:Array<SkillType>;
+	public var skillModifiers:Map<SkillType, Int>;
+	public var savingThrowModifiers:Map<SavingThrow, Int>;
+	public var exceptionalModifiers:Array<TemporaryModifier>;
+	public var protections:Array<Protection>;
+	public var weapons:Array<Weapon>;
+	public var tempMods:Array<TemporaryModifier>;
+	public var money_po:Float;
+	public var bank_po:Float;
+	public var inventory:Array<InventoryItem>;
+	public var damageResistances:Map<DamageType, Int>;
+	public var speed_mod:Int;
+	public var spells:Array<Spell>;
+	public var preparedSpells:Array<PreparedSpell>;
+	public var preparationLocked:Bool;
+	public var lockedPreparedIndices:Array<Int>;
+	public var usedPowers:Map<Int, Int>;
+	public var usedSlots:Map<Int, Int>;
+	public var firedWeapons:Map<Int, Bool>;
+	public var favoriteMagicSchool:Null<SpellSchool>;
+	public var priestDomains:Null<Array<PriestDomain>>;
+	public var isInAnimalForm:Bool;
 
-    public function new() {
-        this.skillRanks = [];
-        this.current_hp = 0;
-        this.levelUpDices = [];
-        this.level = 1;
-        this.max_hp_modifier = 0;
-        this.additionalClassSkills = [];
-        this.skillModifiers = new Map();
-        this.savingThrowModifiers = new Map();
-        this.exceptionalModifiers = [];
-        this.protections = [];
-        this.tempMods = [];
-        this.weapons = [];
-        this.inventory = [];
-        this.money_po = 0;
-        this.bank_po = 0;
-        this.damageResistances = new Map();
-        this.speed_mod = 0;
-        this.spells = [];
-        this.preparedSpells = [];
-        this.preparationLocked = false;
-        this.lockedPreparedIndices = [];
-        this.usedPowers = new Map();
-        this.usedSlots = new Map();
-        this.firedWeapons = new Map();
-        this.isInAnimalForm = false;
-    }
+	var primalSizeCategory:Null<SizeCategory>;
 
-    function updateHP() {
-        current_hp = getMaxHitPoints();
-    }
+	public function new() {
+		this.skillRanks = [];
+		this.current_hp = 0;
+		this.levelUpDices = [];
+		this.level = 1;
+		this.max_hp_modifier = 0;
+		this.additionalClassSkills = [];
+		this.skillModifiers = new Map();
+		this.savingThrowModifiers = new Map();
+		this.exceptionalModifiers = [];
+		this.protections = [];
+		this.tempMods = [];
+		this.weapons = [];
+		this.inventory = [];
+		this.money_po = 0;
+		this.bank_po = 0;
+		this.damageResistances = new Map();
+		this.speed_mod = 0;
+		this.spells = [];
+		this.preparedSpells = [];
+		this.preparationLocked = false;
+		this.lockedPreparedIndices = [];
+		this.usedPowers = new Map();
+		this.usedSlots = new Map();
+		this.firedWeapons = new Map();
+		this.isInAnimalForm = false;
+	}
 
-    public function processEvent(type:FicheEventType) {
-        switch (type) {
-            case CREATE(data):
-                this.basics = data;
-            case CHANGE_ALIGNEMENT(alignement):
-                this.basics.alignement = alignement;
-            case SET_CHARACTERISTICS(data):
-                this.characteristics = data;
-                updateCharacts();
-                updateHP();
-            case ADD_CLASS_SKILL(skill):
-                if (!Rules.isClassSkill(this, skill))
-                    this.additionalClassSkills.push(skill);
+	function updateHP() {
+		current_hp = getMaxHitPoints();
+	}
 
-            case CHANGE_CARAC(c, amount):
-                switch (c) {
-                    case STRENGTH: this.characteristics.str += amount;
-                    case DEXTERITY: this.characteristics.dex += amount;
-                    case CONSTITUTION:
-                        var oldMod = Math.floor(this.characteristics.con / 2);
-                        this.characteristics.con += amount;
-                        var newMod = Math.floor(this.characteristics.con / 2);
-                        // We need to update current HP depending on mod
-                        var diffHP = (newMod - oldMod) * level;
-                        if (diffHP > 0) current_hp = Math.min(current_hp + diffHP, getMaxHitPoints()).int();
-                    case INTELLIGENCE: this.characteristics.int += amount;
-                    case WISDOM: this.characteristics.wis += amount;
-                    case CHARISMA: this.characteristics.cha += amount;
-                }
-                updateCharacts();
-            case ADD_WEAPON(weapon):
-                if (weapon.shouldBeReloaded == null)
-                    weapon.shouldBeReloaded = weapon.name.indexOf("Arbalète") >= 0;
-                weapons.push(weapon);
-            case REMOVE_WEAPON(index):
-                weapons.splice(index, 1);
-                var shifted = new Map<Int, Bool>();
-                for (k in firedWeapons.keys()) {
-                    if (k < index) shifted.set(k, true);
-                    if (k > index) shifted.set(k - 1, true);
-                }
-                firedWeapons = shifted;
-            case FIRE_WEAPON(index):
-                firedWeapons.set(index, true);
-            case RELOAD_WEAPON(index):
-                firedWeapons.remove(index);
-            case LEVEL_UP(hp_dice):
-                level += 1;
-                hp_dice = Math.min(hp_dice, getHitDice()).int();
-                levelUpDices.push(hp_dice);
-            case TRAIN_SKILL(skill):
-                skillRanks.push(skill);
-            case DECREASE_SKILL(skill):
-                skillRanks.remove(skill);
-            case CHANGE_HP(amount):
-                current_hp = Math.min(current_hp + amount, getMaxHitPoints()).int();
-            case DAMAGE_HP(amount, damageType):
-                var resistance = damageResistances.exists(damageType) ? damageResistances.get(damageType) : 0;
-                current_hp -= Math.max(amount - resistance, 0).int();
-            case REMOVE_DAMAGE_RESISTANCE(damageType):
-                damageResistances.remove(damageType);
-            case ADD_DAMAGE_RESISTANCE(damageType, amount):
-                var current = damageResistances.exists(damageType) ? damageResistances.get(damageType) : 0;
-                var newAmount = current + amount;
-                if (newAmount <= 0)
-                    damageResistances.remove(damageType);
-                else
-                    damageResistances.set(damageType, newAmount);
-            case CHANGE_MAX_HP(amount):
-                max_hp_modifier += amount;
-            case SET_SKILL_MODIFIER(skill, mod):
-                skillModifiers.set(skill, mod);
-            case SET_SAVING_THROW_MODIFIER(st, mod):
-                savingThrowModifiers.set(st, mod);
-            case SET_SPEED_MODIFIER(mod):
-                speed_mod += mod;
-            case ADD_EXCEPTIONAL_MODIFIER(mod):
-                exceptionalModifiers.push(mod);
-            case ADD_PROTECTION(armor):
-                protections.push(armor);
-            case REMOVE_PROTECTION(index):
-                protections.splice(index, 1);
-            case ADD_TEMPORARY_MODIFIER(mod):
-                tempMods.push(mod);
-                updateCharacts();
-            case REMOVE_TEMPORARY_MODIFIER(index):
-                tempMods.splice(index, 1);
-                updateCharacts();
-            case CHANGE_MONEY(amount):
-                money_po += amount;
-            case CHANGE_BANK_MONEY(amount):
-                bank_po += amount;
-            case ADD_INVENTORY_ITEM(item):
-                inventory.push(Reflect.copy(item));
-            case CHANGE_ITEM_QUANTITY(item, new_quantity):
-                inventory[item].quantity = new_quantity;
-            case CHANGE_ITEM_NAME(item, new_name):
-                inventory[item].name = new_name;
-            case CHANGE_ITEM_PRIORITY(item, priority):
-                inventory[item].priority = priority;
-            case REMOVE_INVENTORY_ITEM(item):
-                inventory.splice(item, 1);
-            case SPELL_EVENT(ADD_SPELL(spell)):
-                spells.push(Reflect.copy(spell));
-            case SPELL_EVENT(REMOVE_SPELL(index)):
-                spells.splice(index, 1);
-            case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel)):
-                if (!preparationLocked) preparedSpells.push({spellIndex: spellIndex, slotLevel: slotLevel});
-            case SPELL_EVENT(UNPREPARE_SPELL(spellIndex)):
-                if (!preparationLocked) {
-                    var idx = -1;
-                    for (i in 0...preparedSpells.length) {
-                        if (preparedSpells[i].spellIndex == spellIndex) idx = i;
-                    }
-                    if (idx >= 0) preparedSpells.splice(idx, 1);
-                }
-            case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)):
-                if (spells[spellIndex].dices == null) spells[spellIndex].dices = [];
-                spells[spellIndex].dices.push(dice);
-            case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, diceIndex)):
-                spells[spellIndex].dices.splice(diceIndex, 1);
-            case SPELL_EVENT(CAST_SPELL(spellIndex)):
-                var spell = spells[spellIndex];
-                if (spell.usesPerDay != null) {
-                    usedPowers.set(spellIndex, (usedPowers.exists(spellIndex) ? usedPowers.get(spellIndex) : 0) + 1);
-                } else if (spell.level == 0) {
-                    // Cantrips are unlimited — no slot consumed
-                } else if (basics.characterClass.needsSpellPreparation()) {
-                    var idx = -1;
-                    for (i in 0...preparedSpells.length) {
-                        if (preparedSpells[i].spellIndex == spellIndex) idx = i;
-                    }
-                    if (idx >= 0) preparedSpells.splice(idx, 1);
-                } else {
-                    usedSlots.set(spell.level, (usedSlots.exists(spell.level) ? usedSlots.get(spell.level) : 0) + 1);
-                }
-            case SPELL_EVENT(EDIT_SPELL(index, spell)):
-                var edited = Reflect.copy(spell);
-                edited.dices = spells[index].dices;
-                spells[index] = edited;
-            case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority)):
-                spells[spellIndex].priority = priority;
-            case SPELL_EVENT(FINISH_SPELL_PREPARATION):
-                preparationLocked = true;
-                lockedPreparedIndices = preparedSpells.map(p -> p.spellIndex);
-            case NEW_DAY:
-                preparedSpells = [];
-                preparationLocked = false;
-                lockedPreparedIndices = [];
-                usedPowers = new Map();
-                usedSlots = new Map();
-                current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
-            case SET_FAVORITE_MAGIC_SCHOOL(school):
-                favoriteMagicSchool = school;
-            case SET_PRIEST_DOMAIN(domain1, domain2):
-                priestDomains = [domain1, domain2];
-            case ENTER_ANIMAL_FORM:
-                characteristics.str += 4;
-                primalSizeCategory = basics.sizeCategory;
-                basics.sizeCategory = SIZE_G;
-                speed_mod += 4;
-                isInAnimalForm = true;
-                updateCharacts();
-            case EXIT_ANIMAL_FORM:
-                characteristics.str -= 4;
-                basics.sizeCategory = primalSizeCategory;
-                speed_mod -= 4;
-                isInAnimalForm = false;
-                updateCharacts();
-        }
-    }
+	public function processEvent(type:FicheEventType) {
+		switch (type) {
+			case CREATE(data):
+				this.basics = data;
+			case CHANGE_ALIGNEMENT(alignement):
+				this.basics.alignement = alignement;
+			case SET_CHARACTERISTICS(data):
+				this.characteristics = data;
+				updateCharacts();
+				updateHP();
+			case ADD_CLASS_SKILL(skill):
+				if (!Rules.isClassSkill(this, skill))
+					this.additionalClassSkills.push(skill);
 
-    private function updateCharacts() {
-        characteristicsMod = cast {};
-        for (i in Reflect.fields(characteristics)) {
-            var value:Int = Reflect.getProperty(characteristics, i);
-            var totalTempMod = getTempMods([CHARACTERISTIC(i.parseCarac())]).sum();
-            var mod:Int = Std.int((value + totalTempMod) / 2) - 5;
-            Reflect.setProperty(characteristicsMod, i, mod);
-        }
-    }
+			case CHANGE_CARAC(c, amount):
+				switch (c) {
+					case STRENGTH: this.characteristics.str += amount;
+					case DEXTERITY: this.characteristics.dex += amount;
+					case CONSTITUTION:
+						var oldMod = Math.floor(this.characteristics.con / 2);
+						this.characteristics.con += amount;
+						var newMod = Math.floor(this.characteristics.con / 2);
+						// We need to update current HP depending on mod
+						var diffHP = (newMod - oldMod) * level;
+						if (diffHP > 0) current_hp = Math.min(current_hp + diffHP, getMaxHitPoints()).int();
+					case INTELLIGENCE: this.characteristics.int += amount;
+					case WISDOM: this.characteristics.wis += amount;
+					case CHARISMA: this.characteristics.cha += amount;
+				}
+				updateCharacts();
+			case ADD_WEAPON(weapon):
+				if (weapon.shouldBeReloaded == null)
+					weapon.shouldBeReloaded = weapon.name.indexOf("Arbalète") >= 0;
+				weapons.push(weapon);
+			case REMOVE_WEAPON(index):
+				weapons.splice(index, 1);
+				var shifted = new Map<Int, Bool>();
+				for (k in firedWeapons.keys()) {
+					if (k < index)
+						shifted.set(k, true);
+					if (k > index)
+						shifted.set(k - 1, true);
+				}
+				firedWeapons = shifted;
+			case FIRE_WEAPON(index):
+				firedWeapons.set(index, true);
+			case RELOAD_WEAPON(index):
+				firedWeapons.remove(index);
+			case LEVEL_UP(hp_dice):
+				level += 1;
+				hp_dice = Math.min(hp_dice, getHitDice()).int();
+				levelUpDices.push(hp_dice);
+			case TRAIN_SKILL(skill):
+				skillRanks.push(skill);
+			case DECREASE_SKILL(skill):
+				skillRanks.remove(skill);
+			case CHANGE_HP(amount):
+				current_hp = Math.min(current_hp + amount, getMaxHitPoints()).int();
+			case DAMAGE_HP(amount, damageType):
+				var resistance = damageResistances.exists(damageType) ? damageResistances.get(damageType) : 0;
+				current_hp -= Math.max(amount - resistance, 0).int();
+			case REMOVE_DAMAGE_RESISTANCE(damageType):
+				damageResistances.remove(damageType);
+			case ADD_DAMAGE_RESISTANCE(damageType, amount):
+				var current = damageResistances.exists(damageType) ? damageResistances.get(damageType) : 0;
+				var newAmount = current + amount;
+				if (newAmount <= 0)
+					damageResistances.remove(damageType);
+				else
+					damageResistances.set(damageType, newAmount);
+			case CHANGE_MAX_HP(amount):
+				max_hp_modifier += amount;
+			case SET_SKILL_MODIFIER(skill, mod):
+				skillModifiers.set(skill, mod);
+			case SET_SAVING_THROW_MODIFIER(st, mod):
+				savingThrowModifiers.set(st, mod);
+			case SET_SPEED_MODIFIER(mod):
+				speed_mod += mod;
+			case ADD_EXCEPTIONAL_MODIFIER(mod):
+				exceptionalModifiers.push(mod);
+			case ADD_PROTECTION(armor):
+				protections.push(armor);
+			case REMOVE_PROTECTION(index):
+				protections.splice(index, 1);
+			case ADD_TEMPORARY_MODIFIER(mod):
+				tempMods.push(mod);
+				updateCharacts();
+			case REMOVE_TEMPORARY_MODIFIER(index):
+				tempMods.splice(index, 1);
+				updateCharacts();
+			case CHANGE_MONEY(amount):
+				money_po += amount;
+			case CHANGE_BANK_MONEY(amount):
+				bank_po += amount;
+			case ADD_INVENTORY_ITEM(item):
+				inventory.push(Reflect.copy(item));
+			case CHANGE_ITEM_QUANTITY(item, new_quantity):
+				trace('Change item quantity: $item');
+				inventory[item].quantity = new_quantity;
+			case CHANGE_ITEM_NAME(item, new_name):
+				inventory[item].name = new_name;
+			case CHANGE_ITEM_PRIORITY(item, priority):
+				inventory[item].priority = priority;
+			case REMOVE_INVENTORY_ITEM(item):
+				inventory.splice(item, 1);
+			case SPELL_EVENT(ADD_SPELL(spell)):
+				spells.push(Reflect.copy(spell));
+			case SPELL_EVENT(REMOVE_SPELL(index)):
+				spells.splice(index, 1);
+			case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel)):
+				if (!preparationLocked)
+					preparedSpells.push({spellIndex: spellIndex, slotLevel: slotLevel});
+			case SPELL_EVENT(UNPREPARE_SPELL(spellIndex)):
+				if (!preparationLocked) {
+					var idx = -1;
+					for (i in 0...preparedSpells.length) {
+						if (preparedSpells[i].spellIndex == spellIndex)
+							idx = i;
+					}
+					if (idx >= 0)
+						preparedSpells.splice(idx, 1);
+				}
+			case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)):
+				if (spells[spellIndex].dices == null)
+					spells[spellIndex].dices = [];
+				spells[spellIndex].dices.push(dice);
+			case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, diceIndex)):
+				spells[spellIndex].dices.splice(diceIndex, 1);
+			case SPELL_EVENT(CAST_SPELL(spellIndex)):
+				var spell = spells[spellIndex];
+				if (spell.usesPerDay != null) {
+					usedPowers.set(spellIndex, (usedPowers.exists(spellIndex) ? usedPowers.get(spellIndex) : 0) + 1);
+				} else if (spell.level == 0) {
+					// Cantrips are unlimited — no slot consumed
+				} else if (basics.characterClass.needsSpellPreparation()) {
+					var idx = -1;
+					for (i in 0...preparedSpells.length) {
+						if (preparedSpells[i].spellIndex == spellIndex)
+							idx = i;
+					}
+					if (idx >= 0)
+						preparedSpells.splice(idx, 1);
+				} else {
+					usedSlots.set(spell.level, (usedSlots.exists(spell.level) ? usedSlots.get(spell.level) : 0) + 1);
+				}
+			case SPELL_EVENT(EDIT_SPELL(index, spell)):
+				var edited = Reflect.copy(spell);
+				edited.dices = spells[index].dices;
+				spells[index] = edited;
+			case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority)):
+				spells[spellIndex].priority = priority;
+			case SPELL_EVENT(FINISH_SPELL_PREPARATION):
+				preparationLocked = true;
+				lockedPreparedIndices = preparedSpells.map(p -> p.spellIndex);
+			case NEW_DAY:
+				preparedSpells = [];
+				preparationLocked = false;
+				lockedPreparedIndices = [];
+				usedPowers = new Map();
+				usedSlots = new Map();
+				current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
+			case SET_FAVORITE_MAGIC_SCHOOL(school):
+				favoriteMagicSchool = school;
+			case SET_PRIEST_DOMAIN(domain1, domain2):
+				priestDomains = [domain1, domain2];
+			case ENTER_ANIMAL_FORM:
+				characteristics.str += 4;
+				primalSizeCategory = basics.sizeCategory;
+				basics.sizeCategory = SIZE_G;
+				speed_mod += 4;
+				isInAnimalForm = true;
+				updateCharacts();
+			case EXIT_ANIMAL_FORM:
+				characteristics.str -= 4;
+				basics.sizeCategory = primalSizeCategory;
+				speed_mod -= 4;
+				isInAnimalForm = false;
+				updateCharacts();
+		}
+	}
 
-    public function getTempMods(matching:Array<Field>) {
-        return tempMods.filter(t -> {
-            for (i in matching)
-                if (Type.enumEq(t.on, i))
-                    return true;
-            return false;
-        });
-    }
+	private function updateCharacts() {
+		characteristicsMod = cast {};
+		for (i in Reflect.fields(characteristics)) {
+			var value:Int = Reflect.getProperty(characteristics, i);
+			var totalTempMod = getTempMods([CHARACTERISTIC(i.parseCarac())]).sum();
+			var mod:Int = Std.int((value + totalTempMod) / 2) - 5;
+			Reflect.setProperty(characteristicsMod, i, mod);
+		}
+	}
 
-    public function getNumberHitDice() {
-        if (basics.characterClass.match(CONJURATEUR_EIDOLON_BIPED)) {
-            return [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15, 15][level];
-        }
+	public function getTempMods(matching:Array<Field>) {
+		return tempMods.filter(t -> {
+			for (i in matching)
+				if (Type.enumEq(t.on, i))
+					return true;
+			return false;
+		});
+	}
 
-        return level;
-    }
+	public function getNumberHitDice() {
+		if (basics.characterClass.match(CONJURATEUR_EIDOLON_BIPED)) {
+			return [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15, 15][level];
+		}
 
-    public function getHitDice() {
-        return switch (basics.characterClass) {
-            case MAGICIEN:
-                6;
-            case CONJURATEUR, ROUBLARD, PRETRE:
-                8;
-            case CONJURATEUR_EIDOLON_BIPED, METAMORPHE:
-                10;
-        }
-    }
+		return level;
+	}
 
-    public function getMaxHitPoints() {
-        var predilectionClassBonus = if (basics.usePredilectionHP) 1 else 0;
-        var hd = getHitDice();
-        var total = hd + predilectionClassBonus + characteristicsMod.con;
+	public function getHitDice() {
+		return switch (basics.characterClass) {
+			case MAGICIEN:
+				6;
+			case CONJURATEUR, ROUBLARD, PRETRE:
+				8;
+			case CONJURATEUR_EIDOLON_BIPED, METAMORPHE:
+				10;
+		}
+	}
 
-        // Add predilection bonus and cons
-        for (i in 1...getNumberHitDice()) {
-            total += predilectionClassBonus + characteristicsMod.con;
-        }
-        for (dice in levelUpDices) {
-            total += dice;
-        }
+	public function getMaxHitPoints() {
+		var predilectionClassBonus = if (basics.usePredilectionHP) 1 else 0;
+		var hd = getHitDice();
+		var total = hd + predilectionClassBonus + characteristicsMod.con;
 
-        total += max_hp_modifier;
+		// Add predilection bonus and cons
+		for (i in 1...getNumberHitDice()) {
+			total += predilectionClassBonus + characteristicsMod.con;
+		}
+		for (dice in levelUpDices) {
+			total += dice;
+		}
 
-        return total;
-    }
+		total += max_hp_modifier;
+
+		return total;
+	}
 }
