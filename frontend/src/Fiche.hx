@@ -344,7 +344,16 @@ class Fiche implements IJSAsync {
                     dataParent = dataParent.parentElement;
                 var apiResult = Api.rollDice(fiche_id, diceType, mod, dataParent.dataset.id, numDice).jsawait();
                 Dice.roll([mod], apiResult.result, diceType);
-                return apiResult.result + mod;
+                var total = apiResult.result + mod;
+                if (character.basics.characterClass == ROUBLARD && dataParent.dataset.id == "damage") {
+                    var sneakDice = Std.int((character.level + 1) / 2);
+                    new elems.YesNoAlert("Attaque sournoise ?", 'Ajouter ${sneakDice}d6 de dégâts d\'attaque sournoise ?', () -> {
+                        var sneakRolls = [for (_ in 0...sneakDice) Std.int(Math.random() * 6) + 1];
+                        var sneakTotal = sneakRolls.fold((v, acc) -> acc + v, 0);
+                        new elems.Alert("Attaque sournoise", 'Dégâts supplémentaires : [${sneakRolls.join(", ")}] = $sneakTotal (total : ${total + sneakTotal})');
+                    });
+                }
+                return total;
             }
             modInt = Std.parseInt(mod);
         }
