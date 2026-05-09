@@ -245,7 +245,17 @@ class ProtocolUtil {
         return switch (d) {
             case INSTANTANEOUS: "Instantanée";
             case N_ROUNDS(n): '${r(n)} round(s)${formulaSuffix(n, r(n))}';
-            case N_MINUTES(n): '${r(n)} minute(s)${formulaSuffix(n, r(n))}';
+            case N_MINUTES(n):
+                var resolved = r(n);
+                var mins = Std.parseInt(resolved);
+                var display = if (mins != null && mins >= 120) {
+                    var hours = mins / 60;
+                    var hoursStr = hours == Std.int(hours) ? Std.string(Std.int(hours)) : Std.string(hours);
+                    '$hoursStr heure${if (hours > 1) "s" else ""}';
+                } else {
+                    '$resolved minute(s)';
+                };
+                '$display${formulaSuffix(n, resolved)}';
             case CONCENTRATION: "Concentration";
         }
     }
