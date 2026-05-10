@@ -1,0 +1,22 @@
+$containerWidth: 200px;
+$containerHeight: $containerWidth;
+
+$faceWidth: $containerWidth * 0.5;
+$faceHeight: $faceWidth * 0.86;
+
+$transitionDuration: 0.5s;
+$animationDuration: 1s;
+
+$angle: 53deg;
+$ringAngle: -11deg;
+$sideAngle: calc(360deg / 5);
+$opacity: 0.75;
+$color: rgba(216, 112, 15, $opacity);
+
+$rotateX: -$angle;
+$translateZ: $faceWidth * 0.335;
+$translateY: -$faceHeight * 0.15;
+$translateRingZ: $faceWidth * 0.75;
+$translateRingY: $faceHeight * 0.78 + $translateY;
+$translateLowerZ: $translateZ;
+$translateLowerY: $faceHeight * 0.78 + $translateRingY;

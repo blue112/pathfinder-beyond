@@ -1,0 +1,72 @@
+@use 'variables' as *;
+
+.dice-container > .die-d20 {
+    @for $i from 1 through 5 {
+        &[data-face="#{$i}"] {
+            $angleMultiplier: $i - 1;
+            transform: rotateX(-$angle) rotateY($sideAngle * $angleMultiplier);
+        }
+    }
+
+    @for $i from 16 through 20 {
+        &[data-face="#{$i}"] {
+            $angleMultiplier: $i - 15;
+            transform: rotateX(-$angle + 180deg) rotateY(-$sideAngle * $angleMultiplier);
+        }
+    }
+
+    @for $i from 6 through 10 {
+        &[data-face="#{$i}"] {
+            $angleMultiplier: $i - 6;
+            transform: rotateX(-$ringAngle) rotateZ(180deg) rotateY($sideAngle * $angleMultiplier);
+        }
+    }
+
+    @for $i from 11 through 15 {
+        &[data-face="#{$i}"] {
+            $angleMultiplier: $i - 8;
+            transform: rotateX(-$ringAngle) rotateY(-$sideAngle * $angleMultiplier - calc($sideAngle/2));
+        }
+    }
+
+    .face {
+        @for $i from 1 through 5 {
+            &:nth-child(#{$i}) {
+                $angleMultiplier: $i - 1;
+                transform: rotateY(-$sideAngle * $angleMultiplier) translateZ($translateZ) translateY($translateY) rotateX($angle);
+            }
+        }
+
+        @for $i from 16 through 20 {
+            &:nth-child(#{$i}) {
+                $angleMultiplier: $i - 18;
+                transform: rotateY($sideAngle * $angleMultiplier + calc($sideAngle/2))
+                    translateZ($translateLowerZ)
+                    translateY($translateLowerY)
+                    rotateZ(180deg)
+                    rotateX($angle);
+            }
+        }
+
+        @for $i from 6 through 10 {
+            &:nth-child(#{$i}) {
+                $angleMultiplier: $i - 11;
+                transform: rotateY(-$sideAngle * $angleMultiplier)
+                    translateZ($translateRingZ)
+                    translateY($translateRingY)
+                    rotateZ(180deg)
+                    rotateX($ringAngle);
+            }
+        }
+
+        @for $i from 11 through 15 {
+            &:nth-child(#{$i}) {
+                $angleMultiplier: $i - 8;
+                transform: rotateY($sideAngle * $angleMultiplier + calc($sideAngle/2))
+                    translateZ($translateRingZ)
+                    translateY($translateRingY)
+                    rotateX($ringAngle);
+            }
+        }
+    }
+}
