@@ -262,6 +262,104 @@ body.rolling {
     }
 }
 
+@keyframes roll-d8 {
+    0%   { transform: rotateX(0deg)    rotateY(0deg)    rotateZ(0deg); }
+    30%  { transform: rotateX(240deg)  rotateY(120deg)  rotateZ(60deg); }
+    60%  { transform: rotateX(-120deg) rotateY(300deg)  rotateZ(180deg); }
+    100% { transform: rotateX(360deg)  rotateY(480deg)  rotateZ(270deg); }
+}
+
+.dice-container > .die-d8 {
+    // d8 octahedron geometry:
+    // circumradius R = 80px, inradius r = R/√3 ≈ 46px
+    // edge = R√2 ≈ 113px → half-base 57px, triangle height 98px
+    // face elevation from equatorial plane: arctan(√2) ≈ 35.26deg
+    $r: 46px;
+    $halfBase: 57px;
+    $h: 98px;
+    $elev: 35.2644deg; // exact: arctan(√2)
+    $d8Color: $color;                              // face fill (same as D20)
+    $d8BorderColor: rgba(255, 180, 80, 0.6);       // border (lighter outer triangle)
+
+    counter-reset: steps 0;
+
+    // To show face N: rotateX(E) rotateY(-A), where E = elevation of face normal, A = azimuth
+    // Upper faces (E=+elev): azimuths 45°,135°,225°,315° → rotateX(+elev)
+    // Lower faces (E=-elev): opposite azimuths, opp. faces sum to 9 → rotateX(-elev)
+    &[data-face="1"] { transform: rotateX(-$elev) rotateY(-45deg); }
+    &[data-face="2"] { transform: rotateX(-$elev) rotateY(-135deg); }
+    &[data-face="3"] { transform: rotateX(-$elev) rotateY(135deg); }
+    &[data-face="4"] { transform: rotateX(-$elev) rotateY(45deg); }
+    &[data-face="5"] { transform: rotateX($elev)  rotateY(-135deg); }
+    &[data-face="6"] { transform: rotateX($elev)  rotateY(-45deg); }
+    &[data-face="7"] { transform: rotateX($elev)  rotateY(45deg); }
+    &[data-face="8"] { transform: rotateX($elev)  rotateY(135deg); }
+
+    &.rolling {
+        animation: roll-d8 $animationDuration linear;
+    }
+
+    .face {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -$halfBase;
+        margin-top: calc(-#{$h} * 2 / 3);
+        width: 0;
+        height: 0;
+        border-left: $halfBase solid transparent;
+        border-right: $halfBase solid transparent;
+        border-bottom: $h solid $d8BorderColor;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        counter-increment: steps;
+        // Pivot at triangle centroid (2/3 of height from apex, which is at element top)
+        transform-origin: 50% 66.67%;
+
+        // Inner fill triangle — inset by ~3px from each edge
+        // Uniform inset: scale ≈ 0.908, apex offset ≈ 6px down
+        &:after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: -52px;
+            width: 0;
+            height: 0;
+            border-left: 52px solid transparent;
+            border-right: 52px solid transparent;
+            border-bottom: 89px solid $d8Color;
+        }
+
+        &:before {
+            content: counter(steps);
+            position: absolute;
+            top: $h * 0.3;
+            left: -$halfBase;
+            color: #fff;
+            text-shadow: 1px 1px 3px #000;
+            font-size: $h * 0.35;
+            text-align: center;
+            width: $halfBase * 2;
+            height: $h;
+            z-index: 1;
+        }
+
+        // Upper faces 1–4: rotateY(A) rotateX(+elev) translateZ(r)
+        &:nth-child(1) { transform: rotateY(45deg)  rotateX($elev) translateZ($r); }
+        &:nth-child(2) { transform: rotateY(135deg) rotateX($elev) translateZ($r); }
+        &:nth-child(3) { transform: rotateY(225deg) rotateX($elev) translateZ($r); }
+        &:nth-child(4) { transform: rotateY(315deg) rotateX($elev) translateZ($r); }
+
+        // Lower faces 5–8: apex flipped (rotateZ 180°), rotateX negated
+        // Face 5 opposes face 4 (4+5=9), face 6 opposes 3, 7 opposes 2, 8 opposes 1
+        &:nth-child(5) { transform: rotateY(135deg) rotateX(-$elev) translateZ($r) rotateZ(180deg); }
+        &:nth-child(6) { transform: rotateY(45deg)  rotateX(-$elev) translateZ($r) rotateZ(180deg); }
+        &:nth-child(7) { transform: rotateY(315deg) rotateX(-$elev) translateZ($r) rotateZ(180deg); }
+        &:nth-child(8) { transform: rotateY(225deg) rotateX(-$elev) translateZ($r) rotateZ(180deg); }
+
+    }
+}
+
 .dice-container > .die-d6 {
     $faceHeight: 120px;
     $translate: calc($faceHeight / 2);
