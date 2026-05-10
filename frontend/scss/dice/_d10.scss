@@ -1,0 +1,106 @@
+@use 'variables' as *;
+@use 'sass:math';
+
+// D10 (pentagonal trapezohedron): 10 kite-shaped faces
+// Each face = tall upper triangle + small lower tab (::after)
+// Faces 1,3,5,7,9 (odd)  → upper pyramid
+// Faces 2,4,6,8,10 (even) → lower pyramid, offset by $upperHeight
+
+$d10UpperHeight: $containerWidth * 0.5;   // 100px — main triangle height
+$d10LowerHeight: $containerWidth * 0.12;  // 24px  — bottom tab height
+$d10HalfBase:    $d10UpperHeight * 0.52;  // 52px  — half base width
+$d10SideAngle:   72deg;                   // 360deg / 5 faces per pyramid
+$d10Angle:       45deg;
+$d10TranslateZ:  $d10UpperHeight * 0.34;
+$d10TranslateY:  $d10LowerHeight * 0.29;
+
+@keyframes roll-d10 {
+    10%  { transform: rotateX(0deg)    rotateY(0deg)   rotateZ(0deg); }
+    30%  { transform: rotateX(120deg)  rotateY(240deg) rotateZ(0deg); }
+    50%  { transform: rotateX(240deg)  rotateY(480deg) rotateZ(0deg); }
+    70%  { transform: rotateX(360deg)  rotateY(720deg) rotateZ(0deg); }
+    90%  { transform: rotateX(480deg)  rotateY(960deg) rotateZ(0deg); }
+}
+
+.dice-container > .die-d10 {
+    counter-reset: steps 0;
+
+    &.rolling {
+        animation: roll-d10 $animationDuration linear;
+    }
+
+    // data-face rotations — odd faces (1,3,5,7,9) are upper, even are lower
+    @for $i from 1 through 10 {
+        @if $i % 2 == 1 {
+            // upper face — angleMultiplier = 0,1,2,3,4
+            $m: math.div($i - 1, 2);
+            &[data-face="#{$i}"] {
+                transform: rotateX(-$d10Angle) rotateY($d10SideAngle * $m);
+            }
+        } @else {
+            // lower face — angleMultiplier = 1,2,3,4,5
+            $m: math.div($i, 2);
+            &[data-face="#{$i}"] {
+                transform: rotateX(-180deg - $d10Angle) rotateY(-$d10SideAngle * $m);
+            }
+        }
+    }
+
+    // Face positioning — uses .face-N class added by Dice.hx
+    @for $i from 1 through 10 {
+        @if $i % 2 == 1 {
+            $m: math.div($i - 1, 2);
+            .face.face-#{$i} {
+                transform: rotateY(-$d10SideAngle * $m) translateZ($d10TranslateZ) translateY($d10TranslateY) rotateX($d10Angle);
+            }
+        } @else {
+            $m: math.div($i, 2);
+            .face.face-#{$i} {
+                top: $d10UpperHeight;
+                transform: rotateY($d10SideAngle * $m) translateZ(-$d10TranslateZ) translateY(-$d10TranslateY) rotateZ(180deg) rotateY(180deg) rotateX($d10Angle);
+            }
+        }
+    }
+
+    .face {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        margin: 0 (-$d10HalfBase);
+        border-left: $d10HalfBase solid transparent;
+        border-right: $d10HalfBase solid transparent;
+        border-bottom: $d10UpperHeight solid $color;
+        width: 0;
+        height: 0;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        counter-increment: steps;
+
+        // Bottom tab — gives each face its kite/D10 shape
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: -($d10UpperHeight + $d10LowerHeight);
+            left: -$d10HalfBase;
+            border-left: $d10HalfBase solid transparent;
+            border-right: $d10HalfBase solid transparent;
+            border-top: $d10LowerHeight solid $color;
+            width: 0;
+            height: 0;
+        }
+
+        &:before {
+            content: counter(steps);
+            position: absolute;
+            top: $d10UpperHeight * 0.25;
+            left: -$d10HalfBase;
+            color: #fff;
+            text-shadow: 1px 1px 3px #000;
+            font-size: $d10UpperHeight * 0.5;
+            text-align: center;
+            line-height: $d10UpperHeight;
+            width: $d10HalfBase * 2;
+            height: $d10UpperHeight;
+        }
+    }
+}
