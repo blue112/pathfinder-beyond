@@ -1,0 +1,121 @@
+@use 'variables' as *;
+@use 'sass:math';
+
+// D12 (regular dodecahedron): 12 pentagonal faces
+// Pentagon clipped from an $s × $s square using clip-path.
+// IMPORTANT: clip-path is incompatible with transform-style: preserve-3d on the same element.
+//   → face elements use transform-style: flat; the die container provides the 3D context.
+//
+// Geometry:
+//   Pentagon edge a ≈ 0.618 × $s, inradius r = 1.1135 × a
+//   Dihedral angle: 116.565°, complement (face elevation): 63.435°
+//   Face groups: 1 top | 5 upper ring (72° apart) | 5 lower ring (36° offset) | 1 bottom
+
+$d12S:         80px;      // pentagon bounding square side
+$d12A:         $d12S * 0.618;  // pentagon edge ≈ 49.4px
+$d12R:         $d12A * 1.1135; // dodecahedron inradius ≈ 55px
+$d12Elevation: 63.435deg; // arctan(2), complement of dihedral angle
+$d12SideAngle: 72deg;     // 360° / 5
+
+@keyframes roll-d12 {
+    10%  { transform: rotateX(0deg)   rotateY(0deg)   rotateZ(0deg); }
+    40%  { transform: rotateX(180deg) rotateY(240deg) rotateZ(120deg); }
+    70%  { transform: rotateX(360deg) rotateY(480deg) rotateZ(240deg); }
+    90%  { transform: rotateX(540deg) rotateY(600deg) rotateZ(300deg); }
+}
+
+.dice-container > .die-d12 {
+    counter-reset: steps 0;
+
+    &.rolling {
+        animation: roll-d12 $animationDuration linear;
+    }
+
+    // data-face rotations = inverse of face positioning rotations
+    // Top: positioning is rotateX(-90°) → data-face is rotateX(+90°)
+    &[data-face="1"] { transform: rotateX(90deg); }
+
+    // Upper ring: rotateZ(180°) first in CSS = applied last (after face faces viewer)
+    &[data-face="2"] { transform: rotateZ(180deg) rotateX(153.435deg); }
+    &[data-face="3"] { transform: rotateZ(180deg) rotateX(153.435deg) rotateY(72deg); }
+    &[data-face="4"] { transform: rotateZ(180deg) rotateX(153.435deg) rotateY(-72deg); }
+    &[data-face="5"] { transform: rotateZ(180deg) rotateX(153.435deg) rotateY(144deg); }
+    &[data-face="6"] { transform: rotateZ(180deg) rotateX(153.435deg) rotateY(-144deg); }
+
+    // Lower ring: positioning is rotateX(+153.435°) → data-face is rotateX(-153.435°)
+    @for $i from 0 through 4 {
+        $face: $i + 7;
+        $a: 36deg + $i * $d12SideAngle;
+        &[data-face="#{$face}"] { transform: rotateX(-153.435deg) rotateY(-$a); }
+    }
+
+    // Bottom: positioning is rotateX(+90°) → data-face is rotateX(-90°)
+    &[data-face="12"] { transform: rotateX(-90deg); }
+
+    .face {
+        // Override generic triangle-face styles
+        width: $d12S;
+        height: $d12S;
+        border: none;
+        top: 50%;
+        left: 50%;
+        margin-left: math.div(-$d12S, 2);
+        margin-top: math.div(-$d12S, 2);
+
+        background: #d68840; // edge/border color
+        clip-path: polygon(50% 4.89%, 100% 41.22%, 80.90% 100%, 19.10% 100%, 0% 41.22%);
+        backface-visibility: hidden;
+        transform-style: flat; // clip-path is incompatible with preserve-3d
+        transform-origin: 50% 57.5%; // rotate around pentagon centroid, not square center
+        counter-increment: steps;
+
+        // Inner fill pentagon — inset ~10% from each edge
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: $color;
+            clip-path: polygon(50% 10.15%, 95% 42.85%, 77.81% 95.75%, 22.19% 95.75%, 5% 42.85%);
+            z-index: 0;
+        }
+
+        &:before {
+            content: counter(steps);
+            position: absolute;
+            top: 10%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            text-shadow: 1px 1px 3px #000;
+            font-size: $d12S * 0.35;
+            z-index: 1;
+        }
+
+        // Face elevation = arctan(1/2) = 26.565°, rotateX = -(180° - 26.565°) = -153.435°
+        $d12UpperRing: rotateX(-153.435deg) rotateZ(-180deg) translateZ(55px);
+
+        &.face-1 { transform: rotateX(-90deg) translateZ(55px); }
+
+        // Upper ring: all 5 faces are the same base, rotated 72° apart around Y
+        &.face-2 { transform: #{$d12UpperRing}; }
+        &.face-3 { transform: rotateY(-72deg)  #{$d12UpperRing}; }
+        &.face-4 { transform: rotateY(72deg)   #{$d12UpperRing}; }
+        &.face-5 { transform: rotateY(-144deg) #{$d12UpperRing}; }
+        &.face-6 { transform: rotateY(144deg)  #{$d12UpperRing}; }
+
+        // Lower ring: mirror of upper ring — rotateX sign flipped, 36° azimuth offset
+        $d12LowerRing: rotateX(153.435deg) translateZ(55px);
+        &.face-7  { transform: rotateY(36deg)  #{$d12LowerRing}; }
+        &.face-8  { transform: rotateY(108deg) #{$d12LowerRing}; }
+        &.face-9  { transform: rotateY(180deg) #{$d12LowerRing}; }
+        &.face-10 { transform: rotateY(252deg) #{$d12LowerRing}; }
+        &.face-11 { transform: rotateY(324deg) #{$d12LowerRing}; }
+
+        // Face 12: bottom — mirror of top
+        &.face-12 { transform: rotateX(90deg) translateZ(55px); }
+    }
+}
