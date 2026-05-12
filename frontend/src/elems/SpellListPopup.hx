@@ -207,6 +207,11 @@ class SpellListPopup extends Popup {
             levelSpan.innerText = if (isPower) "Pouvoir" else 'Niv.${spell.level}';
             li.appendChild(levelSpan);
 
+            var schoolSpan = Browser.document.createSpanElement();
+            schoolSpan.className = "spell-school";
+            schoolSpan.innerText = if (spell.school != null) spell.school.spellSchoolToString() else "";
+            li.appendChild(schoolSpan);
+
             var nameCell = Browser.document.createSpanElement();
             nameCell.className = "spell-name-cell";
             var nameA = Browser.document.createAnchorElement();
