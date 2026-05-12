@@ -1,0 +1,48 @@
+@use 'variables' as *;
+
+// D2 (coin): full D6 cube geometry, odd faces labelled "1", even faces "2".
+// Dice.hx creates 6 faces for a D2. data-face is 1 or 2:
+//   1 → show D6 face 1 (odd, labelled "1")
+//   2 → show D6 face 6 (opposite face, labelled "2")
+
+$d2FaceHeight: 120px;
+$d2Translate:  calc($d2FaceHeight / 2);
+
+.dice-container > .die-d2 {
+    &.rolling {
+        animation: roll-d6 1s linear;
+        transform-origin: $d2FaceHeight $d2FaceHeight * 0.5 $d2FaceHeight * 0.5;
+    }
+
+    &[data-face="1"] { transform: rotateY(-185deg) rotateX(8deg); }
+    &[data-face="2"] { transform: rotateY(-12deg)  rotateX(-10deg); }
+
+    .face {
+        width: $d2FaceHeight;
+        height: $d2FaceHeight;
+        background: $color;
+        border: 6px solid $color;
+
+        &:before {
+            color: #fff;
+            text-shadow: 2px 2px 6px #000;
+            font-size: $d2FaceHeight * 0.7;
+            text-align: center;
+            line-height: $d2FaceHeight * 0.5;
+            width: $d2FaceHeight;
+            height: $d2FaceHeight;
+            left: -10px;
+        }
+
+        // Odd faces → "1", even faces → "2"
+        &:nth-child(odd):before  { content: "1"; }
+        &:nth-child(even):before { content: "2"; }
+
+        &:nth-child(1) { transform: rotateY(180deg); }
+        &:nth-child(2) { transform: rotateX(180deg) rotateY(90deg) rotateX(180deg) translateZ($d2Translate) translateX($d2Translate); }
+        &:nth-child(3) { transform: rotateX(-90deg) translateY(-$d2Translate) translateZ($d2Translate); }
+        &:nth-child(4) { transform: rotateX(90deg) translateY($d2Translate) translateZ($d2Translate); }
+        &:nth-child(5) { transform: rotateY(90deg) translateZ($d2Translate) translateX(-$d2Translate); }
+        &:nth-child(6) { transform: rotateY(180deg) rotateZ(180deg) rotateX(180deg) translateZ($d2Translate * 2); }
+    }
+}

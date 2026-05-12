@@ -45,7 +45,8 @@ class Dice {
             ';
 
         var dice:DivElement = cast d20Tray.querySelector('.die-d$numFaces');
-        for (i in 0...numFaces) {
+        var numFacesForDie = if (numFaces == 2) 6 else numFaces;
+        for (i in 0...numFacesForDie) {
             var face = Browser.document.createElement("FIGURE");
             face.classList.add("face");
             face.classList.add('face-${i + 1}');
