@@ -182,16 +182,30 @@ class SpellDetailPopup extends Popup {
             }
         } else if (isSpontaneous) {
             var slots = Rules.getSpellSlots(character.basics.characterClass, character);
-            var remaining = slots[spell.level] - (character.usedSlots.exists(spell.level) ? character.usedSlots.get(spell.level) : 0);
-            if (remaining == 0) {
+            // Find the lowest available slot at or above spell level
+            var availableSlotLevel:Null<Int> = null;
+            for (lvl in spell.level...10) {
+                var rem = slots[lvl] - (character.usedSlots.exists(lvl) ? character.usedSlots.get(lvl) : 0);
+                if (rem > 0) { availableSlotLevel = lvl; break; }
+            }
+            if (availableSlotLevel == null) {
                 castBtn.classList.add("disabled");
             } else {
+                var remaining = slots[availableSlotLevel] - (character.usedSlots.exists(availableSlotLevel) ? character.usedSlots.get(availableSlotLevel) : 0);
                 var usageSpan = Browser.document.createSpanElement();
                 usageSpan.className = "cast-usage";
-                usageSpan.innerText = '($remaining emplacement${if (remaining > 1) "s" else ""} restant${if (remaining > 1) "s" else ""})';
+                var slotDesc = if (availableSlotLevel == spell.level)
+                    '$remaining emplacement${if (remaining > 1) "s" else ""} restant${if (remaining > 1) "s" else ""}'
+                else
+                    'emplacement niv.$availableSlotLevel';
+                usageSpan.innerText = '($slotDesc)';
                 castBtn.appendChild(usageSpan);
                 castBtn.addEventListener("click", () -> {
-                    new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? Un emplacement de niveau ${spell.level} sera consommé.', () -> {
+                    var slotMsg = if (availableSlotLevel == spell.level)
+                        'Un emplacement de niveau ${spell.level} sera consommé.'
+                    else
+                        'Aucun emplacement de niveau ${spell.level} disponible — un emplacement de niveau $availableSlotLevel sera consommé.';
+                    new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? $slotMsg', () -> {
                         pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
                         closeSilent();
                         new elems.SpellCastPopup(spell, character, ficheId);

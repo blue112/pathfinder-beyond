@@ -215,7 +215,14 @@ class FullCharacter {
 					if (idx >= 0)
 						preparedSpells.splice(idx, 1);
 				} else {
-					usedSlots.set(spell.level, (usedSlots.exists(spell.level) ? usedSlots.get(spell.level) : 0) + 1);
+					// Use the lowest available slot ≥ spell level
+					var slots = Rules.getSpellSlots(basics.characterClass, this);
+					var slotLevel = spell.level;
+					for (lvl in spell.level...10) {
+						var rem = slots[lvl] - (usedSlots.exists(lvl) ? usedSlots.get(lvl) : 0);
+						if (rem > 0) { slotLevel = lvl; break; }
+					}
+					usedSlots.set(slotLevel, (usedSlots.exists(slotLevel) ? usedSlots.get(slotLevel) : 0) + 1);
 				}
 			case SPELL_EVENT(EDIT_SPELL(index, spell)):
 				var edited = Reflect.copy(spell);
