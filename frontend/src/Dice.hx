@@ -27,25 +27,18 @@ class Dice {
         var d20Tray = Browser.document.createDivElement();
         d20Tray.classList.add("dice-tray");
 
-        if (numFaces == 3) {
-            numFaces = 6;
-            resultOnDice = (result * 2) - 1 + Std.random(2);
-            d20Tray.classList.add("d3");
-        }
-
         d20Tray.innerHTML = '
         <div class="dice-container">
             <div class="die-d$numFaces rolling">
             </div>
         </div>
         <h3>-</h3>
-        <p class="d3">(pour un dé 3, un dé 6 est lancé et la valeur est divisée par deux)</p>
         <h3 class="critical critical-fail">Échec critique !</h3>
         <h3 class="critical critical-success">Réussite critique !</h3>
             ';
 
         var dice:DivElement = cast d20Tray.querySelector('.die-d$numFaces');
-        var numFacesForDie = if (numFaces == 2) 6 else numFaces;
+        var numFacesForDie = if (numFaces == 2 || numFaces == 3) 6 else numFaces;
         for (i in 0...numFacesForDie) {
             var face = Browser.document.createElement("FIGURE");
             face.classList.add("face");
