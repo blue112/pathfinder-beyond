@@ -101,6 +101,15 @@ body.rolling {
     }
 }
 
+.dice-tray-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+}
+
 .dice-container {
     width: 200px;
     height: 200px;

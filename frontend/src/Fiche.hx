@@ -343,7 +343,7 @@ class Fiche implements IJSAsync {
                 while (dataParent != null && dataParent.dataset.id == null)
                     dataParent = dataParent.parentElement;
                 var apiResult = Api.rollDice(fiche_id, diceType, mod, dataParent.dataset.id, numDice).jsawait();
-                Dice.roll([mod], apiResult.result, diceType);
+                Dice.roll([mod], apiResult.result, diceType, null, numDice);
                 var total = apiResult.result + mod;
                 if (character.basics.characterClass == ROUBLARD && dataParent.dataset.id == "damage") {
                     var sneakDice = Std.int((character.level + 1) / 2);

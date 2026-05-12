@@ -22,7 +22,8 @@ $d10TranslateY:  $d10LowerHeight * 0.29;
     90%  { transform: rotateX(480deg)  rotateY(960deg) rotateZ(0deg); }
 }
 
-.dice-container > .die-d10 {
+.dice-container > .die-d10,
+.dice-container > .die-d10-tens {
     counter-reset: steps 0;
 
     &.rolling {
@@ -103,4 +104,18 @@ $d10TranslateY:  $d10LowerHeight * 0.29;
             height: $d10UpperHeight;
         }
     }
+}
+
+// Tens die for D100: same geometry, explicit labels 00–90
+.dice-container > .die-d10-tens {
+    .face.face-1:before  { content: "00"; }
+    .face.face-2:before  { content: "10"; }
+    .face.face-3:before  { content: "20"; }
+    .face.face-4:before  { content: "30"; }
+    .face.face-5:before  { content: "40"; }
+    .face.face-6:before  { content: "50"; }
+    .face.face-7:before  { content: "60"; }
+    .face.face-8:before  { content: "70"; }
+    .face.face-9:before  { content: "80"; }
+    .face.face-10:before { content: "90"; }
 }
