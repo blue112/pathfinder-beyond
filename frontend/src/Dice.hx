@@ -125,7 +125,17 @@ class Dice {
         }
 
         tray.appendChild(rowDiv);
-        tray.innerHTML += '<h3>-</h3><h3 class="critical critical-fail">Échec critique !</h3><h3 class="critical critical-success">Réussite critique !</h3>';
+        var h3 = (cast Browser.document.createElement("h3") : js.html.HeadingElement);
+        h3.innerText = "-";
+        tray.appendChild(h3);
+        var failH3 = (cast Browser.document.createElement("h3") : js.html.HeadingElement);
+        failH3.className = "critical critical-fail";
+        failH3.innerText = "Échec critique !";
+        tray.appendChild(failH3);
+        var successH3 = (cast Browser.document.createElement("h3") : js.html.HeadingElement);
+        successH3.className = "critical critical-success";
+        successH3.innerText = "Réussite critique !";
+        tray.appendChild(successH3);
         Browser.document.body.append(tray);
 
         for (i in 0...numDice)

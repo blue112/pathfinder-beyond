@@ -226,7 +226,17 @@ class SpellCastPopup extends Popup {
 								return;
 							}
 							var fieldId = 'sort-${spell.name}';
+							// Count distinct face types in this formula
+							var faceRe = ~/\d+d(\d+)/g;
+							var formulaResolved = StringTools.replace(formula, "NLS", Std.string(character.level));
+							var faces = new haxe.ds.IntMap<Bool>();
+							while (faceRe.match(formulaResolved)) {
+								faces.set(Std.parseInt(faceRe.matched(1)), true);
+								formulaResolved = faceRe.matchedRight();
+							}
+							var singleFaceType = [for (_ in faces.keys()) true].length <= 1;
 							Api.rollDice(ficheId, parsed.faces, parsed.flatMod, fieldId, parsed.count).then(res -> {
+								if (singleFaceType) Dice.roll([parsed.flatMod], res.result, parsed.faces, null, parsed.count);
 								var diceStr = '${parsed.count}d${parsed.faces}';
 								var total = res.result + parsed.flatMod;
 								resultSpan.innerText = if (parsed.flatMod != 0) {
