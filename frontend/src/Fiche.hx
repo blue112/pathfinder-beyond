@@ -434,6 +434,15 @@ class Fiche implements IJSAsync {
 
     private function updateWeapons() {
         var weaponsSection = mainElem.querySelector(".weapons");
+        var activeTab = weaponsSection.querySelector(".weapon-tab.active");
+        var activeIdx = if (activeTab != null) {
+            var tabs = weaponsSection.querySelectorAll(".weapon-tab");
+            var found = 0;
+            for (i in 0...tabs.length)
+                if (tabs.item(i) == activeTab) found = i;
+            found;
+        } else 0;
+
         weaponsSection.innerHTML = "<h2>Armes</h2>";
 
         for (idx in 0...character.weapons.length)
@@ -442,6 +451,7 @@ class Fiche implements IJSAsync {
         if (character.weapons.length <= 1)
             return;
 
+        var activeIdx = if (activeIdx < character.weapons.length) activeIdx else 0;
         var weaponDivs = weaponsSection.querySelectorAll(".weapon");
         var tabsDiv = Browser.document.createDivElement();
         tabsDiv.classList.add("weapon-tabs");
@@ -451,7 +461,7 @@ class Fiche implements IJSAsync {
             tab.classList.add("weapon-tab");
             tab.innerText = character.weapons[idx].name;
             tab.dataset.label = character.weapons[idx].name;
-            if (idx == 0)
+            if (idx == activeIdx)
                 tab.classList.add("active");
             else
                 (cast weaponDivs.item(idx) : Element).classList.add("hidden");
