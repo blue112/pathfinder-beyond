@@ -1,0 +1,84 @@
+@use 'variables' as *;
+
+// D4 (regular tetrahedron): 4 equilateral triangular faces
+// 1 bottom face + 3 side faces (120° apart)
+// Side face normals at elevation arcsin(1/3) ≈ 19.47° above equatorial plane
+// Inradius = edge / (2√6) ≈ 0.2041 × edge
+
+$d4HalfBase: 60px;
+$d4H:        104px;   // equilateral height = halfBase × √3 ≈ 103.9px
+$d4R:        25px;    // tetrahedron inradius ≈ edge/(2√6) = 120/4.899 ≈ 24.5px
+$d4Elev:     19.47deg; // arcsin(1/3)
+
+@keyframes roll-d4 {
+    0%   { transform: rotateX(0deg)   rotateY(0deg)   rotateZ(0deg); }
+    33%  { transform: rotateX(240deg) rotateY(120deg) rotateZ(60deg); }
+    66%  { transform: rotateX(120deg) rotateY(360deg) rotateZ(180deg); }
+    100% { transform: rotateX(360deg) rotateY(480deg) rotateZ(270deg); }
+}
+
+.dice-container > .die-d4 {
+    counter-reset: steps 0;
+
+    &.rolling {
+        animation: roll-d4 $animationDuration linear;
+    }
+
+    // data-face = inverse of face positioning
+    &[data-face="1"] { transform: rotateX(90deg) rotateY(-60deg); }            // bottom
+    &[data-face="2"] { transform: rotateX(-$d4Elev); }                        // side, azimuth 0°
+    &[data-face="3"] { transform: rotateX(-$d4Elev) rotateY(-120deg); }       // side, azimuth 120°
+    &[data-face="4"] { transform: rotateX(-$d4Elev) rotateY(120deg); }        // side, azimuth 240°
+
+    .face {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -$d4HalfBase;
+        margin-top: calc(-#{$d4H} * 2 / 3);
+        width: 0;
+        height: 0;
+        border-left: $d4HalfBase solid transparent;
+        border-right: $d4HalfBase solid transparent;
+        border-bottom: $d4H solid rgba(255, 180, 80, 0.6); // edge/border color
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        counter-increment: steps;
+        transform-origin: 50% 66.67%; // centroid at 2/3 height from apex
+
+        // Inner fill triangle (inset ~10% from each edge)
+        &:after {
+            content: '';
+            position: absolute;
+            top: 7px;
+            left: -54px;
+            width: 0;
+            height: 0;
+            border-left: 54px solid transparent;
+            border-right: 54px solid transparent;
+            border-bottom: 94px solid $color;
+        }
+
+        &:before {
+            content: counter(steps);
+            position: absolute;
+            top: $d4H * 0.35;
+            left: -$d4HalfBase;
+            color: #fff;
+            text-shadow: 1px 1px 3px #000;
+            font-size: $d4H * 0.32;
+            text-align: center;
+            width: $d4HalfBase * 2;
+            height: $d4H;
+            z-index: 1;
+        }
+
+        // Face 1: bottom — rotateZ(60°) aligns edges with the 3 side faces
+        &.face-1 { transform: rotateX(-90deg) rotateZ(60deg) translateZ($d4R); }
+
+        // Side faces: rotateY(azimuth) rotateX(+elev) translateZ(r)
+        &.face-2 { transform:              rotateX($d4Elev) translateZ($d4R); }
+        &.face-3 { transform: rotateY(120deg)  rotateX($d4Elev) translateZ($d4R); }
+        &.face-4 { transform: rotateY(240deg)  rotateX($d4Elev) translateZ($d4R); }
+    }
+}
