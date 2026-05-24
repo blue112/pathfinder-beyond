@@ -78,6 +78,7 @@ class Fiche implements IJSAsync {
         bindSpeedActions();
         bindInitiativeActions();
         bindChangeAlignementAction();
+        bindChangeAgeAction();
 
         load(fiche_id);
     }
@@ -206,6 +207,15 @@ class Fiche implements IJSAsync {
             var all = CharacterAlignement.createAll();
             new ChoicesDialog("Changer l'alignement", all.map(a -> a.alignementToString()), (choice) -> {
                 pushEvent(CHANGE_ALIGNEMENT(all[choice]));
+            });
+        });
+    }
+
+    function bindChangeAgeAction() {
+        var plus = mainElem.querySelector(".field[data-id=age] .plus");
+        plus.addEventListener("click", () -> {
+            new AmountChoice("Modifier l'âge", "Quel est le nouvel âge du personnage ?", {defaultValue: character.basics.age}, (result, _) -> {
+                pushEvent(CHANGE_AGE(result));
             });
         });
     }

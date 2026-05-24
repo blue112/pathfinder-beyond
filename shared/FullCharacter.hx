@@ -78,6 +78,8 @@ class FullCharacter {
 				this.basics = data;
 			case CHANGE_ALIGNEMENT(alignement):
 				this.basics.alignement = alignement;
+			case CHANGE_AGE(age):
+				this.basics.age = age;
 			case SET_CHARACTERISTICS(data):
 				this.characteristics = data;
 				updateCharacts();

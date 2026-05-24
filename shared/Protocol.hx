@@ -22,6 +22,7 @@ enum FicheEventType {
     SET_SAVING_THROW_MODIFIER(st:SavingThrow, mod:Int);
     SET_SPEED_MODIFIER(mod:Int);
     CHANGE_ALIGNEMENT(alignement:CharacterAlignement);
+    CHANGE_AGE(age:Int);
     ADD_EXCEPTIONAL_MODIFIER(mod:TemporaryModifier);
     ADD_PROTECTION(armor:Protection);
     REMOVE_PROTECTION(index:Int);
