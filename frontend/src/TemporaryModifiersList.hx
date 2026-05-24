@@ -40,7 +40,9 @@ class TemporaryModifiersList extends Popup implements IJSAsync {
             var fieldName = switch (mod.on) {
                 case CHARACTERISTIC(c): c.caracToString(false);
                 case SKILL(type): RulesSkills.getSkillLabel(type);
-                case AC: "CA";
+                case AC: "CA (armure/bouclier/naturelle)";
+                case AC_DODGE: "CA (esquive)";
+                case AC_DEFLECTION: "CA (parade/intuition/chance)";
                 case INITIATIVE: "Initiative";
                 case SAVING_THROW(st): 'Jet de sauvegarde (${st.savingThrowToString()})';
                 case WEAPON_ATTACK: 'Jet d\'attaque';

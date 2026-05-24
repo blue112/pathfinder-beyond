@@ -293,7 +293,9 @@ typedef TemporaryModifier = {
 enum Field {
     SKILL(type:SkillType);
     CHARACTERISTIC(carac:Characteristic);
-    AC;
+    AC;           // armor/shield/natural armor → total + flat-footed
+    AC_DODGE;     // dodge/esquive → total + contact
+    AC_DEFLECTION; // deflection/parade/insight → all three
     INITIATIVE;
     SAVING_THROW(st:SavingThrow);
     MAX_HP;

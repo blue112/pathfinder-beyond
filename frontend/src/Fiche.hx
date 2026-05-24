@@ -212,9 +212,25 @@ class Fiche implements IJSAsync {
 
     function bindACActions() {
         var action = mainElem.querySelector(".ac .plus");
-        makeTempModMenu(action, action.parentElement.parentElement, AC, ["Ajouter une protection"], (_) -> {
-            new AddProtectionDialog((protection) -> {
-                pushEvent(ADD_PROTECTION(protection));
+        var attachOn = action.parentElement.parentElement;
+        action.addEventListener("click", () -> {
+            new ContextMenu(attachOn, [
+                "Ajouter un modificateur temporaire (armure / bouclier / armure naturelle)",
+                "Ajouter un modificateur temporaire (esquive)",
+                "Ajouter un modificateur temporaire (parade / intuition / chance)",
+                "Ajouter une protection"
+            ], (choice) -> {
+                if (choice == 3) {
+                    new AddProtectionDialog((protection) -> {
+                        pushEvent(ADD_PROTECTION(protection));
+                    });
+                } else {
+                    var acField = if (choice == 0) AC else if (choice == 1) AC_DODGE else AC_DEFLECTION;
+                    new AmountChoice("Modificateur temporaire de CA", "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true}, (result, reason) -> {
+                        pushEvent(ADD_TEMPORARY_MODIFIER({mod: result, why: reason, on: acField}));
+                    });
+                }
+                return true;
             });
         });
     }
@@ -593,17 +609,15 @@ class Fiche implements IJSAsync {
     private function updateAC(field:String, includeArmor:Bool, includeDex:Bool) {
         var acDiv = availableFields.get(field);
 
-        var mod = character.getAC(includeArmor, includeDex);
-
-        // Check if we have a temp modifier on that or on related characteristic
-        var match = [];
-        if (includeArmor) {
-            match.push(AC);
-            mod += character.getTempMods(match).sum();
-        }
-        if (includeDex)
+        // Build the set of temp mod targets relevant to this AC variant
+        var match = [AC_DEFLECTION]; // deflection applies to all three CAs
+        if (includeArmor) match.push(AC);      // armor/shield/natural: total + flat-footed
+        if (includeDex) {
+            match.push(AC_DODGE);              // dodge: total + contact
             match.push(CHARACTERISTIC(DEXTERITY));
+        }
 
+        var mod = character.getAC(includeArmor, includeDex) + character.getTempMods(match).sum();
         var totalTempMod = character.getTempMods(match).sum();
         if (totalTempMod != 0) {
             acDiv.classList.add("temp-mod");
