@@ -93,7 +93,7 @@ class SpellCastPopup extends Popup {
 			yesBtn.addEventListener("click", () -> {
 				btns.remove();
 				question.innerText = "Résistance à la magie :";
-				var nls = character.level;
+				var nls = character.getNLS();
 				var otherMod = Rules.getRMRollMod(character);
 				Api.rollDice(ficheId, 20, nls + otherMod, "sort-rm").then(res -> {
 					var mods = [nls];
@@ -186,7 +186,7 @@ class SpellCastPopup extends Popup {
 						return;
 					switch (d.diceType) {
 						case NLS:
-							var nls = character.level;
+							var nls = character.getNLS();
 							var fieldId = 'sort-nls-${spell.name}';
 							Api.rollDice(ficheId, 20, nls, fieldId).then(res -> {
 								Dice.roll([nls], res.result, 20);
@@ -206,7 +206,11 @@ class SpellCastPopup extends Popup {
 							var bba = Rules.getBBA(character);
 							var statMod = if (d.diceType.match(CONTACT_MELEE)) character.characteristicsMod.str else character.characteristicsMod.dex;
 							var size = Rules.getSizeMod(character, false);
-							var mods = if (size != 0) [bba, statMod, size] else [bba, statMod];
+							var negLvl = character.getTempMods([NEGATIVE_LEVEL]).sum(); // negative value
+							var mods = if (size != 0 && negLvl != 0) [bba, statMod, size, negLvl]
+								else if (size != 0) [bba, statMod, size]
+								else if (negLvl != 0) [bba, statMod, negLvl]
+								else [bba, statMod];
 							var totalMod = mods.fold((m, acc) -> m + acc, 0);
 							var fieldId = if (d.diceType.match(CONTACT_MELEE)) "contact-cac" else "contact-distance";
 							Api.rollDice(ficheId, 20, totalMod, fieldId).then(res -> {
@@ -215,7 +219,8 @@ class SpellCastPopup extends Popup {
 								item.classList.add("rolled");
 							});
 						case MANUAL(formula):
-							var parsed = parseFormula(formula, character.level);
+							var nls = character.getNLS();
+							var parsed = parseFormula(formula, nls);
 							if (parsed.unparseable) {
 								new Alert("Formule invalide", 'La formule "$formula" n\'a pas pu être évaluée.');
 								return;
@@ -228,7 +233,7 @@ class SpellCastPopup extends Popup {
 							var fieldId = 'sort-${spell.name}';
 							// Count distinct face types in this formula
 							var faceRe = ~/\d+d(\d+)/g;
-							var formulaResolved = StringTools.replace(formula, "NLS", Std.string(character.level));
+							var formulaResolved = StringTools.replace(formula, "NLS", Std.string(nls));
 							var faces = new haxe.ds.IntMap<Bool>();
 							while (faceRe.match(formulaResolved)) {
 								faces.set(Std.parseInt(faceRe.matched(1)), true);

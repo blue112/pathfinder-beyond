@@ -160,6 +160,8 @@ class FullCharacter {
 				protections.splice(index, 1);
 			case ADD_TEMPORARY_MODIFIER(mod):
 				tempMods.push(mod);
+				if (mod.on.match(NEGATIVE_LEVEL))
+					current_hp += mod.mod * 5; // mod is −1 per level, so −5 HP per level
 				updateCharacts();
 			case REMOVE_TEMPORARY_MODIFIER(index):
 				tempMods.splice(index, 1);
@@ -262,6 +264,10 @@ class FullCharacter {
 		}
 	}
 
+	public function getNLS() {
+		return Std.int(Math.max(0, level + getTempMods([NEGATIVE_LEVEL]).sum()));
+	}
+
 	private function updateCharacts() {
 		characteristicsMod = cast {};
 		for (i in Reflect.fields(characteristics)) {
@@ -314,6 +320,7 @@ class FullCharacter {
 		}
 
 		total += max_hp_modifier;
+		total += getTempMods([NEGATIVE_LEVEL]).sum() * 5; // each level is mod −1, so −5 HP per level
 
 		return total;
 	}

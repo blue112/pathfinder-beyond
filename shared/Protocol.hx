@@ -303,6 +303,7 @@ enum Field {
     WEAPON_ATTACK;
     WEAPON_DAMAGE;
     SAVING_THROW_NOTE(st:SavingThrow);
+    NEGATIVE_LEVEL; // temporary negative level: −1 to skills/saves/attacks/BMO, −5 max HP, −1 NLS
 }
 
 typedef ExceptionalSkillModifier = {

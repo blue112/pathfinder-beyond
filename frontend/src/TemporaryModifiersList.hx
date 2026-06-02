@@ -49,6 +49,7 @@ class TemporaryModifiersList extends Popup implements IJSAsync {
                 case WEAPON_DAMAGE: 'Jet de dommage';
                 case MAX_HP: "PV maximums";
                 case SAVING_THROW_NOTE(st): 'Note (${st.savingThrowToString()})';
+                case NEGATIVE_LEVEL: "Niveau négatif temporaire";
             }
             fieldName = fieldName.charAt(0).toUpperCase() + fieldName.substr(1);
             var delBtn = Browser.document.createAnchorElement();

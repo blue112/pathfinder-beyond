@@ -207,13 +207,13 @@ class Rules {
 				characteristic: n.modifier,
 				ranks: ranks,
 				canUse: canUse,
-				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod + armorMod
+				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod + armorMod + char.getTempMods([NEGATIVE_LEVEL]).sum()
 			};
 		});
 	}
 
 	static public function getBMO(char:FullCharacter) {
-		return getBBA(char) + char.characteristicsMod.str + getSizeMod(char, true);
+		return getBBA(char) + char.characteristicsMod.str + getSizeMod(char, true) + char.getTempMods([NEGATIVE_LEVEL]).sum();
 	}
 
 	static public function getDMD(char:FullCharacter) {
@@ -251,7 +251,7 @@ class Rules {
 	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
 		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
 		var permanentMod = if (char.savingThrowModifiers.exists(st)) char.savingThrowModifiers.get(st) else 0;
-		return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus + permanentMod;
+		return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus + permanentMod + char.getTempMods([NEGATIVE_LEVEL]).sum();
 	}
 
 	static public function getSizeMod(char:FullCharacter, forBMOOrDMD:Bool) {

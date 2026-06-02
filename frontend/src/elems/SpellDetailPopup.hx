@@ -43,7 +43,7 @@ class SpellDetailPopup extends Popup {
             dl.appendChild(dd);
         }
 
-        var nls = character.level;
+        var nls = character.getNLS();
         function resolveNls(s:String):String {
             if (s.indexOf("NLS") < 0) return s;
             return Std.string(MathExpr.eval(s.replace("NLS", Std.string(nls))));
@@ -93,7 +93,7 @@ class SpellDetailPopup extends Popup {
             var row = Browser.document.createDivElement();
             row.className = "spell-dice-item";
             var label = Browser.document.createSpanElement();
-            label.innerText = '${d.reason} : ${diceDisplayLabel(d.diceType, character.level)}';
+            label.innerText = '${d.reason} : ${diceDisplayLabel(d.diceType, character.getNLS())}';
             var del = Browser.document.createAnchorElement();
             del.className = "spell-dice-del";
             del.innerText = "×";

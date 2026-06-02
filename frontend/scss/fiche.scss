@@ -678,7 +678,8 @@ h3 {
     }
 
     .mod.temp-mod,
-    .value.temp-mod {
+    .value.temp-mod,
+    .max.temp-mod {
         background-color: rgb(150, 255, 138) !important;
 
         &.negative {

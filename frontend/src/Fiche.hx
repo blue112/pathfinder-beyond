@@ -131,13 +131,18 @@ class Fiche implements IJSAsync {
     }
 
     function bindLevelActions() {
-        var menuLabels = ["Monter de niveau"];
         var action = mainElem.querySelector(".field[data-id=level] .plus");
         action.addEventListener("click", () -> {
-            new ContextMenu(cast action, menuLabels, (choice) -> {
-                new YesNoAlert("Montée de niveau", "Valider la montée de niveau ?", () -> {
-                    onActionLevelUp();
-                });
+            new ContextMenu(cast action, ["Monter de niveau", "Ajouter un niveau négatif temporaire"], (choice) -> {
+                if (choice == 0) {
+                    new YesNoAlert("Montée de niveau", "Valider la montée de niveau ?", () -> {
+                        onActionLevelUp();
+                    });
+                } else if (choice == 1) {
+                    new AmountChoice("Niveau négatif temporaire", "Nombre de niveaux négatifs ?", {askReason: true, defaultValue: 1}, (result, reason) -> {
+                        pushEvent(ADD_TEMPORARY_MODIFIER({on: NEGATIVE_LEVEL, mod: -result, why: reason}));
+                    });
+                }
                 return true;
             });
         });
@@ -537,10 +542,10 @@ class Fiche implements IJSAsync {
         ].join(" / ");
 
         var attackMod = character.getCaracMod(weapon.weaponAttackCharacteristic) + Rules.getSizeMod(character, false) + Rules.getBBA(character)
-            + weapon.attack_modifier + character.getTempMods([WEAPON_ATTACK]).sum();
+            + weapon.attack_modifier + character.getTempMods([WEAPON_ATTACK]).sum() + character.getTempMods([NEGATIVE_LEVEL]).sum();
 
         character.applyTempModsClass(getField(divWeapon, "attack").parentElement.parentElement,
-            [WEAPON_ATTACK, CHARACTERISTIC(weapon.weaponAttackCharacteristic)]);
+            [WEAPON_ATTACK, CHARACTERISTIC(weapon.weaponAttackCharacteristic), NEGATIVE_LEVEL]);
         getField(divWeapon, "attack").innerText = attackMod.asMod();
 
         var damage = weapon.damage_modifier + character.getCaracMod(weapon.weaponDamageCharacteristic) + character.getTempMods([WEAPON_DAMAGE]).sum();
@@ -579,6 +584,7 @@ class Fiche implements IJSAsync {
     }
 
     private function updateCharacts() {
+        var negLvlMod = character.getTempMods([NEGATIVE_LEVEL]).sum();
         for (i in Reflect.fields(character.characteristics)) {
             var value:Int = Reflect.getProperty(character.characteristics, i);
             var mod:Int = Reflect.getProperty(character.characteristicsMod, i);
@@ -588,9 +594,9 @@ class Fiche implements IJSAsync {
             character.applyTempModsClass(valueField, [CHARACTERISTIC(i.parseCarac())]);
             var modField = valueField.parentElement.querySelector(".mod");
 
-            character.applyTempModsClass(modField, [CHARACTERISTIC(i.parseCarac())]);
+            character.applyTempModsClass(modField, [CHARACTERISTIC(i.parseCarac()), NEGATIVE_LEVEL]);
 
-            modField.innerText = mod.asMod(false);
+            modField.innerText = (mod + negLvlMod).asMod(false);
         }
     }
 
@@ -661,7 +667,7 @@ class Fiche implements IJSAsync {
         var mod = Rules.getSavingThrowMod(character, st);
 
         // Check if we have a temp modifier on that or on related characteristic
-        var totalTempMod = character.getTempMods([SAVING_THROW(st), CHARACTERISTIC(Rules.getSavingThrowCarac(st))]).sum();
+        var totalTempMod = character.getTempMods([SAVING_THROW(st), CHARACTERISTIC(Rules.getSavingThrowCarac(st)), NEGATIVE_LEVEL]).sum();
         mod += character.getTempMods([SAVING_THROW(st)]).sum();
         if (totalTempMod != 0) {
             stDiv.parentElement.classList.add("temp-mod");
@@ -732,7 +738,9 @@ class Fiche implements IJSAsync {
         initField.innerText = (dexMod + character.getTempMods([INITIATIVE]).sum()).asMod(true);
 
         var maxHP = character.getMaxHitPoints().string();
-        availableFields.get("hp-max").innerText = maxHP;
+        var hpMaxField = availableFields.get("hp-max");
+        hpMaxField.innerText = maxHP;
+        character.applyTempModsClass(hpMaxField, [MAX_HP, NEGATIVE_LEVEL]);
         availableFields.get("hp").innerText = character.current_hp.string();
         availableFields.get("non-lethal-max").innerText = maxHP;
         availableFields.get("non-lethal-damages").innerText = 0.string();
@@ -744,10 +752,16 @@ class Fiche implements IJSAsync {
         updateSavingThrow("saving-reflexes", REFLEXES);
         updateSavingThrow("saving-vigor", VIGOR);
         updateSavingThrow("saving-will", WILL);
-        availableFields.get("bba").innerText = Rules.getBBA(character).asMod(true);
-        availableFields.get("bmo").innerText = Rules.getBMO(character).asMod(true);
+        var bmoField = availableFields.get("bmo");
+        bmoField.innerText = Rules.getBMO(character).asMod(true);
+        character.applyTempModsClass(bmoField.parentElement, [NEGATIVE_LEVEL]);
+        var bbaField = availableFields.get("bba");
+        bbaField.innerText = Rules.getBBA(character).asMod(true);
+        character.applyTempModsClass(bbaField, [NEGATIVE_LEVEL]);
         availableFields.get("dmd").innerText = Rules.getDMD(character).string();
-        availableFields.get("level").innerText = character.level.string();
+        var levelField = availableFields.get("level");
+        levelField.innerText = character.getNLS().string();
+        character.applyTempModsClass(levelField.parentElement, [NEGATIVE_LEVEL]);
 
         addSkills();
         addArmor();
@@ -851,7 +865,7 @@ class Fiche implements IJSAsync {
             }
 
             // Check if we have a temp modifier on that or on related characteristic
-            character.applyTempModsClass(skillDiv.querySelector(".mod"), [SKILL(skill.name), CHARACTERISTIC(skill.characteristic)]);
+            character.applyTempModsClass(skillDiv.querySelector(".mod"), [SKILL(skill.name), CHARACTERISTIC(skill.characteristic), NEGATIVE_LEVEL]);
             skillDiv.querySelector(".ranks").innerText = skill.ranks.string();
 
             skillDiv.classList.add("class-skill");
