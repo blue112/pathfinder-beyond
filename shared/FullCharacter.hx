@@ -224,7 +224,10 @@ class FullCharacter {
 					var slotLevel = spell.level;
 					for (lvl in spell.level...10) {
 						var rem = slots[lvl] - (usedSlots.exists(lvl) ? usedSlots.get(lvl) : 0);
-						if (rem > 0) { slotLevel = lvl; break; }
+						if (rem > 0) {
+							slotLevel = lvl;
+							break;
+						}
 					}
 					usedSlots.set(slotLevel, (usedSlots.exists(slotLevel) ? usedSlots.get(slotLevel) : 0) + 1);
 				}
@@ -275,6 +278,10 @@ class FullCharacter {
 			var totalTempMod = getTempMods([CHARACTERISTIC(i.parseCarac())]).sum();
 			var mod:Int = Std.int((value + totalTempMod) / 2) - 5;
 			Reflect.setProperty(characteristicsMod, i, mod);
+		}
+
+		if (current_hp > getMaxHitPoints()) {
+			current_hp = getMaxHitPoints();
 		}
 	}
 
