@@ -40,7 +40,7 @@ enum FicheEventType {
 	NEW_DAY;
 	SET_FAVORITE_MAGIC_SCHOOL(school:SpellSchool);
 	SET_PRIEST_DOMAIN(domain1:PriestDomain, domain2:PriestDomain);
-	ENTER_ANIMAL_FORM;
+	ENTER_ANIMAL_FORM(formNumber:Int);
 	EXIT_ANIMAL_FORM;
 }
 
@@ -414,6 +414,7 @@ typedef FicheNote = {
 
 enum Feats {
 	TIR_A_BOUT_PORTANT;
+	ATTAQUE_EN_PUISSANCE;
 }
 
 typedef PublicDiceRoll = {

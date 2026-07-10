@@ -324,11 +324,10 @@ class Fiche implements IJSAsync {
 		var animalFormBtn = Browser.document.createAnchorElement();
 		animalFormBtn.className = "animal-form-btn";
 		animalFormBtn.addEventListener("click", () -> {
-			if (character.isInAnimalForm)
+			if (character.currentAnimalForm != 0)
 				new YesNoAlert("Forme animale", "Reprendre la forme normale ?", () -> pushEvent(EXIT_ANIMAL_FORM));
 			else
-				new YesNoAlert("Forme animale", "Se transformer en forme animale ? (+2 armure naturelle, +4 FOR, -2 DEX, +4 cases de déplacement, taille G)",
-					() -> pushEvent(ENTER_ANIMAL_FORM));
+				new ChoicesDialog("Forme animale", ["Forme de loup", "Forme de tigre"], (choice) -> pushEvent(ENTER_ANIMAL_FORM(choice + 1)));
 		});
 		mainElem.querySelector("section.actions").appendChild(animalFormBtn);
 	}
@@ -394,7 +393,7 @@ class Fiche implements IJSAsync {
 						weaponDiv = weaponDiv.parentElement;
 					if (weaponDiv != null) {
 						var widx = Std.parseInt(weaponDiv.dataset.weaponIdx);
-						currentWeapon = character.weapons[widx];
+						currentWeapon = character.weaponsByForm.get(character.currentAnimalForm)[widx];
 					}
 				}
 
@@ -404,6 +403,15 @@ class Fiche implements IJSAsync {
 					var choice = makeChoiceAsync("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})'))).jsawait();
 					if (choice > 0) {
 						expMod = expMods[choice - 1].mod;
+					}
+				}
+
+				if (character.feats.contains(ATTAQUE_EN_PUISSANCE) && currentWeapon != null && currentWeapon.range == 0) {
+					var attaqueEnPuissanceDamageMod = (Math.floor(character.getBBA() / 4) + 1) * 2;
+					var choice = makeChoiceAsync("Attaque en puissance choisie lors du jet d'attaque ?",
+						['Oui (${attaqueEnPuissanceDamageMod.asMod()})', 'Non']).jsawait();
+					if (choice == 0) {
+						expMod = attaqueEnPuissanceDamageMod;
 					}
 				}
 
@@ -445,8 +453,9 @@ class Fiche implements IJSAsync {
 				weaponDiv = weaponDiv.parentElement;
 			if (weaponDiv != null) {
 				var widx = Std.parseInt(weaponDiv.dataset.weaponIdx);
-				currentWeapon = character.weapons[widx];
-				if (character.weapons[widx] != null && character.weapons[widx].shouldBeReloaded == true)
+				currentWeapon = character.weaponsByForm.get(character.currentAnimalForm)[widx];
+				if (character.weaponsByForm.get(character.currentAnimalForm)[widx] != null
+					&& character.weaponsByForm.get(character.currentAnimalForm)[widx].shouldBeReloaded == true)
 					reloadableWeaponIdx = widx;
 			}
 		}
@@ -464,6 +473,11 @@ class Fiche implements IJSAsync {
 
 			if (currentWeapon != null && (currentWeapon.range == null || currentWeapon.range == 0)) {
 				expMods.push({why: "Prise en tenaille ?", mod: 2, on: WEAPON_ATTACK});
+
+				if (character.feats.contains(ATTAQUE_EN_PUISSANCE)) {
+					var attaqueEnPuissanceAttackMod = Math.floor(character.getBBA() / 4) + 1;
+					expMods.push({why: "Faire une attaque en puissance ?", mod: -attaqueEnPuissanceAttackMod, on: WEAPON_ATTACK});
+				}
 			}
 
 			if (expMods.length > 0) {
@@ -520,22 +534,27 @@ class Fiche implements IJSAsync {
 
 		weaponsSection.innerHTML = "<h2>Armes</h2>";
 
-		for (idx in 0...character.weapons.length)
-			addWeapon(character.weapons[idx], idx);
+		if (!character.weaponsByForm.exists(character.currentAnimalForm))
+			character.weaponsByForm.set(character.currentAnimalForm, []);
 
-		if (character.weapons.length <= 1)
+		var currentWeaponSet = character.weaponsByForm.get(character.currentAnimalForm);
+
+		for (idx in 0...currentWeaponSet.length)
+			addWeapon(currentWeaponSet[idx], idx);
+
+		if (currentWeaponSet.length <= 1)
 			return;
 
-		var activeIdx = if (activeIdx < character.weapons.length) activeIdx else 0;
+		var activeIdx = if (activeIdx < currentWeaponSet.length) activeIdx else 0;
 		var weaponDivs = weaponsSection.querySelectorAll(".weapon");
 		var tabsDiv = Browser.document.createDivElement();
 		tabsDiv.classList.add("weapon-tabs");
 
-		for (idx in 0...character.weapons.length) {
+		for (idx in 0...currentWeaponSet.length) {
 			var tab = Browser.document.createDivElement();
 			tab.classList.add("weapon-tab");
-			tab.innerText = character.weapons[idx].name;
-			tab.dataset.label = character.weapons[idx].name;
+			tab.innerText = currentWeaponSet[idx].name;
+			tab.dataset.label = currentWeaponSet[idx].name;
 			if (idx == activeIdx)
 				tab.classList.add("active");
 			else
@@ -829,8 +848,8 @@ class Fiche implements IJSAsync {
 		var canTransform = character.basics.characterClass == METAMORPHE && character.level >= 4;
 		animalFormBtn.classList.toggle("hidden", !canTransform);
 		if (canTransform) {
-			animalFormBtn.innerText = if (character.isInAnimalForm) "Forme normale" else "Forme animale";
-			animalFormBtn.classList.toggle("active", character.isInAnimalForm);
+			animalFormBtn.innerText = if (character.currentAnimalForm != 0) "Forme normale" else "Forme animale";
+			animalFormBtn.classList.toggle("active", character.currentAnimalForm != 0);
 		}
 	}
 

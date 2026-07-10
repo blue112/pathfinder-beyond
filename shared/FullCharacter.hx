@@ -1,3 +1,4 @@
+import haxe.ds.IntMap;
 import Protocol;
 import RulesSkills;
 
@@ -20,7 +21,7 @@ class FullCharacter {
 	public var savingThrowModifiers:Map<SavingThrow, Int>;
 	public var exceptionalModifiers:Array<TemporaryModifier>;
 	public var protections:Array<Protection>;
-	public var weapons:Array<Weapon>;
+	public var weaponsByForm:IntMap<Array<Weapon>>;
 	public var tempMods:Array<TemporaryModifier>;
 	public var money_po:Float;
 	public var bank_po:Float;
@@ -36,7 +37,7 @@ class FullCharacter {
 	public var firedWeapons:Map<Int, Bool>;
 	public var favoriteMagicSchool:Null<SpellSchool>;
 	public var priestDomains:Null<Array<PriestDomain>>;
-	public var isInAnimalForm:Bool;
+	public var currentAnimalForm:Int;
 	public var feats:Array<Feats>;
 
 	var primalSizeCategory:Null<SizeCategory>;
@@ -53,7 +54,7 @@ class FullCharacter {
 		this.exceptionalModifiers = [];
 		this.protections = [];
 		this.tempMods = [];
-		this.weapons = [];
+		this.weaponsByForm = new IntMap();
 		this.inventory = [];
 		this.money_po = 0;
 		this.bank_po = 0;
@@ -67,7 +68,7 @@ class FullCharacter {
 		this.usedSlots = new Map();
 		this.firedWeapons = new Map();
 		this.feats = [];
-		this.isInAnimalForm = false;
+		this.currentAnimalForm = 0;
 	}
 
 	function updateHP() {
@@ -109,9 +110,13 @@ class FullCharacter {
 			case ADD_WEAPON(weapon):
 				if (weapon.shouldBeReloaded == null)
 					weapon.shouldBeReloaded = weapon.name.indexOf("Arbalète") >= 0;
-				weapons.push(weapon);
+
+				if (!weaponsByForm.exists(currentAnimalForm))
+					weaponsByForm.set(currentAnimalForm, []);
+
+				weaponsByForm.get(currentAnimalForm).push(weapon);
 			case REMOVE_WEAPON(index):
-				weapons.splice(index, 1);
+				weaponsByForm.get(currentAnimalForm).splice(index, 1);
 				var shifted = new Map<Int, Bool>();
 				for (k in firedWeapons.keys()) {
 					if (k < index)
@@ -252,18 +257,18 @@ class FullCharacter {
 				favoriteMagicSchool = school;
 			case SET_PRIEST_DOMAIN(domain1, domain2):
 				priestDomains = [domain1, domain2];
-			case ENTER_ANIMAL_FORM:
+			case ENTER_ANIMAL_FORM(n):
 				characteristics.str += 4;
 				primalSizeCategory = basics.sizeCategory;
 				basics.sizeCategory = SIZE_G;
 				speed_mod += 4;
-				isInAnimalForm = true;
+				currentAnimalForm = n;
 				updateCharacts();
 			case EXIT_ANIMAL_FORM:
 				characteristics.str -= 4;
 				basics.sizeCategory = primalSizeCategory;
 				speed_mod -= 4;
-				isInAnimalForm = false;
+				currentAnimalForm = 0;
 				updateCharacts();
 			case ADD_FEAT(feat):
 				feats.push(feat);
