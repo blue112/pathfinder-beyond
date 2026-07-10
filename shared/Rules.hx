@@ -41,7 +41,8 @@ class Rules {
 	// Level 0 (cantrips) never gets a bonus.
 	static public function getBonusSpellSlots(mod:Int):Array<Int> {
 		return [
-			for (level in 0...10) if (level == 0 || mod < level) 0 else Std.int((mod - level) / 4) + 1
+			for (level in 0...10)
+				if (level == 0 || mod < level) 0 else Std.int((mod - level) / 4) + 1
 		];
 	}
 
@@ -207,7 +208,8 @@ class Rules {
 				characteristic: n.modifier,
 				ranks: ranks,
 				canUse: canUse,
-				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod + armorMod + char.getTempMods([NEGATIVE_LEVEL]).sum()
+				mod: if (!canUse) 0 else char.getCaracMod(n.modifier) + ranks + (if (classSkill && ranks > 0) 3 else 0) + specialMod + charMod + armorMod
+					+ char.getTempMods([NEGATIVE_LEVEL]).sum()
 			};
 		});
 	}

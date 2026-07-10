@@ -363,6 +363,14 @@ class Fiche implements IJSAsync {
 		return e;
 	}
 
+	function makeChoiceAsync(text:String, choices:Array<String>):Promise<Int> {
+		return new Promise((res, rej) -> {
+			new ChoicesDialog(text, choices, (choice) -> {
+				res(choice);
+			});
+		});
+	}
+
 	@:jsasync function rollDice(elem:Element, ?additionalMod:Int) {
 		var parent = elem.parentElement;
 		var modInt = null;
@@ -378,9 +386,33 @@ class Fiche implements IJSAsync {
 				var dataParent = parent;
 				while (dataParent != null && dataParent.dataset.id == null)
 					dataParent = dataParent.parentElement;
-				var apiResult = Api.rollDice(fiche_id, diceType, mod, dataParent.dataset.id, numDice).jsawait();
-				Dice.roll([mod], apiResult.result, diceType, null, numDice);
-				var total = apiResult.result + mod;
+
+				var currentWeapon = null;
+				if (dataParent.dataset.id == "damage") {
+					var weaponDiv = parent.parentElement;
+					while (weaponDiv != null && !weaponDiv.classList.contains("weapon"))
+						weaponDiv = weaponDiv.parentElement;
+					if (weaponDiv != null) {
+						var widx = Std.parseInt(weaponDiv.dataset.weaponIdx);
+						currentWeapon = character.weapons[widx];
+					}
+				}
+
+				var expMod = 0;
+				if (character.feats.contains(TIR_A_BOUT_PORTANT) && currentWeapon != null && currentWeapon.range > 0) {
+					var expMods = [{why: "A bout portant (6 cases ou moins) ?", mod: 1, on: WEAPON_DAMAGE}];
+					var choice = makeChoiceAsync("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})'))).jsawait();
+					if (choice > 0) {
+						expMod = expMods[choice - 1].mod;
+					}
+				}
+
+				var apiResult = Api.rollDice(fiche_id, diceType, mod + expMod, dataParent.dataset.id, numDice).jsawait();
+				var mods = [mod];
+				if (expMod > 0)
+					mods.push(expMod);
+				Dice.roll(mods, apiResult.result, diceType, null, numDice);
+				var total = apiResult.result + mod + expMod;
 				if (character.basics.characterClass == ROUBLARD && dataParent.dataset.id == "damage") {
 					var sneakDice = Std.int((character.level + 1) / 2);
 					new elems.YesNoAlert("Attaque sournoise ?", 'Ajouter ${sneakDice}d6 de dégâts d\'attaque sournoise ?', () -> {
@@ -1085,6 +1117,12 @@ class Fiche implements IJSAsync {
 				return "ST not found";
 			}
 			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: SAVING_THROW(st), mod: param2.parseInt(), why: param3}));
+			return "Ok";
+		} else if (what == "feat") {
+			var feat = Feats.createByName(param1.toUpperCase());
+			if (feat == null)
+				return "Feat not found";
+			Api.pushEvent(ficheId, ADD_FEAT(feat));
 			return "Ok";
 		} else if (what == "expsavingnote") {
 			var st = SavingThrow.createByName(param1.toUpperCase());

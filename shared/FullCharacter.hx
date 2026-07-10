@@ -37,6 +37,7 @@ class FullCharacter {
 	public var favoriteMagicSchool:Null<SpellSchool>;
 	public var priestDomains:Null<Array<PriestDomain>>;
 	public var isInAnimalForm:Bool;
+	public var feats:Array<Feats>;
 
 	var primalSizeCategory:Null<SizeCategory>;
 
@@ -65,6 +66,7 @@ class FullCharacter {
 		this.usedPowers = new Map();
 		this.usedSlots = new Map();
 		this.firedWeapons = new Map();
+		this.feats = [];
 		this.isInAnimalForm = false;
 	}
 
@@ -173,7 +175,6 @@ class FullCharacter {
 			case ADD_INVENTORY_ITEM(item):
 				inventory.push(Reflect.copy(item));
 			case CHANGE_ITEM_QUANTITY(item, new_quantity):
-				trace('Change item quantity: $item');
 				inventory[item].quantity = new_quantity;
 			case CHANGE_ITEM_NAME(item, new_name):
 				inventory[item].name = new_name;
@@ -264,6 +265,8 @@ class FullCharacter {
 				speed_mod -= 4;
 				isInAnimalForm = false;
 				updateCharacts();
+			case ADD_FEAT(feat):
+				feats.push(feat);
 		}
 	}
 
