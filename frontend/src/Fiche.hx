@@ -406,12 +406,14 @@ class Fiche implements IJSAsync {
 		} else if (parent.dataset.id == "attack") WEAPON_ATTACK else if (parent.dataset.id == "damage") WEAPON_DAMAGE else null;
 
 		var reloadableWeaponIdx:Null<Int> = null;
+		var currentWeapon = null;
 		if (parent.dataset.id == "attack") {
 			var weaponDiv = parent.parentElement;
 			while (weaponDiv != null && !weaponDiv.classList.contains("weapon"))
 				weaponDiv = weaponDiv.parentElement;
 			if (weaponDiv != null) {
 				var widx = Std.parseInt(weaponDiv.dataset.weaponIdx);
+				currentWeapon = character.weapons[widx];
 				if (character.weapons[widx] != null && character.weapons[widx].shouldBeReloaded == true)
 					reloadableWeaponIdx = widx;
 			}
@@ -427,6 +429,11 @@ class Fiche implements IJSAsync {
 				case _:
 			}
 			var expMods = character.exceptionalModifiers.filter(s -> Type.enumEq(s.on, expModEnum));
+
+			if (currentWeapon != null && (currentWeapon.range == null || currentWeapon.range == 0)) {
+				expMods.push({why: "Prise en tenaille ?", mod: 2, on: WEAPON_ATTACK});
+			}
+
 			if (expMods.length > 0) {
 				new ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(n -> '${n.why} (${n.mod.asMod()})')), (choice) -> {
 					(if (choice == 0) doDiceRoll([modInt], parent.dataset.id, savingThrowNote) else {
