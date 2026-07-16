@@ -115,6 +115,11 @@
     section.npcs {
         margin-top: 40px;
 
+        table
+        {
+            margin-bottom: 100px;
+        }
+
         td.npc-name {
             cursor: pointer;
             &:hover {
