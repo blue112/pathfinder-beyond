@@ -541,8 +541,23 @@ h3 {
             display: flex;
             justify-content: center;
         }
-        .value {
+        .value-po {
             margin-right: 5px;
+            color: rgb(128, 111, 18);
+            font-family: "Roboto";
+            font-size: 1.1em;
+        }
+        .value-pa {
+            margin-right: 5px;
+            margin-left: 5px;
+            color: rgb(127, 127, 127);
+            font-family: "Roboto";
+            font-size: 1.1em;
+        }
+        .value-pc {
+            margin-left: 5px;
+            margin-right: 5px;
+            color: rgb(146, 93, 25);
             font-family: "Roboto";
             font-size: 1.1em;
         }

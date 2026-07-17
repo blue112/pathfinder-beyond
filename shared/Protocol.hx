@@ -30,6 +30,8 @@ enum FicheEventType {
 	ADD_TEMPORARY_MODIFIER(mod:TemporaryModifier);
 	REMOVE_TEMPORARY_MODIFIER(index:Int);
 	CHANGE_MONEY(amount_po:Float);
+	CHANGE_MONEY_PA(amount_pa:Float);
+	CHANGE_MONEY_PC(amount_pc:Float);
 	CHANGE_BANK_MONEY(amount_po:Float);
 	ADD_INVENTORY_ITEM(item:InventoryItem);
 	CHANGE_ITEM_QUANTITY(item:Int, new_quantity:Int);

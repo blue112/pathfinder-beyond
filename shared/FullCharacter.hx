@@ -24,6 +24,8 @@ class FullCharacter {
 	public var weaponsByForm:IntMap<Array<Weapon>>;
 	public var tempMods:Array<TemporaryModifier>;
 	public var money_po:Float;
+	public var money_pa:Float;
+	public var money_pc:Float;
 	public var bank_po:Float;
 	public var inventory:Array<InventoryItem>;
 	public var damageResistances:Map<DamageType, Int>;
@@ -57,6 +59,8 @@ class FullCharacter {
 		this.weaponsByForm = new IntMap();
 		this.inventory = [];
 		this.money_po = 0;
+		this.money_pa = 0;
+		this.money_pc = 0;
 		this.bank_po = 0;
 		this.damageResistances = new Map();
 		this.speed_mod = 0;
@@ -175,6 +179,10 @@ class FullCharacter {
 				updateCharacts();
 			case CHANGE_MONEY(amount):
 				money_po += amount;
+			case CHANGE_MONEY_PA(amount):
+				money_pa += amount;
+			case CHANGE_MONEY_PC(amount):
+				money_pc += amount;
 			case CHANGE_BANK_MONEY(amount):
 				bank_po += amount;
 			case ADD_INVENTORY_ITEM(item):

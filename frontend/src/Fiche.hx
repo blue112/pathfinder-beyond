@@ -103,13 +103,20 @@ class Fiche implements IJSAsync {
 	function bindMoneyActions() {
 		var action = mainElem.querySelector("[data-id=po] .plus");
 		action.addEventListener("click", () -> {
-			new ContextMenu(cast action, ["Ajouter/retirer des PO", "Ajouter/retirer en banque"], (choice) -> {
-				if (choice == 0) {
-					new AmountChoice('Ajouter/retirer des PO', "Combien de PO ajouter ou retirer ?", {canBeNegative: true}, (value, _) -> {
-						if (value != 0)
-							pushEvent(CHANGE_MONEY(value));
+			new ContextMenu(cast action, [
+				"Ajouter/retirer des PO",
+				"Ajouter/retirer des PA",
+				"Ajouter/retirer des PC",
+				"Ajouter/retirer en banque"
+			], (choice) -> {
+				if (choice < 3) {
+					var moneyName = ["PO", "PA", "PC"][choice];
+					new AmountChoice('Ajouter/retirer des $moneyName', 'Combien de $moneyName ajouter ou retirer ?', {canBeNegative: true}, (value, _) -> {
+						if (value != 0) {
+							pushEvent(if (choice == 0) CHANGE_MONEY(value) else if (choice == 1) CHANGE_MONEY_PA(value) else CHANGE_MONEY_PC(value));
+						}
 					});
-				} else if (choice == 1) {
+				} else {
 					new AmountChoice('Ajouter/retirer des PO en banque', "Combien de PO ajouter ou retirer ?", {canBeNegative: true}, (value, _) -> {
 						if (value != 0)
 							pushEvent(CHANGE_BANK_MONEY(value));
@@ -853,7 +860,9 @@ class Fiche implements IJSAsync {
 		updateWeapons();
 		updateInventory();
 
-		availableFields.get("po").innerText = character.money_po.string();
+		availableFields.get("po").querySelector(".value-po").innerText = character.money_po.string();
+		availableFields.get("po").querySelector(".value-pa").innerText = character.money_pa.string();
+		availableFields.get("po").querySelector(".value-pc").innerText = character.money_pc.string();
 		availableFields.get("bank-po").innerText = character.bank_po.string();
 		mainElem.querySelector("[data-id=bank-po]").classList.toggle("hidden", character.bank_po == 0);
 
