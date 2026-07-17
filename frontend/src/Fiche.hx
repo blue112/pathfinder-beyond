@@ -301,7 +301,7 @@ class Fiche implements IJSAsync {
 			new TemporaryModifiersList(fiche_id, character.tempMods);
 		});
 		mainElem.querySelector("a.roll-free-dice").addEventListener("click", () -> {
-			new FreeDiceDialog((choice) -> {
+			new FreeDiceDialog(fiche_id, (choice) -> {
 				if (FreeDiceDialog.isSpecificRoll(choice)) {
 					var roll = FreeDiceDialog.contactRollForIndex(choice);
 					if (roll.id == 'contact-cac' || roll.id == 'contact-distance') {
