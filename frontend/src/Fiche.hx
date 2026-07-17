@@ -42,7 +42,7 @@ class Fiche implements IJSAsync {
 		availableFields = new StringMap();
 		fieldsNames = new StringMap();
 		fieldsNames.set("libre", "Lancé de dé libre");
-		for (r in elems.FreeDiceDialog.contactRolls)
+		for (r in elems.FreeDiceDialog.specificRolls)
 			fieldsNames.set(r.id, r.label);
 		for (i in mainElem.querySelectorAll("*")) {
 			var e:Element = cast i;
@@ -302,13 +302,22 @@ class Fiche implements IJSAsync {
 		});
 		mainElem.querySelector("a.roll-free-dice").addEventListener("click", () -> {
 			new FreeDiceDialog((choice) -> {
-				if (FreeDiceDialog.isContactRoll(choice)) {
+				if (FreeDiceDialog.isSpecificRoll(choice)) {
 					var roll = FreeDiceDialog.contactRollForIndex(choice);
-					var bba = Rules.getBBA(character);
-					var caracMod = if (roll.id == "contact-cac") character.characteristicsMod.str else character.characteristicsMod.dex;
-					var sizeMod = Rules.getSizeMod(character, false);
-					var mods = if (sizeMod != 0) [bba, caracMod, sizeMod] else [bba, caracMod];
-					doDiceRoll(mods, roll.id);
+					if (roll.id == 'contact-cac' || roll.id == 'contact-distance') {
+						var bba = Rules.getBBA(character);
+						var caracMod = if (roll.id == "contact-cac") character.characteristicsMod.str else character.characteristicsMod.dex;
+						var sizeMod = Rules.getSizeMod(character, false);
+						var mods = if (sizeMod != 0) [bba, caracMod, sizeMod] else [bba, caracMod];
+						doDiceRoll(mods, roll.id);
+					} else if (roll.id == 'nls') {
+						doDiceRoll([character.level], roll.id);
+					} else if (roll.id == 'focus') {
+						doDiceRoll([
+							character.level,
+							Rules.getCastingModifier(character.basics.characterClass, character)
+						], roll.id);
+					}
 				} else {
 					rollFreeDice(FreeDiceDialog.diceForIndex(choice));
 				}
