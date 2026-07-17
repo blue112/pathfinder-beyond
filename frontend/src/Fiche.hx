@@ -89,7 +89,7 @@ class Fiche implements IJSAsync {
 
 	function bindFightActions() {
 		var menuLabels = ["Ajouter une arme"];
-		var action = mainElem.querySelector("section.fight h2 .plus");
+		var action = mainElem.querySelector("section.fight .weapons h2 .plus");
 		action.addEventListener("click", () -> {
 			new ContextMenu(action.parentElement.parentElement, menuLabels, (choice) -> {
 				new WeaponDialog(menuLabels[choice], (weapon:Weapon) -> {
@@ -530,7 +530,7 @@ class Fiche implements IJSAsync {
 	}
 
 	private function updateWeapons() {
-		var weaponsSection = mainElem.querySelector(".weapons");
+		var weaponsSection = mainElem.querySelector(".weapons .list");
 		var activeTab = weaponsSection.querySelector(".weapon-tab.active");
 		var activeIdx = if (activeTab != null) {
 			var tabs = weaponsSection.querySelectorAll(".weapon-tab");
@@ -541,7 +541,7 @@ class Fiche implements IJSAsync {
 			found;
 		} else 0;
 
-		weaponsSection.innerHTML = "<h2>Armes</h2>";
+		weaponsSection.innerHTML = "";
 
 		if (!character.weaponsByForm.exists(character.currentAnimalForm))
 			character.weaponsByForm.set(character.currentAnimalForm, []);
@@ -625,7 +625,17 @@ class Fiche implements IJSAsync {
 			damage += Math.floor(character.getCaracMod(weapon.weaponDamageCharacteristic) / 2);
 		}
 
-		getField(divWeapon, "damage").innerText = [for (d in weapon.damage_dices) '1d' + d].join(" + ") + " " + damage.asMod(true);
+		var diceCount = 0;
+		var diceType = 0;
+		for (d in weapon.damage_dices) {
+			if (diceType == 0)
+				diceType = d;
+			else if (diceType != d)
+				trace('NOT SUPPORTED: DIFFERENT DICE TYPE');
+
+			diceCount++;
+		}
+		getField(divWeapon, "damage").innerText = '${diceCount}d${diceType} ' + damage.asMod(true);
 
 		character.applyTempModsClass(getField(divWeapon, "damage").parentElement.parentElement,
 			[WEAPON_DAMAGE, CHARACTERISTIC(weapon.weaponDamageCharacteristic)]);
@@ -650,7 +660,7 @@ class Fiche implements IJSAsync {
 			attackField.appendChild(reloadBtn);
 		}
 
-		mainElem.querySelector(".weapons").appendChild(divWeapon);
+		mainElem.querySelector(".weapons .list").appendChild(divWeapon);
 
 		fieldsNames.set("damage", "Dégats d'arme");
 		fieldsNames.set("attack", "Jet pour toucher");

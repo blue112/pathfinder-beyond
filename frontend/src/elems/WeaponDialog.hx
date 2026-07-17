@@ -6,15 +6,15 @@ import js.html.InputElement;
 import js.Browser;
 
 class WeaponDialog extends Popup {
-    public var reasonInput:InputElement;
+	public var reasonInput:InputElement;
 
-    public function new(title:String, onChoice:Weapon->Void) {
-        super(title);
+	public function new(title:String, onChoice:Weapon->Void) {
+		super(title);
 
-        mainElem.classList.add("weapon");
-        mainElem.classList.add("alert");
+		mainElem.classList.add("weapon");
+		mainElem.classList.add("alert");
 
-        getContent().innerHTML = "
+		getContent().innerHTML = "
         <div class='input-field'>
             <label>Nom de l'arme</label>
             <input type='text' name='name' />
@@ -28,11 +28,11 @@ class WeaponDialog extends Popup {
         </div>
         <div class='input-field'>
             <label>Bonus pour toucher (lié à l'arme)</label>
-            <input type='number' name='attack-bonus' />
+            <input type='number' value='0' name='attack-bonus' />
         </div>
         <div class='input-field'>
-            <label>Dé de dégats (nombre de faces)</label>
-            <input type='number' name='damage-dice' />
+            <label>Dés de dégats (nombre de faces, ex: 8,8 pour 2d8)</label>
+            <input type='text' name='damage-dice' />
         </div>
         <div class='input-field'>
             <label>Type de jet de dégats</label>
@@ -43,15 +43,15 @@ class WeaponDialog extends Popup {
         </div>
         <div class='input-field'>
             <label>Bonus de dégats (lié à l'arme)</label>
-            <input type='number' name='damage-bonus' />
+            <input type='number' value='0' name='damage-bonus' />
         </div>
         <div class='input-field'>
             <label>Nombres critiques (séparés par des virgules, généralement 20)</label>
-            <input type='text' name='critical-nums' />
+            <input type='text' value='20' name='critical-nums' />
         </div>
         <div class='input-field'>
             <label>Multiplicateur critique (généralement 2)</label>
-            <input type='number' name='critical-mult' />
+            <input type='number' value='2' name='critical-mult' />
         </div>
         <div class='input-field'>
             <label>Type de dégats</label>
@@ -77,38 +77,35 @@ class WeaponDialog extends Popup {
             <a class='validate'>Valider</a>
         </div>";
 
-        mainElem.querySelector("a.validate").addEventListener("click", () -> {
-            var reloadInput:InputElement = cast mainElem.querySelector("input[name=should-be-reloaded]");
-            var w:Weapon = {
-                name: (cast mainElem.querySelector("input[name=name]")).value,
-                munitions: (cast mainElem.querySelector("input[name=ammo]")).value,
-                range: (cast mainElem.querySelector("input[name=range]") : InputElement).value.parseInt(),
-                damage_types: [
-                    for (i in (cast mainElem.querySelector("select[name=type]") : SelectElement).selectedOptions)
-                        i
-                ].map((n) -> {
-                    return WeaponDamageType.createByName((cast n : OptionElement).value);
-                }),
-                critical_text: {
-                    nums: (cast mainElem.querySelector("input[name=critical-nums]") : InputElement).value.split(",").map(s -> s.parseInt()),
-                    damageMultiplier: (cast mainElem.querySelector("input[name=critical-mult]") : InputElement).value.parseInt()
-                },
-                damage_modifier: (cast mainElem.querySelector("input[name=damage-bonus]") : InputElement).value.parseInt(),
-                weaponDamageCharacteristic: Characteristic.createByName((cast mainElem.querySelector("select[name=damage-type]") : SelectElement).value),
-                weaponAttackCharacteristic: Characteristic.createByName((cast mainElem.querySelector("select[name=attack-type]") : SelectElement).value),
-                weaponHasPlus50PercentDamage: false,
-                attack_modifier: (cast mainElem.querySelector("input[name=attack-bonus]") : InputElement).value.parseInt(),
-                damage_dices: [
-                    (cast mainElem.querySelector("input[name=damage-dice]") : InputElement)
-                    .value.parseInt()
-                ],
-                shouldBeReloaded: reloadInput.checked,
-            };
+		mainElem.querySelector("a.validate").addEventListener("click", () -> {
+			var reloadInput:InputElement = cast mainElem.querySelector("input[name=should-be-reloaded]");
+			var w:Weapon = {
+				name: (cast mainElem.querySelector("input[name=name]")).value,
+				munitions: (cast mainElem.querySelector("input[name=ammo]")).value,
+				range: (cast mainElem.querySelector("input[name=range]") : InputElement).value.parseInt(),
+				damage_types: [
+					for (i in (cast mainElem.querySelector("select[name=type]") : SelectElement).selectedOptions)
+						i
+				].map((n) -> {
+					return WeaponDamageType.createByName((cast n : OptionElement).value);
+				}),
+				critical_text: {
+					nums: (cast mainElem.querySelector("input[name=critical-nums]") : InputElement).value.split(",").map(s -> s.parseInt()),
+					damageMultiplier: (cast mainElem.querySelector("input[name=critical-mult]") : InputElement).value.parseInt()
+				},
+				damage_modifier: (cast mainElem.querySelector("input[name=damage-bonus]") : InputElement).value.parseInt(),
+				weaponDamageCharacteristic: Characteristic.createByName((cast mainElem.querySelector("select[name=damage-type]") : SelectElement).value),
+				weaponAttackCharacteristic: Characteristic.createByName((cast mainElem.querySelector("select[name=attack-type]") : SelectElement).value),
+				weaponHasPlus50PercentDamage: false,
+				attack_modifier: (cast mainElem.querySelector("input[name=attack-bonus]") : InputElement).value.parseInt(),
+				damage_dices: (cast mainElem.querySelector("input[name=damage-dice]") : InputElement).value.split(",").map(Std.parseInt),
+				shouldBeReloaded: reloadInput.checked,
+			};
 
-            onChoice(w);
-            close();
-        });
+			onChoice(w);
+			close();
+		});
 
-        Browser.document.body.appendChild(mainElem);
-    }
+		Browser.document.body.appendChild(mainElem);
+	}
 }
