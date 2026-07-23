@@ -36,15 +36,15 @@ class FreeDiceDialog extends ChoicesDialog implements IJSAsync {
 	}
 
 	@:jsasync public function onFreeDice(v:InputElement, _) {
-		var diceRegex = ~/([1-9])d([1-9][0-9]*)((\+|-)[0-9]+)?/;
+		var diceRegex = ~/([1-9])d([1-9][0-9]*)\s*((\+|-)\s*[0-9]+)?/;
 		diceRegex.match(v.value);
 		var numDice = diceRegex.matched(1).parseInt();
 		var diceType = diceRegex.matched(2).parseInt();
-		var mod = diceRegex.matched(3).parseInt();
+		var mod = diceRegex.matched(3).replace(" ", "").parseInt();
 		if (mod == null)
 			mod = 0;
 
-		var apiResult = Api.rollDice(fiche_id, diceType, mod, 'Jet libre ${v.value}', numDice).jsawait();
+		var apiResult = Api.rollDice(fiche_id, diceType, mod, 'Jet libre ${diceRegex.matched(0)}', numDice).jsawait();
 
 		Dice.roll([mod], apiResult.result, diceType, null, numDice);
 	}
