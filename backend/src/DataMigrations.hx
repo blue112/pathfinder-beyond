@@ -51,7 +51,9 @@ class DataMigrations implements IJSAsync {
 				Unserializer.run(row.event_params.toString()); // OK if no crash
 			} catch (e:Dynamic) {
 				// Corrupted entry, remove it
-				if (StringTools.contains(row.event_params, ":AC:")) {
+				if (StringTools.contains(row.event_params, ":AC:")
+					|| StringTools.contains(row.event_params, ":AC_DEFLECTION:")
+					|| StringTools.contains(row.event_params, ":AC_DODGE:")) {
 					var newData = [{on: Field.INITIATIVE, mod: 0, why: ""}];
 					trace('Fixing entry ${row.event_params}');
 					DatabaseHandler.exec("UPDATE fiche_events SET event_params = ? WHERE id=?", [Serializer.run(newData), row.id]).jsawait();
