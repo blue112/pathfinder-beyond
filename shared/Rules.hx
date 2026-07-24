@@ -304,11 +304,21 @@ class Rules {
 
 		if (char.currentAnimalForm != 0) {
 			protections.push({
-				name: "Forme bestiale II",
+				name: "Forme bestiale II (taille G) - Armure",
 				armorMalus: 0,
 				max_dex: null,
-				armor: 2,
+				isTemporary: false,
+				armor: 4,
 				type: NATURAL_ARMOR_BONUS
+			});
+
+			protections.push({
+				name: "Forme bestiale II (taille G) - Dex",
+				armorMalus: 0,
+				isTemporary: false,
+				max_dex: null,
+				armor: -2,
+				type: DODGE_BONUS
 			});
 		}
 
