@@ -71,13 +71,7 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case ADD_PROTECTION(armor):
 					currentProtections.push(armor);
 					var malusStr = if (armor.armorMalus != null && armor.armorMalus != 0) ', malus ${armor.armorMalus.asMod()}' else "";
-					'Ajout ${switch (armor.type) {
-                        case ARMOR: "d'une armure";
-                        case SHIELD: "d'un bouclier";
-                        case NATURAL_ARMOR: "d'une armure naturelle";
-                        case EVADE: "d'un bonus d'esquive";
-                        case ARMOR_BONUS: "bonus à la CA";
-                    }}: ${armor.name.htmlEscape()} (+${armor.armor} CA$malusStr)';
+					'Ajout ${armor.type.acTypeToString()}: ${armor.name.htmlEscape()} (+${armor.armor} CA$malusStr)';
 				case REMOVE_PROTECTION(n):
 					var p = currentProtections.splice(n, 1)[0];
 					'Retrait d\'une protection (${p.name.htmlEscape()})';

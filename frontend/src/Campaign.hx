@@ -308,7 +308,7 @@ class Campaign implements IJSAsync {
 
             var name = if (fc != null) fc.basics.characterName else if (npc != null) npc.name else "?";
             var hp = if (fc != null) '${fc.current_hp} / ${fc.getMaxHitPoints()}' else if (npc != null && entry.currentHp != null) '${entry.currentHp} / ${npc.maxHp}' else "?";
-            var ac = if (fc != null) fc.getAC().string() else if (entry.currentAc != null) entry.currentAc.string() else "?";
+            var ac = if (fc != null) fc.getAC(NORMAL).string() else if (entry.currentAc != null) entry.currentAc.string() else "?";
             var acTooltip = if (fc != null) 'Contact: ${fc.getACContact()} / Surprise: ${fc.getACSurprise()}' else if (npc != null) 'Contact: ${npc.acContact} / Surprise: ${npc.acBySurprise}' else "";
 
             var row = Browser.document.createTableRowElement();

@@ -279,17 +279,19 @@ h3 {
         }
     }
 
-    section.armorlist > div {
-        display: grid;
-        grid-template-columns: 1fr 100px;
-        gap: 5px;
+    section.armorlist {
+        .protections-btn {
+            display: block;
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            border: 3px solid variables.$redColor;
+            cursor: pointer;
+            background: color.adjust($color: variables.$backgroundColor, $lightness: -10%);
 
-        .name {
-            @include mixins.box;
-        }
-        .ac {
-            @include mixins.mod-box;
-            font-size: 0.9em;
+            &:hover {
+                background: color.adjust($color: variables.$backgroundColor, $lightness: -5%);
+            }
         }
     }
 

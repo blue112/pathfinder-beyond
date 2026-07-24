@@ -238,25 +238,21 @@ class Fiche implements IJSAsync {
 		var action = mainElem.querySelector(".ac .plus");
 		var attachOn = action.parentElement.parentElement;
 		action.addEventListener("click", () -> {
-			new ContextMenu(attachOn, [
-				"Ajouter un modificateur temporaire (armure / bouclier / armure naturelle)",
-				"Ajouter un modificateur temporaire (esquive)",
-				"Ajouter un modificateur temporaire (parade / intuition / chance)",
-				"Ajouter une protection"
-			], (choice) -> {
-				if (choice == 3) {
+			new ContextMenu(attachOn, ["Ajouter une protection temporaire", "Ajouter une protection permanente"], (choice) -> {
+				if (choice == 1) {
 					new AddProtectionDialog((protection) -> {
 						pushEvent(ADD_PROTECTION(protection));
 					});
 				} else {
-					var acField = if (choice == 0) AC else if (choice == 1) AC_DODGE else AC_DEFLECTION;
-					new AmountChoice("Modificateur temporaire de CA", "Quel modificateur appliquer ?", {canBeNegative: true, askReason: true},
-						(result, reason) -> {
-							pushEvent(ADD_TEMPORARY_MODIFIER({mod: result, why: reason, on: acField}));
-						});
+					new AddTemporaryProtectionDialog(tempMod -> {
+						pushEvent(ADD_TEMPORARY_MODIFIER(tempMod));
+					});
 				}
 				return true;
 			});
+		});
+		mainElem.querySelector(".protections-btn").addEventListener("click", () -> {
+			new ProtectionsList(fiche_id, character.protections, character);
 		});
 	}
 
@@ -712,30 +708,13 @@ class Fiche implements IJSAsync {
 		});
 	}
 
-	private function updateAC(field:String, includeArmor:Bool, includeDex:Bool) {
+	private function updateAC(field:String, type:CharacterACType) {
 		var acDiv = availableFields.get(field);
 
-		// Build the set of temp mod targets relevant to this AC variant
-		var match = [AC_DEFLECTION]; // deflection applies to all three CAs
-		if (includeArmor)
-			match.push(AC); // armor/shield/natural: total + flat-footed
-		if (includeDex) {
-			match.push(AC_DODGE); // dodge: total + contact
-			match.push(CHARACTERISTIC(DEXTERITY));
-		}
-
-		var mod = character.getAC(includeArmor, includeDex) + character.getTempMods(match).sum();
-		var totalTempMod = character.getTempMods(match).sum();
-		if (totalTempMod != 0) {
-			acDiv.classList.add("temp-mod");
-			if (totalTempMod < 0)
-				acDiv.classList.add("negative");
-		} else {
-			acDiv.classList.remove("temp-mod");
-		}
+		var mod = character.getAC(type);
 
 		// Check if we have an exceptional mod (only on the full AC field)
-		var expCA = character.exceptionalModifiers.filter(m -> m.on.match(AC));
+		var expCA = character.exceptionalModifiers.filter(m -> m.on.match(AC(NO_TYPE)));
 		if (expCA.length > 0 && field == "ac") {
 			mainElem.querySelector('.ac').classList.add('exp');
 			var expEl = mainElem.querySelector('.ac .exp');
@@ -837,9 +816,9 @@ class Fiche implements IJSAsync {
 		availableFields.get("non-lethal-max").innerText = maxHP;
 		availableFields.get("non-lethal-damages").innerText = 0.string();
 
-		updateAC("ac", true, true);
-		updateAC("ac-contact", false, true);
-		updateAC("ac-surprise", true, false);
+		updateAC("ac", NORMAL);
+		updateAC("ac-contact", TOUCH);
+		updateAC("ac-surprise", SURPRISE);
 
 		updateSavingThrow("saving-reflexes", REFLEXES);
 		updateSavingThrow("saving-vigor", VIGOR);
@@ -856,7 +835,6 @@ class Fiche implements IJSAsync {
 		character.applyTempModsClass(levelField.parentElement, [NEGATIVE_LEVEL]);
 
 		addSkills();
-		addArmor();
 		updateWeapons();
 		updateInventory();
 
@@ -878,39 +856,6 @@ class Fiche implements IJSAsync {
 		if (canTransform) {
 			animalFormBtn.innerText = if (character.currentAnimalForm != 0) "Forme normale" else "Forme animale";
 			animalFormBtn.classList.toggle("active", character.currentAnimalForm != 0);
-		}
-	}
-
-	function addArmor() {
-		var armorsDiv = mainElem.querySelector(".armorlist");
-		armorsDiv.innerHTML = "<h2>Protections <small>(déjà appliquées à la CA)</small></h2>";
-		for (i in 0...character.protections.length) {
-			var p = character.protections[i];
-			var armorDiv = Browser.document.createDivElement();
-			armorDiv.classList.add("armor");
-			var actionsHover = Browser.document.createDivElement();
-			actionsHover.className = "actions-hover";
-			var plus = Browser.document.createAnchorElement();
-			plus.className = "plus";
-			plus.innerText = "+";
-			actionsHover.appendChild(plus);
-			armorDiv.appendChild(actionsHover);
-			var nameSpan = Browser.document.createSpanElement();
-			nameSpan.className = "name";
-			nameSpan.innerText = p.name;
-			armorDiv.appendChild(nameSpan);
-			var acSpan = Browser.document.createSpanElement();
-			acSpan.className = "ac";
-			acSpan.innerText = '${p.armor.asMod()} CA';
-			armorDiv.appendChild(acSpan);
-			plus.addEventListener("click", () -> {
-				new ContextMenu(armorDiv, ["Supprimer la protection"], (choice) -> {
-					if (choice == 0)
-						pushEvent(REMOVE_PROTECTION(i));
-					return true;
-				});
-			});
-			armorsDiv.appendChild(armorDiv);
 		}
 	}
 
@@ -1182,7 +1127,7 @@ class Fiche implements IJSAsync {
 			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: WEAPON_ATTACK, mod: param1.parseInt(), why: param2}));
 			return "Ok";
 		} else if (what == "expacmod") {
-			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: AC, mod: param1.parseInt(), why: param2}));
+			Api.pushEvent(ficheId, ADD_EXCEPTIONAL_MODIFIER({on: AC(NO_TYPE), mod: param1.parseInt(), why: param2}));
 			return "Ok";
 		} else if (what == "skillmod") {
 			var skill = SkillType.createByName(param1.toUpperCase());

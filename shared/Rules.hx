@@ -1,9 +1,17 @@
+import haxe.ds.StringMap;
 import js.html.Element;
 import RulesSkills.SkillType;
 import Protocol;
 
 using Rules;
 using Lambda;
+using ProtocolUtil;
+
+enum CharacterACType {
+	NORMAL;
+	TOUCH;
+	SURPRISE;
+}
 
 class Rules {
 	static public function canCastSpells(cls:CharacterClass):Bool {
@@ -184,8 +192,8 @@ class Rules {
 	}
 
 	static public function getSkillsMods(char:FullCharacter) {
-		var armorPenalty = char.protections.filter(p -> (p.type == ARMOR || p.type == SHIELD)
-			&& p.armorMalus != null).fold((p, acc) -> acc + p.armorMalus, 0);
+		var armorPenalty = char.protections.filter(p -> (p.type == ARMOR_BONUS || p.type == SHIELD_BONUS) && p.armorMalus != null)
+			.fold((p, acc) -> acc + p.armorMalus, 0);
 
 		return RulesSkills.skills.map(n -> {
 			var ranks = char.getSkillRank(n.name);
@@ -234,6 +242,10 @@ class Rules {
 		}
 	}
 
+	static public function arraySum(val:Array<Int>) {
+		return val.fold((t, r) -> t + r, 0);
+	}
+
 	static public function sum(tempMod:Array<TemporaryModifier>) {
 		return tempMod.fold((t, r) -> t.mod + r, 0);
 	}
@@ -273,21 +285,62 @@ class Rules {
 		return sizeMod;
 	}
 
-	static public function getAC(char:FullCharacter, includeArmor:Bool = true, includeDex:Bool = true) {
+	static public function getActiveProtections(char:FullCharacter) {
+		var applicableProtectionsByType:Map<ACType, Array<Protection>> = new Map();
+		var protections = char.protections.copy();
+		var tempProtections = char.tempMods.filter(n -> n.on.match(AC(_)));
+		for (i in tempProtections) {
+			protections.push({
+				name: i.why,
+				armorMalus: 0,
+				max_dex: null,
+				armor: i.mod,
+				type: switch (i.on) {
+					case AC(t): t;
+					default: return null;
+				}
+			});
+		}
+
+		if (char.currentAnimalForm != 0) {
+			protections.push({
+				name: "Forme bestiale II",
+				armorMalus: 0,
+				max_dex: null,
+				armor: 2,
+				type: NATURAL_ARMOR_BONUS
+			});
+		}
+
+		for (i in protections) {
+			if (!applicableProtectionsByType.exists(i.type))
+				applicableProtectionsByType.set(i.type, [i]);
+			else if (i.type.canBeStacked())
+				applicableProtectionsByType.get(i.type).push(i);
+			else if (applicableProtectionsByType.get(i.type)[0].armor < i.armor)
+				applicableProtectionsByType.get(i.type)[0] = i;
+		}
+
+		return applicableProtectionsByType;
+	}
+
+	static public function getAC(char:FullCharacter, type:CharacterACType) {
 		var sizeMod = getSizeMod(char, false);
 
 		var total = 10;
 		total += sizeMod; // Always
-		total += char.protections.filter(f -> f.type == ARMOR_BONUS).fold((i, r) -> r + i.armor, 0);
-		if (includeDex) {
-			total += char.characteristicsMod.dex;
-			total += char.protections.filter(f -> f.type == EVADE).fold((i, r) -> r + i.armor, 0);
-		}
 
-		if (includeArmor) {
-			total += char.protections.filter(f -> f.type == ARMOR || f.type == SHIELD || f.type == NATURAL_ARMOR).fold((i, r) -> r + i.armor, 0);
-			if (char.currentAnimalForm != 0)
-				total += 2;
+		var applicableProtectionsByType:Map<ACType, Array<Protection>> = getActiveProtections(char);
+
+		total += switch (type) {
+			case NORMAL:
+				char.characteristicsMod.dex + [for (i in applicableProtectionsByType) i.map(n -> n.armor).arraySum()].arraySum();
+			case TOUCH:
+				var ks = [for (i in applicableProtectionsByType.keys()) i].filter(n -> n.helpsForTouch());
+				char.characteristicsMod.dex + [for (i in ks) applicableProtectionsByType.get(i).map(n -> n.armor).arraySum()].arraySum();
+			case SURPRISE:
+				var ks = [for (i in applicableProtectionsByType.keys()) i].filter(n -> n.helpsForSurprise());
+				[for (i in ks) applicableProtectionsByType.get(i).map(n -> n.armor).arraySum()].arraySum();
 		}
 
 		return total;
@@ -295,12 +348,12 @@ class Rules {
 
 	static public function getACSurprise(char:FullCharacter) {
 		// Remove dex
-		return getAC(char, true, false);
+		return getAC(char, SURPRISE);
 	}
 
 	static public function getACContact(char:FullCharacter) {
 		// Remove armor and shield
-		return getAC(char, false, true);
+		return getAC(char, TOUCH);
 	}
 
 	static public function getVD(char:FullCharacter) {

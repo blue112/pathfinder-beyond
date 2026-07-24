@@ -1,4 +1,6 @@
 @use "alert";
+@use "variables";
+@use "sass:color";
 
 .popup {
     .main {
@@ -54,6 +56,53 @@
             &.event-history ul {
                 display: flex;
                 flex-direction: column-reverse;
+            }
+
+            &.protections table {
+                border-collapse: collapse;
+                margin: auto;
+
+                th {
+                    background: variables.$backgroundColor;
+                    padding: 10px;
+                    border-bottom: 1px solid black;
+                }
+
+                td {
+                    background: color.adjust($color: variables.$backgroundColor, $lightness: -10%);
+                    padding: 10px;
+                }
+
+                tr {
+                    &:nth-child(even) td {
+                        background: color.adjust($color: variables.$backgroundColor, $lightness: -20%);
+                    }
+                    &:hover td {
+                        background: color.adjust($color: variables.$backgroundColor, $lightness: 10%);
+                        cursor: pointer;
+                    }
+
+                    &.inactive {
+                        td {
+                            background: #838383;
+                            text-decoration: line-through;
+
+                            &.comment {
+                                text-decoration: none;
+                            }
+                        }
+                    }
+
+                    &.temporary {
+                        td {
+                            background: #cfffd2;
+                        }
+
+                        &:hover td {
+                            background: #e1fae3;
+                        }
+                    }
+                }
             }
         }
     }

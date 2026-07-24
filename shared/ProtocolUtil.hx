@@ -3,282 +3,330 @@ import Protocol;
 using StringTools;
 
 class ProtocolUtil {
-    static public function parseCharacterAlignement(align:String):CharacterAlignement {
-        var byName = CharacterAlignement.createByName("ALIGNEMENT_" + align.toUpperCase());
-        if (byName != null)
-            return byName;
-        return null;
-    }
+	static public function parseCharacterAlignement(align:String):CharacterAlignement {
+		var byName = CharacterAlignement.createByName("ALIGNEMENT_" + align.toUpperCase());
+		if (byName != null)
+			return byName;
+		return null;
+	}
 
-    static public function parseCharacterClass(charClass:String):CharacterClass {
-        var byName = CharacterClass.createByName(charClass.toUpperCase());
-        if (byName != null)
-            return byName;
-        return null;
-    }
+	static public function parseCharacterClass(charClass:String):CharacterClass {
+		var byName = CharacterClass.createByName(charClass.toUpperCase());
+		if (byName != null)
+			return byName;
+		return null;
+	}
 
-    static public function parseSizeCategory(size:String):SizeCategory {
-        var byName = SizeCategory.createByName("SIZE_" + size.toUpperCase());
-        if (byName != null)
-            return byName;
-        return null;
-    }
+	static public function parseSizeCategory(size:String):SizeCategory {
+		var byName = SizeCategory.createByName("SIZE_" + size.toUpperCase());
+		if (byName != null)
+			return byName;
+		return null;
+	}
 
-    static public function parseCharacterGender(gender:String):CharacterGender {
-        var byName = CharacterGender.createByName(gender.toUpperCase());
-        if (byName != null)
-            return byName;
-        return null;
-    }
+	static public function parseCharacterGender(gender:String):CharacterGender {
+		var byName = CharacterGender.createByName(gender.toUpperCase());
+		if (byName != null)
+			return byName;
+		return null;
+	}
 
-    static public function genderToString(gender:CharacterGender):String {
-        return switch (gender) {
-            case MALE: "M";
-            case FEMALE: "F";
-        };
-    }
+	static public function genderToString(gender:CharacterGender):String {
+		return switch (gender) {
+			case MALE: "M";
+			case FEMALE: "F";
+		};
+	}
 
-    static public function parseCharacterRace(race:String):CharacterRace {
-        var byName = CharacterRace.createByName(race.toUpperCase());
-        if (byName != null)
-            return byName;
-        return null;
-    }
+	static public function parseCharacterRace(race:String):CharacterRace {
+		var byName = CharacterRace.createByName(race.toUpperCase());
+		if (byName != null)
+			return byName;
+		return null;
+	}
 
-    static public function parseCarac(c:String):Characteristic {
-        return if (c == "str") STRENGTH else if (c == "dex") DEXTERITY else if (c == "wis") WISDOM else if (c == "int") INTELLIGENCE else if (c == "cha")
-            CHARISMA else if (c == "con") CONSTITUTION else null;
-    }
+	static public function parseCarac(c:String):Characteristic {
+		return if (c == "str") STRENGTH else if (c == "dex") DEXTERITY else if (c == "wis") WISDOM else if (c == "int") INTELLIGENCE else if (c == "cha")
+			CHARISMA else if (c == "con") CONSTITUTION else null;
+	}
 
-    static public function savingThrowToString(st:SavingThrow) {
-        return switch (st) {
-            case REFLEXES: "Réflexes";
-            case WILL: "Volonté";
-            case VIGOR: "Vigueur";
-        }
-    }
+	static public function savingThrowToString(st:SavingThrow) {
+		return switch (st) {
+			case REFLEXES: "Réflexes";
+			case WILL: "Volonté";
+			case VIGOR: "Vigueur";
+		}
+	}
 
-    static public function caracToString(c:Characteristic, withPrefix:Bool) {
-        return switch (c) {
-            case STRENGTH: if (withPrefix) "de la force" else "Force";
-            case DEXTERITY: if (withPrefix) "de la dextérité" else "Dextérité";
-            case WISDOM: if (withPrefix) "de la sagesse" else "Sagesse";
-            case INTELLIGENCE: if (withPrefix) "de l'intelligence" else "Intelligence";
-            case CHARISMA: if (withPrefix) "du charisme" else "Charisme";
-            case CONSTITUTION: if (withPrefix) "de la constitution" else "Constitution";
-        };
-    }
+	static public function canBeStacked(at:ACType) {
+		return switch (at) {
+			case NATURAL_ARMOR_BONUS, NATURAL_ARMOR_ALTERATION_BONUS, ARMOR_BONUS, ARMOR_ALTERATION_BONUS, SHIELD_BONUS, SHIELD_ALTERATION_BONUS: false;
+			case DODGE_BONUS: true;
+			case DEFLECT_BONUS: false;
+			case CHANCE_BONUS: false;
+			case INTUITION_BONUS: false;
+			case NO_TYPE: true;
+		}
+	}
 
-    static public function classToString(cls:CharacterClass) {
-        return switch (cls) {
-            case ROUBLARD: "Roublard(e)";
-            case METAMORPHE: "Métamorphe";
-            case CONJURATEUR: "Conjurateur";
-            case CONJURATEUR_EIDOLON_BIPED: "Eidolon du Conjurateur";
-            case MAGICIEN: "Magicien(ne)";
-            case PRETRE: "Prêtre(sse)";
-        }
-    }
+	static public function helpsForSurprise(at:ACType) { // No dex
+		return switch (at) {
+			case NATURAL_ARMOR_BONUS, NATURAL_ARMOR_ALTERATION_BONUS, ARMOR_BONUS, ARMOR_ALTERATION_BONUS, SHIELD_BONUS, SHIELD_ALTERATION_BONUS: true;
+			case DODGE_BONUS: false;
+			case DEFLECT_BONUS: true;
+			case CHANCE_BONUS: true;
+			case INTUITION_BONUS: true;
+			case NO_TYPE: true;
+		}
+	}
 
-    static public function characteristicToIconPath(c:Characteristic) {
-        return '/assets/icons/characs/${c.getName().toLowerCase()}.svg';
-    }
+	static public function helpsForTouch(at:ACType) { // No armor
+		return switch (at) {
+			case NATURAL_ARMOR_BONUS, NATURAL_ARMOR_ALTERATION_BONUS, ARMOR_BONUS, ARMOR_ALTERATION_BONUS, SHIELD_BONUS, SHIELD_ALTERATION_BONUS: false;
+			case DODGE_BONUS: true;
+			case DEFLECT_BONUS: true;
+			case CHANCE_BONUS: true;
+			case INTUITION_BONUS: true;
+			case NO_TYPE: true;
+		}
+	}
 
-    static public function classToIconPath(cls:CharacterClass) {
-        var name = switch (cls) {
-            case ROUBLARD: "roublard";
-            case METAMORPHE: "metamorphe";
-            case CONJURATEUR: "conjurateur";
-            case CONJURATEUR_EIDOLON_BIPED: "eidolon_du_conjurateur";
-            case MAGICIEN: "magicien";
-            case PRETRE: "pretre";
-        };
-        return '/assets/icons/classes/$name.svg';
-    }
+	static public function acTypeToString(at:ACType) {
+		return switch (at) {
+			case NATURAL_ARMOR_BONUS: "Bonus d'armure naturelle";
+			case NATURAL_ARMOR_ALTERATION_BONUS: "Bonus d'alteration d'armure naturelle";
+			case ARMOR_BONUS: "Bonus d'armure";
+			case ARMOR_ALTERATION_BONUS: "Bonus d'alteration d'armure";
+			case SHIELD_BONUS: "Bonus de bouclier";
+			case SHIELD_ALTERATION_BONUS: "Bonus d'alteration de bouclier";
+			case DODGE_BONUS: "Bonus d'esquive"; // Can be stacked
+			case DEFLECT_BONUS: "Bonus de parade";
+			case CHANCE_BONUS: "Bonus de chance";
+			case INTUITION_BONUS: "Bonus d'intuition";
+			case NO_TYPE: "Sans type (très rare)";
+		}
+	}
 
-    static public function sizeCategoryToString(size:SizeCategory) {
-        return switch (size) {
-            case SIZE_I: "I (Infime)";
-            case SIZE_MIN: "M (Minuscule)";
-            case SIZE_TP: "TP (Très petit)";
-            case SIZE_P: "P (Petit)";
-            case SIZE_M: "M (Moyen)";
-            case SIZE_G: "G (Grand)";
-            case SIZE_TG: "TG (Très grand)";
-            case SIZE_GIG: "Gig (Giganteste)";
-            case SIZE_C: "C (Colossal)";
-        };
-    }
+	static public function caracToString(c:Characteristic, withPrefix:Bool) {
+		return switch (c) {
+			case STRENGTH: if (withPrefix) "de la force" else "Force";
+			case DEXTERITY: if (withPrefix) "de la dextérité" else "Dextérité";
+			case WISDOM: if (withPrefix) "de la sagesse" else "Sagesse";
+			case INTELLIGENCE: if (withPrefix) "de l'intelligence" else "Intelligence";
+			case CHARISMA: if (withPrefix) "du charisme" else "Charisme";
+			case CONSTITUTION: if (withPrefix) "de la constitution" else "Constitution";
+		};
+	}
 
-    static public function damageTypeToString(dt:DamageType) {
-        return switch (dt) {
-            case BLUDGEONING: "Contondant";
-            case PIERCING: "Perforant";
-            case SLASHING: "Tranchant";
-            case ACID: "Acide";
-            case COLD: "Froid";
-            case ELECTRICITY: "Électricité";
-            case FIRE: "Feu";
-            case SONIC: "Sonique";
-            case FORCE: "Force";
-            case POSITIVE: "Énergie positive";
-            case NEGATIVE: "Énergie négative";
-            case CHAOTIC: "Chaotique";
-            case EVIL: "Mal";
-            case GOOD: "Bien";
-            case LAWFUL: "Loi";
-            case UNTYPED: "Sans type";
-        }
-    }
+	static public function classToString(cls:CharacterClass) {
+		return switch (cls) {
+			case ROUBLARD: "Roublard(e)";
+			case METAMORPHE: "Métamorphe";
+			case CONJURATEUR: "Conjurateur";
+			case CONJURATEUR_EIDOLON_BIPED: "Eidolon du Conjurateur";
+			case MAGICIEN: "Magicien(ne)";
+			case PRETRE: "Prêtre(sse)";
+		}
+	}
 
-    static public function raceToString(race:CharacterRace):String {
-        return switch (race) {
-            case HUMAN: "Humain(e)";
-            case DWARF: "Nain(e)";
-            case ELF: "Elfe";
-            case HALF_ELF: "Demi-elfe";
-            case GNOME: "Gnome";
-            case HALF_ORC: "Demi-orque";
-        case ANGEL: "Ange";
-        };
-    }
+	static public function characteristicToIconPath(c:Characteristic) {
+		return '/assets/icons/characs/${c.getName().toLowerCase()}.svg';
+	}
 
-    static public function alignementToString(alignement:CharacterAlignement) {
-        return switch (alignement) {
-            case ALIGNEMENT_LB: "Loyal/Bon";
-            case ALIGNEMENT_NB: "Neutre/Bon";
-            case ALIGNEMENT_CB: "Chaotique/Bon";
-            case ALIGNEMENT_LN: "Loyal/Neutre";
-            case ALIGNEMENT_N: "Neutre";
-            case ALIGNEMENT_LM: "Loyal/Mauvais";
-            case ALIGNEMENT_NM: "Neutre/Mauvais";
-            case ALIGNEMENT_CM: "Chaotique/Mauvais";
-        }
-    }
+	static public function classToIconPath(cls:CharacterClass) {
+		var name = switch (cls) {
+			case ROUBLARD: "roublard";
+			case METAMORPHE: "metamorphe";
+			case CONJURATEUR: "conjurateur";
+			case CONJURATEUR_EIDOLON_BIPED: "eidolon_du_conjurateur";
+			case MAGICIEN: "magicien";
+			case PRETRE: "pretre";
+		};
+		return '/assets/icons/classes/$name.svg';
+	}
 
-    static public function priestDomainToString(d:PriestDomain):String {
-        return switch (d) {
-            case AIR:         "Air";
-            case ANIMAL:      "Animal";
-            case ARTIFICE:    "Artifice";
-            case CHAOS:       "Chaos";
-            case CHARM:       "Charme";
-            case COMMUNITY:   "Communauté";
-            case DARKNESS:    "Ténèbres";
-            case DEATH:       "Mort";
-            case DESTRUCTION: "Destruction";
-            case EARTH:       "Terre";
-            case EVIL:        "Mal";
-            case FIRE:        "Feu";
-            case GLORY:       "Gloire";
-            case GOOD:        "Bien";
-            case HEALING:     "Guérison";
-            case KNOWLEDGE:   "Connaissance";
-            case LAW:         "Loi";
-            case LIBERATION:  "Libération";
-            case LUCK:        "Chance";
-            case MADNESS:     "Folie";
-            case MAGIC:       "Magie";
-            case NOBILITY:    "Noblesse";
-            case PLANT:       "Plantes";
-            case PROTECTION:  "Protection";
-            case REPOSE:      "Repos";
-            case RUNE:        "Rune";
-            case STRENGTH:    "Vigueur";
-            case SUN:         "Soleil";
-            case TRAVEL:      "Voyage";
-            case TRICKERY:    "Tromperie";
-            case VOID:        "Vide";
-            case WAR:         "Guerre";
-            case WATER:       "Eau";
-            case WEATHER:     "Météores";
-        }
-    }
+	static public function sizeCategoryToString(size:SizeCategory) {
+		return switch (size) {
+			case SIZE_I: "I (Infime)";
+			case SIZE_MIN: "M (Minuscule)";
+			case SIZE_TP: "TP (Très petit)";
+			case SIZE_P: "P (Petit)";
+			case SIZE_M: "M (Moyen)";
+			case SIZE_G: "G (Grand)";
+			case SIZE_TG: "TG (Très grand)";
+			case SIZE_GIG: "Gig (Giganteste)";
+			case SIZE_C: "C (Colossal)";
+		};
+	}
 
-    static public function spellSchoolToString(s:SpellSchool):String {
-        return switch (s) {
-            case ABJURATION: "Abjuration";
-            case CONJURATION: "Invocation";
-            case DIVINATION: "Divination";
-            case ENCHANTMENT: "Enchantement";
-            case EVOCATION: "Évocation";
-            case ILLUSION: "Illusion";
-            case NECROMANCY: "Nécromancie";
-            case TRANSMUTATION: "Transmutation";
-            case UNIVERSAL: "Universel";
-        }
-    }
+	static public function damageTypeToString(dt:DamageType) {
+		return switch (dt) {
+			case BLUDGEONING: "Contondant";
+			case PIERCING: "Perforant";
+			case SLASHING: "Tranchant";
+			case ACID: "Acide";
+			case COLD: "Froid";
+			case ELECTRICITY: "Électricité";
+			case FIRE: "Feu";
+			case SONIC: "Sonique";
+			case FORCE: "Force";
+			case POSITIVE: "Énergie positive";
+			case NEGATIVE: "Énergie négative";
+			case CHAOTIC: "Chaotique";
+			case EVIL: "Mal";
+			case GOOD: "Bien";
+			case LAWFUL: "Loi";
+			case UNTYPED: "Sans type";
+		}
+	}
 
-    static public function spellComponentToString(c:SpellComponent):String {
-        return switch (c) {
-            case VERBAL: "Verbale";
-            case SOMATIC: "Gestuelle";
-            case MATERIAL: "Matérielle";
-        }
-    }
+	static public function raceToString(race:CharacterRace):String {
+		return switch (race) {
+			case HUMAN: "Humain(e)";
+			case DWARF: "Nain(e)";
+			case ELF: "Elfe";
+			case HALF_ELF: "Demi-elfe";
+			case GNOME: "Gnome";
+			case HALF_ORC: "Demi-orque";
+			case ANGEL: "Ange";
+		};
+	}
 
-    static public function spellSaveEffectToString(e:SpellSaveEffect):String {
-        return switch (e) {
-            case HALF_DAMAGE: "1/2 dégâts";
-            case NEGATES: "Annule";
-            case REVEALS: "Dévoile";
-        }
-    }
+	static public function alignementToString(alignement:CharacterAlignement) {
+		return switch (alignement) {
+			case ALIGNEMENT_LB: "Loyal/Bon";
+			case ALIGNEMENT_NB: "Neutre/Bon";
+			case ALIGNEMENT_CB: "Chaotique/Bon";
+			case ALIGNEMENT_LN: "Loyal/Neutre";
+			case ALIGNEMENT_N: "Neutre";
+			case ALIGNEMENT_LM: "Loyal/Mauvais";
+			case ALIGNEMENT_NM: "Neutre/Mauvais";
+			case ALIGNEMENT_CM: "Chaotique/Mauvais";
+		}
+	}
 
-    static function formulaSuffix(original:String, resolved:String):String {
-        return if (resolved == original) ""
-        else ' (${original.replace("+", " + ").replace("-", " - ").replace("*", " × ").replace("/", " / ")})';
-    }
+	static public function priestDomainToString(d:PriestDomain):String {
+		return switch (d) {
+			case AIR: "Air";
+			case ANIMAL: "Animal";
+			case ARTIFICE: "Artifice";
+			case CHAOS: "Chaos";
+			case CHARM: "Charme";
+			case COMMUNITY: "Communauté";
+			case DARKNESS: "Ténèbres";
+			case DEATH: "Mort";
+			case DESTRUCTION: "Destruction";
+			case EARTH: "Terre";
+			case EVIL: "Mal";
+			case FIRE: "Feu";
+			case GLORY: "Gloire";
+			case GOOD: "Bien";
+			case HEALING: "Guérison";
+			case KNOWLEDGE: "Connaissance";
+			case LAW: "Loi";
+			case LIBERATION: "Libération";
+			case LUCK: "Chance";
+			case MADNESS: "Folie";
+			case MAGIC: "Magie";
+			case NOBILITY: "Noblesse";
+			case PLANT: "Plantes";
+			case PROTECTION: "Protection";
+			case REPOSE: "Repos";
+			case RUNE: "Rune";
+			case STRENGTH: "Vigueur";
+			case SUN: "Soleil";
+			case TRAVEL: "Voyage";
+			case TRICKERY: "Tromperie";
+			case VOID: "Vide";
+			case WAR: "Guerre";
+			case WATER: "Eau";
+			case WEATHER: "Météores";
+		}
+	}
 
-    static public function spellCastingTimeToString(ct:SpellCastingTime, ?resolveFormula:String->String):String {
-        var r = resolveFormula != null ? resolveFormula : (s -> s);
-        return switch (ct) {
-            case STANDARD_ACTION: "Action simple";
-            case FULL_ACTION: "Action complexe";
-            case N_ROUNDS(n): '${r(n)} round(s)${formulaSuffix(n, r(n))}';
-            case N_MINUTES(n): '${r(n)} minute(s)${formulaSuffix(n, r(n))}';
-        }
-    }
+	static public function spellSchoolToString(s:SpellSchool):String {
+		return switch (s) {
+			case ABJURATION: "Abjuration";
+			case CONJURATION: "Invocation";
+			case DIVINATION: "Divination";
+			case ENCHANTMENT: "Enchantement";
+			case EVOCATION: "Évocation";
+			case ILLUSION: "Illusion";
+			case NECROMANCY: "Nécromancie";
+			case TRANSMUTATION: "Transmutation";
+			case UNIVERSAL: "Universel";
+		}
+	}
 
-    static public function spellDurationToString(d:SpellDuration, ?resolveFormula:String->String):String {
-        var r = resolveFormula != null ? resolveFormula : (s -> s);
-        return switch (d) {
-            case INSTANTANEOUS: "Instantanée";
-            case N_ROUNDS(n): '${r(n)} round(s)${formulaSuffix(n, r(n))}';
-            case N_MINUTES(n):
-                var resolved = r(n);
-                var mins = Std.parseInt(resolved);
-                var display = if (mins != null && mins >= 120) {
-                    var hours = mins / 60;
-                    var hoursStr = hours == Std.int(hours) ? Std.string(Std.int(hours)) : Std.string(hours);
-                    '$hoursStr heure${if (hours > 1) "s" else ""}';
-                } else {
-                    '$resolved minute(s)';
-                };
-                '$display${formulaSuffix(n, resolved)}';
-            case CONCENTRATION: "Concentration";
-        }
-    }
+	static public function spellComponentToString(c:SpellComponent):String {
+		return switch (c) {
+			case VERBAL: "Verbale";
+			case SOMATIC: "Gestuelle";
+			case MATERIAL: "Matérielle";
+		}
+	}
 
-    static public function spellRangeToString(range:SpellRange, ?resolveFormula:String->String, ?nls:Int):String {
-        var r = resolveFormula != null ? resolveFormula : (s -> s);
-        return switch (range) {
-            case PERSONAL: "Personnelle";
-            case TOUCH: "Contact";
-            case CLOSE: nls != null ? 'Courte (${5 + Std.int(nls / 2)} cases)' : "Courte";
-            case MEDIUM: nls != null ? 'Moyenne (${20 + 2 * nls} cases)' : "Moyenne";
-            case LONG: nls != null ? 'Longue (${80 + 8 * nls} cases)' : "Longue";
-            case SPECIFIC(cases): '${r(cases)} case(s)${formulaSuffix(cases, r(cases))}';
-        }
-    }
+	static public function spellSaveEffectToString(e:SpellSaveEffect):String {
+		return switch (e) {
+			case HALF_DAMAGE: "1/2 dégâts";
+			case NEGATES: "Annule";
+			case REVEALS: "Dévoile";
+		}
+	}
 
-    static public function spellDiceTypeToString(t:SpellDiceType):String {
-        return switch (t) {
-            case CARACTERISTIC(c): caracToString(c, false);
-            case CONTACT_MELEE: "Contact au corps à corps";
-            case CONTACT_RANGED: "Contact à distance";
-            case NLS: "NLS";
-            case MANUAL(formula): formula;
-        }
-    }
+	static function formulaSuffix(original:String, resolved:String):String {
+		return if (resolved == original) "" else ' (${original.replace("+", " + ").replace("-", " - ").replace("*", " × ").replace("/", " / ")})';
+	}
+
+	static public function spellCastingTimeToString(ct:SpellCastingTime, ?resolveFormula:String->String):String {
+		var r = resolveFormula != null ? resolveFormula : (s->s);
+		return switch (ct) {
+			case STANDARD_ACTION: "Action simple";
+			case FULL_ACTION: "Action complexe";
+			case N_ROUNDS(n): '${r(n)} round(s)${formulaSuffix(n, r(n))}';
+			case N_MINUTES(n): '${r(n)} minute(s)${formulaSuffix(n, r(n))}';
+		}
+	}
+
+	static public function spellDurationToString(d:SpellDuration, ?resolveFormula:String->String):String {
+		var r = resolveFormula != null ? resolveFormula : (s->s);
+		return switch (d) {
+			case INSTANTANEOUS: "Instantanée";
+			case N_ROUNDS(n): '${r(n)} round(s)${formulaSuffix(n, r(n))}';
+			case N_MINUTES(n):
+				var resolved = r(n);
+				var mins = Std.parseInt(resolved);
+				var display = if (mins != null && mins >= 120) {
+					var hours = mins / 60;
+					var hoursStr = hours == Std.int(hours) ? Std.string(Std.int(hours)) : Std.string(hours);
+					'$hoursStr heure${if (hours > 1) "s" else ""}';
+				} else {
+					'$resolved minute(s)';
+				};
+				'$display${formulaSuffix(n, resolved)}';
+			case CONCENTRATION: "Concentration";
+		}
+	}
+
+	static public function spellRangeToString(range:SpellRange, ?resolveFormula:String->String, ?nls:Int):String {
+		var r = resolveFormula != null ? resolveFormula : (s->s);
+		return switch (range) {
+			case PERSONAL: "Personnelle";
+			case TOUCH: "Contact";
+			case CLOSE: nls != null ? 'Courte (${5 + Std.int(nls / 2)} cases)' : "Courte";
+			case MEDIUM: nls != null ? 'Moyenne (${20 + 2 * nls} cases)' : "Moyenne";
+			case LONG: nls != null ? 'Longue (${80 + 8 * nls} cases)' : "Longue";
+			case SPECIFIC(cases): '${r(cases)} case(s)${formulaSuffix(cases, r(cases))}';
+		}
+	}
+
+	static public function spellDiceTypeToString(t:SpellDiceType):String {
+		return switch (t) {
+			case CARACTERISTIC(c): caracToString(c, false);
+			case CONTACT_MELEE: "Contact au corps à corps";
+			case CONTACT_RANGED: "Contact à distance";
+			case NLS: "NLS";
+			case MANUAL(formula): formula;
+		}
+	}
 }

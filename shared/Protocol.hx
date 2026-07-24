@@ -237,20 +237,27 @@ typedef InventoryItem = {
 	var ?priority:Int;
 }
 
-enum ProtectionType {
-	ARMOR;
-	SHIELD;
-	NATURAL_ARMOR;
-	EVADE; // Mod dex
-	ARMOR_BONUS; // Will apply to every CA
+enum ACType {
+	ARMOR_BONUS;
+	ARMOR_ALTERATION_BONUS;
+	SHIELD_BONUS;
+	SHIELD_ALTERATION_BONUS;
+	NATURAL_ARMOR_BONUS;
+	NATURAL_ARMOR_ALTERATION_BONUS;
+	DODGE_BONUS; // Can be stacked
+	DEFLECT_BONUS;
+	CHANCE_BONUS;
+	INTUITION_BONUS;
+	NO_TYPE;
 }
 
 typedef Protection = {
 	var name:String;
-	var type:ProtectionType;
+	var type:ACType;
 	var armor:Int;
 	var max_dex:Null<Int>;
 	var armorMalus:Null<Int>;
+	@:optional var isTemporary:Bool;
 };
 
 typedef Weapon = {
@@ -297,9 +304,7 @@ typedef TemporaryModifier = {
 enum Field {
 	SKILL(type:SkillType);
 	CHARACTERISTIC(carac:Characteristic);
-	AC; // armor/shield/natural armor → total + flat-footed
-	AC_DODGE; // dodge/esquive → total + contact
-	AC_DEFLECTION; // deflection/parade/insight → all three
+	AC(type:ACType); // armor/shield/natural armor → total + flat-footed
 	INITIATIVE;
 	SAVING_THROW(st:SavingThrow);
 	MAX_HP;
