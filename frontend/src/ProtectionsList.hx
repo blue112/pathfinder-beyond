@@ -45,7 +45,7 @@ class ProtectionsList extends Popup {
 				armorMalus: 0,
 				isTemporary: false,
 				max_dex: null,
-				armor: -2,
+				armor: -1,
 				type: DODGE_BONUS
 			});
 		}
@@ -100,8 +100,8 @@ class ProtectionsList extends Popup {
 			line.append(name);
 			line.append(bonus_type);
 			line.append(value);
-			line.append(malus);
 			line.append(max_dex);
+			line.append(malus);
 			line.append(comment);
 			line.append(remove);
 

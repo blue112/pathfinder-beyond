@@ -317,7 +317,7 @@ class Rules {
 				armorMalus: 0,
 				isTemporary: false,
 				max_dex: null,
-				armor: -2,
+				armor: -1,
 				type: DODGE_BONUS
 			});
 		}
@@ -329,6 +329,20 @@ class Rules {
 				applicableProtectionsByType.get(i.type).push(i);
 			else if (applicableProtectionsByType.get(i.type)[0].armor < i.armor)
 				applicableProtectionsByType.get(i.type)[0] = i;
+		}
+
+		if (char.currentAnimalForm != 0 && applicableProtectionsByType.exists(ARMOR_BONUS)) {
+			// Force armor bonus to 0 when in animal form
+			applicableProtectionsByType.set(ARMOR_BONUS, [
+				{
+					name: "Forme animale",
+					isTemporary: false,
+					armorMalus: null,
+					max_dex: null,
+					armor: 0,
+					type: ARMOR_BONUS
+				}
+			]);
 		}
 
 		return applicableProtectionsByType;
