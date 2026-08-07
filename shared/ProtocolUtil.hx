@@ -126,6 +126,7 @@ class ProtocolUtil {
 			case CONJURATEUR_EIDOLON_BIPED: "Eidolon du Conjurateur";
 			case MAGICIEN: "Magicien(ne)";
 			case PRETRE: "Prêtre(sse)";
+			case GUERRIER: "Guerrier(ère)";
 		}
 	}
 
@@ -141,6 +142,7 @@ class ProtocolUtil {
 			case CONJURATEUR_EIDOLON_BIPED: "eidolon_du_conjurateur";
 			case MAGICIEN: "magicien";
 			case PRETRE: "pretre";
+			case GUERRIER: "guerrier";
 		};
 		return '/assets/icons/classes/$name.svg';
 	}

@@ -291,7 +291,7 @@ class SpellDialog extends Popup implements IJSAsync {
             case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED: "conjurateur";
             case MAGICIEN: "magicien";
             case PRETRE: "pretre";
-            case ROUBLARD | METAMORPHE: "magicien"; // fallback, shouldn't be reached
+            case ROUBLARD | METAMORPHE | GUERRIER: "magicien"; // fallback, shouldn't be reached
         };
         var searchInput:InputElement = cast getContent().querySelector('input[name=spell-search]');
         var suggestions = getContent().querySelector('ul.spell-suggestions');
