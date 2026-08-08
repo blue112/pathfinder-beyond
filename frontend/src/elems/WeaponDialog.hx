@@ -96,7 +96,7 @@ class WeaponDialog extends Popup {
 				damage_modifier: (cast mainElem.querySelector("input[name=damage-bonus]") : InputElement).value.parseInt(),
 				weaponDamageCharacteristic: Characteristic.createByName((cast mainElem.querySelector("select[name=damage-type]") : SelectElement).value),
 				weaponAttackCharacteristic: Characteristic.createByName((cast mainElem.querySelector("select[name=attack-type]") : SelectElement).value),
-				weaponHasPlus50PercentDamage: false,
+				weaponHasPlus50PercentDamage: (cast Browser.window).WEAPON_DMG != null,
 				attack_modifier: (cast mainElem.querySelector("input[name=attack-bonus]") : InputElement).value.parseInt(),
 				damage_dices: (cast mainElem.querySelector("input[name=damage-dice]") : InputElement).value.split(",").map(Std.parseInt),
 				shouldBeReloaded: reloadInput.checked,
