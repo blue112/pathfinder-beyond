@@ -88,6 +88,7 @@
             font-weight: bold;
         }
 
+        td.initiative,
         td.npc-hp,
         td.npc-ac {
             cursor: pointer;
@@ -115,8 +116,7 @@
     section.npcs {
         margin-top: 40px;
 
-        table
-        {
+        table {
             margin-bottom: 100px;
         }
 

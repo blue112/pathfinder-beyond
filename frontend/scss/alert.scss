@@ -44,6 +44,22 @@
                 margin-top: 8px;
             }
 
+            .roll-line.critical-success {
+                background-color: rgb(150, 255, 150);
+                padding: 10px;
+            }
+
+            .roll-line.critical-failure {
+                background-color: rgb(255, 150, 150);
+                padding: 10px;
+            }
+
+            .critical-text {
+                display: block;
+                font-weight: bold;
+                margin-top: 5px;
+            }
+
             span.die-result {
                 background: #f5ecd7;
                 border: 1px solid #c8a96e;
@@ -90,19 +106,16 @@
             margin: 0;
         }
 
-        .composed
-        {
+        .composed {
             display: flex;
             flex-direction: column;
             align-items: center;
 
-            input
-            {
+            input {
                 font-size: 20px;
             }
 
-            button
-            {
+            button {
                 display: block;
                 border: 1px solid black;
                 padding: 5px 20px;
@@ -315,5 +328,4 @@
             margin-top: 10px;
         }
     }
-
 }
