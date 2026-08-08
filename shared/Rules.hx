@@ -262,6 +262,18 @@ class Rules {
 			div.classList.remove("negative");
 	}
 
+	static public function applyTempModsClassFn(character:FullCharacter, div:Element, matchingFunction:TemporaryModifier->Bool) {
+		var tempMod = character.tempMods.filter(matchingFunction).sum();
+		if (tempMod != 0)
+			div.classList.add("temp-mod");
+		else
+			div.classList.remove("temp-mod");
+		if (tempMod < 0)
+			div.classList.add("negative");
+		else
+			div.classList.remove("negative");
+	}
+
 	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
 		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
 		var permanentMod = if (char.savingThrowModifiers.exists(st)) char.savingThrowModifiers.get(st) else 0;

@@ -728,6 +728,14 @@ class Fiche implements IJSAsync {
 			}
 		}
 
+		character.applyTempModsClassFn(acDiv, (temp) -> {
+			return switch (temp.on) {
+				case AC(ac_type):
+					if (type == TOUCH) ac_type.helpsForTouch() else if (type == SURPRISE) ac_type.helpsForSurprise() else true;
+				default: false;
+			}
+		});
+
 		acDiv.innerText = mod.string();
 	}
 
