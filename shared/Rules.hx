@@ -17,14 +17,14 @@ class Rules {
 	static public function canCastSpells(cls:CharacterClass):Bool {
 		return switch (cls) {
 			case CONJURATEUR | MAGICIEN | PRETRE: true;
-			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE: false;
+			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER: false;
 		};
 	}
 
 	static public function needsSpellPreparation(cls:CharacterClass):Bool {
 		return switch (cls) {
 			case MAGICIEN | PRETRE: true;
-			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE: false;
+			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER: false;
 		};
 	}
 
@@ -34,7 +34,7 @@ class Rules {
 			case MAGICIEN: char.characteristicsMod.int;
 			case PRETRE: char.characteristicsMod.wis;
 			case CONJURATEUR: char.characteristicsMod.cha;
-			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE: 0;
+			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER: 0;
 		};
 	}
 
@@ -86,7 +86,7 @@ class Rules {
 		return switch (cls) {
 			case MAGICIEN | PRETRE: [for (L in 0...10) spellSlotBase[L][charIdx]];
 			case CONJURATEUR: [for (L in 0...10) spellSlotBaseConjurateur[L][charIdx]];
-			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		};
 	}
 
@@ -131,6 +131,7 @@ class Rules {
 		CONJURATEUR_EIDOLON_BIPED => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
 		MAGICIEN => [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
 		PRETRE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+		GUERRIER => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
 	];
 	static var savingThrowTables = [
 		ROUBLARD => [
@@ -162,6 +163,11 @@ class Rules {
 			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9],
 			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5],
 			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9],
+		],
+		GUERRIER => [
+			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 		]
 	];
 

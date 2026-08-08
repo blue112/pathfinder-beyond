@@ -70,7 +70,7 @@ class RulesSkills {
             label: "Artisanat",
             modifier: INTELLIGENCE,
             needTraining: false,
-            classSkillFor: [ROUBLARD, CONJURATEUR, CONJURATEUR_EIDOLON_BIPED, MAGICIEN, PRETRE],
+            classSkillFor: [ROUBLARD, CONJURATEUR, CONJURATEUR_EIDOLON_BIPED, MAGICIEN, PRETRE, GUERRIER],
         },
         {
             name: BLUFF,
@@ -84,7 +84,7 @@ class RulesSkills {
             label: "Connaissance (Exploration)",
             modifier: INTELLIGENCE,
             needTraining: true,
-            classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN],
+            classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN, GUERRIER],
         },
         {
             name: CONNAISSANCE_FOLFKLORE_LOCAL,
@@ -112,7 +112,7 @@ class RulesSkills {
             label: "Connaissance (Ingénierie)",
             modifier: INTELLIGENCE,
             needTraining: true,
-            classSkillFor: [CONJURATEUR, MAGICIEN],
+            classSkillFor: [CONJURATEUR, MAGICIEN, GUERRIER],
         },
         {
             name: CONNAISSANCE_MYSTERES,
@@ -175,21 +175,21 @@ class RulesSkills {
             label: "Dressage",
             modifier: CHARISMA,
             needTraining: true,
-            classSkillFor: [CONJURATEUR, METAMORPHE],
+            classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER],
         },
         {
             name: EQUITATION,
             label: "Équitation",
             modifier: DEXTERITY,
             needTraining: false,
-            classSkillFor: [CONJURATEUR, METAMORPHE],
+            classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER],
         },
         {
             name: ESCALADE,
             label: "Escalade",
             modifier: STRENGTH,
             needTraining: false,
-            classSkillFor: [ROUBLARD, METAMORPHE],
+            classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER],
         },
         {
             name: ESCAMOTAGE,
@@ -217,7 +217,7 @@ class RulesSkills {
             label: "Intimidation",
             modifier: CHARISMA,
             needTraining: false,
-            classSkillFor: [ROUBLARD],
+            classSkillFor: [ROUBLARD, GUERRIER],
         },
         {
             name: LINGUISTIQUE,
@@ -231,7 +231,7 @@ class RulesSkills {
             label: "Natation",
             modifier: STRENGTH,
             needTraining: false,
-            classSkillFor: [ROUBLARD, METAMORPHE],
+            classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER],
         },
         {
             name: PERCEPTION,
@@ -252,7 +252,7 @@ class RulesSkills {
             label: "Profession",
             modifier: WISDOM,
             needTraining: true,
-            classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN],
+            classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN, GUERRIER],
         },
         {
             name: PSYCHOLOGIE,
@@ -280,7 +280,7 @@ class RulesSkills {
             label: "Survie",
             modifier: WISDOM,
             needTraining: false,
-            classSkillFor: [METAMORPHE],
+            classSkillFor: [METAMORPHE, GUERRIER],
         },
         {
             name: UTILISATION_OBJETS_MAGIQUES,

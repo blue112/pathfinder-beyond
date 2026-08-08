@@ -375,6 +375,7 @@ enum CharacterClass {
 	METAMORPHE;
 	MAGICIEN;
 	PRETRE;
+	GUERRIER;
 }
 
 enum CharacterAlignement {
