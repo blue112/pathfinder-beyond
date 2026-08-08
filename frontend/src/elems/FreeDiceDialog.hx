@@ -40,9 +40,7 @@ class FreeDiceDialog extends ChoicesDialog implements IJSAsync {
 		diceRegex.match(v.value);
 		var numDice = diceRegex.matched(1).parseInt();
 		var diceType = diceRegex.matched(2).parseInt();
-		var mod = diceRegex.matched(3).replace(" ", "").parseInt();
-		if (mod == null)
-			mod = 0;
+		var mod = if (diceRegex.matched(3) != null) diceRegex.matched(3).replace(" ", "").parseInt(); else 0;
 
 		var apiResult = Api.rollDice(fiche_id, diceType, mod, 'Jet libre ${diceRegex.matched(0)}', numDice).jsawait();
 
