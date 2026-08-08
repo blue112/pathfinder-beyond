@@ -321,8 +321,15 @@ h3 {
                 cursor: pointer;
             }
         }
+
         .exp {
             display: none;
+        }
+
+        img {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
         }
 
         &.exp .value::after {
@@ -519,6 +526,10 @@ h3 {
                 position: relative;
             }
         }
+    }
+
+    section.saving div.label:hover {
+        grid-template-columns: auto auto 1fr;
     }
 
     h2:has(.actions-hover):hover,
