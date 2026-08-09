@@ -16,14 +16,14 @@ enum CharacterACType {
 class Rules {
 	static public function canCastSpells(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case CONJURATEUR | MAGICIEN | PRETRE | BARDE | DRUIDE | ENSORCELEUR: true;
+			case CONJURATEUR | MAGICIEN | PRETRE | BARDE | DRUIDE | ENSORCELEUR | PALADIN: true;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: false;
 		};
 	}
 
 	static public function needsSpellPreparation(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case MAGICIEN | PRETRE | DRUIDE: true;
+			case MAGICIEN | PRETRE | DRUIDE | PALADIN: true;
 			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE | ENSORCELEUR | MOINE: false;
 		};
 	}
@@ -33,7 +33,7 @@ class Rules {
 		return switch (cls) {
 			case MAGICIEN: char.characteristicsMod.int;
 			case PRETRE | DRUIDE: char.characteristicsMod.wis;
-			case CONJURATEUR | BARDE | ENSORCELEUR: char.characteristicsMod.cha;
+			case CONJURATEUR | BARDE | ENSORCELEUR | PALADIN: char.characteristicsMod.cha;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: 0;
 		};
 	}
@@ -83,7 +83,7 @@ class Rules {
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 6], // L9
 	];
 
-	// Base spell slots for the Conjurateur/Barde (6-level spontaneous caster, PF1e Summoner table).
+	// Base spell slots for the Conjurateur/Barde
 	static var spellSlotBaseConjurateurBarde = [
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // L0
 		[1, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5], // L1
@@ -97,11 +97,21 @@ class Rules {
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // L9
 	];
 
+	// Base spell slots for the Paladin
+	static var spellSlotBaseConjurateurPaladin = [
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // L0
+		[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4], // L1
+		[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4], // L2
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3], // L3
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 3], // L4
+	];
+
 	static function getBaseSlots(cls:CharacterClass, charIdx:Int):Array<Int> {
 		return switch (cls) {
 			case MAGICIEN | PRETRE | DRUIDE: [for (L in 0...10) spellSlotBase[L][charIdx]];
 			case ENSORCELEUR: [for (L in 0...10) spellSlotBaseEnsorceleur[L][charIdx]];
 			case CONJURATEUR | BARDE: [for (L in 0...10) spellSlotBaseConjurateurBarde[L][charIdx]];
+			case PALADIN: [for (L in 0...10) spellSlotBaseConjurateurPaladin[L][charIdx]];
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		};
 	}

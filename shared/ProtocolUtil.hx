@@ -126,6 +126,7 @@ class ProtocolUtil {
 			case METAMORPHE: "Métamorphe";
 			case CONJURATEUR: "Conjurateur";
 			case BARDE: "Barde";
+			case PALADIN: "Paladin";
 			case MOINE: "Moine";
 			case ENSORCELEUR: "Ensorceleur(euse)";
 			case DRUIDE: "Druide";
@@ -149,6 +150,7 @@ class ProtocolUtil {
 			case BARDE: "barde";
 			case MOINE: "moine";
 			case DRUIDE: "druide";
+			case PALADIN: "paladin";
 			case CONJURATEUR_EIDOLON_BIPED: "eidolon_du_conjurateur";
 			case MAGICIEN: "magicien";
 			case ENSORCELEUR: "ensorceleur";

@@ -292,6 +292,7 @@ class SpellDialog extends Popup implements IJSAsync {
 			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED: "conjurateur";
 			case BARDE: "barde";
 			case DRUIDE: "druide";
+			case PALADIN: "paladin";
 			case MAGICIEN | ENSORCELEUR: "magicien";
 			case PRETRE: "pretre";
 			default: "magicien"; // fallback, shouldn't be reached

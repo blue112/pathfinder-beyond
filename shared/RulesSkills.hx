@@ -63,7 +63,7 @@ class RulesSkills {
 			label: "Art de la magie",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, DRUIDE, ENSORCELEUR],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, DRUIDE, ENSORCELEUR, PALADIN],
 		},
 		{
 			name: ARTISANAT,
@@ -81,7 +81,8 @@ class RulesSkills {
 				BARDE,
 				DRUIDE,
 				ENSORCELEUR,
-				MOINE
+				MOINE,
+				PALADIN
 			],
 		},
 		{
@@ -145,7 +146,7 @@ class RulesSkills {
 			label: "Connaissance (Noblesse)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, PALADIN],
 		},
 		{
 			name: CONNAISSANCE_PLANS,
@@ -159,7 +160,7 @@ class RulesSkills {
 			label: "Connaissance (Religion)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, MOINE],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, MOINE, PALADIN],
 		},
 		{
 			name: DEGUISEMENT,
@@ -173,7 +174,7 @@ class RulesSkills {
 			label: "Diplomatie",
 			modifier: CHARISMA,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, PRETRE, BARDE],
+			classSkillFor: [ROUBLARD, PRETRE, BARDE, PALADIN],
 		},
 		{
 			name: DISCRETION,
@@ -187,14 +188,14 @@ class RulesSkills {
 			label: "Dressage",
 			modifier: CHARISMA,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE, DRUIDE],
+			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE, DRUIDE, PALADIN],
 		},
 		{
 			name: EQUITATION,
 			label: "Équitation",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE, DRUIDE, MOINE],
+			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE, DRUIDE, MOINE, PALADIN],
 		},
 		{
 			name: ESCALADE,
@@ -257,21 +258,31 @@ class RulesSkills {
 			label: "Premiers secours",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [PRETRE, DRUIDE],
+			classSkillFor: [PRETRE, DRUIDE, PALADIN],
 		},
 		{
 			name: PROFESSION,
 			label: "Profession",
 			modifier: WISDOM,
 			needTraining: true,
-			classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN, GUERRIER, BARDE, DRUIDE, ENSORCELEUR, MOINE],
+			classSkillFor: [
+				ROUBLARD,
+				CONJURATEUR,
+				MAGICIEN,
+				GUERRIER,
+				BARDE,
+				DRUIDE,
+				ENSORCELEUR,
+				MOINE,
+				PALADIN
+			],
 		},
 		{
 			name: PSYCHOLOGIE,
 			label: "Psychologie",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, PRETRE, BARDE, MOINE],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, PRETRE, BARDE, MOINE, PALADIN],
 		},
 		{
 			name: REPRESENTATION,

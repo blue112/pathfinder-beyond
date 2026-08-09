@@ -381,6 +381,7 @@ enum CharacterClass {
 	ENSORCELEUR;
 	MOINE; // Unchained
 	PRETRE;
+	PALADIN;
 }
 
 enum CharacterAlignement {
