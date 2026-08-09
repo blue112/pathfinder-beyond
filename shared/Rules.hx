@@ -17,14 +17,14 @@ class Rules {
 	static public function canCastSpells(cls:CharacterClass):Bool {
 		return switch (cls) {
 			case CONJURATEUR | MAGICIEN | PRETRE | BARDE | DRUIDE | ENSORCELEUR: true;
-			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE: false;
+			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: false;
 		};
 	}
 
 	static public function needsSpellPreparation(cls:CharacterClass):Bool {
 		return switch (cls) {
 			case MAGICIEN | PRETRE | DRUIDE: true;
-			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE | ENSORCELEUR: false;
+			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE | ENSORCELEUR | MOINE: false;
 		};
 	}
 
@@ -34,7 +34,7 @@ class Rules {
 			case MAGICIEN: char.characteristicsMod.int;
 			case PRETRE | DRUIDE: char.characteristicsMod.wis;
 			case CONJURATEUR | BARDE | ENSORCELEUR: char.characteristicsMod.cha;
-			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE: 0;
+			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: 0;
 		};
 	}
 
@@ -102,7 +102,7 @@ class Rules {
 			case MAGICIEN | PRETRE | DRUIDE: [for (L in 0...10) spellSlotBase[L][charIdx]];
 			case ENSORCELEUR: [for (L in 0...10) spellSlotBaseEnsorceleur[L][charIdx]];
 			case CONJURATEUR | BARDE: [for (L in 0...10) spellSlotBaseConjurateurBarde[L][charIdx]];
-			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		};
 	}
 
@@ -147,6 +147,7 @@ class Rules {
 		DRUIDE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		METAMORPHE => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
 		GUERRIER => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+		MOINE => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
 		BARBARE => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
 		CONJURATEUR_EIDOLON_BIPED => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
 		MAGICIEN => [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
@@ -181,6 +182,11 @@ class Rules {
 		BARBARE => [
 			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+		],
+		MOINE => [
+			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 		],
 		CONJURATEUR => [

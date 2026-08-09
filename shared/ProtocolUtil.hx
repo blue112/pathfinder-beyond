@@ -126,6 +126,7 @@ class ProtocolUtil {
 			case METAMORPHE: "Métamorphe";
 			case CONJURATEUR: "Conjurateur";
 			case BARDE: "Barde";
+			case MOINE: "Moine";
 			case ENSORCELEUR: "Ensorceleur(euse)";
 			case DRUIDE: "Druide";
 			case CONJURATEUR_EIDOLON_BIPED: "Eidolon du Conjurateur";
@@ -142,10 +143,11 @@ class ProtocolUtil {
 		var name = switch (cls) {
 			case ROUBLARD: "roublard";
 			case GUERRIER: "guerrier";
-			case BARBARE: "barbabe";
+			case BARBARE: "barbare";
 			case METAMORPHE: "metamorphe";
 			case CONJURATEUR: "conjurateur";
 			case BARDE: "barde";
+			case MOINE: "moine";
 			case DRUIDE: "druide";
 			case CONJURATEUR_EIDOLON_BIPED: "eidolon_du_conjurateur";
 			case MAGICIEN: "magicien";

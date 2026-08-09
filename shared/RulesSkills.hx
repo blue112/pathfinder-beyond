@@ -56,7 +56,7 @@ class RulesSkills {
 			label: "Acrobaties",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, METAMORPHE, BARBARE, BARDE],
+			classSkillFor: [ROUBLARD, METAMORPHE, BARBARE, BARDE, MOINE],
 		},
 		{
 			name: ART_DE_LA_MAGIE,
@@ -80,7 +80,8 @@ class RulesSkills {
 				BARBARE,
 				BARDE,
 				DRUIDE,
-				ENSORCELEUR
+				ENSORCELEUR,
+				MOINE
 			],
 		},
 		{
@@ -116,7 +117,7 @@ class RulesSkills {
 			label: "Connaissance (Histoire)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, MOINE],
 		},
 		{
 			name: CONNAISSANCE_INGENIERIE,
@@ -158,7 +159,7 @@ class RulesSkills {
 			label: "Connaissance (Religion)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, MOINE],
 		},
 		{
 			name: DEGUISEMENT,
@@ -179,7 +180,7 @@ class RulesSkills {
 			label: "Discrétion",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, METAMORPHE, BARDE],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, METAMORPHE, BARDE, MOINE],
 		},
 		{
 			name: DRESSAGE,
@@ -193,14 +194,14 @@ class RulesSkills {
 			label: "Équitation",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE, DRUIDE],
+			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE, DRUIDE, MOINE],
 		},
 		{
 			name: ESCALADE,
 			label: "Escalade",
 			modifier: STRENGTH,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER, BARBARE, BARDE, DRUIDE],
+			classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER, BARBARE, BARDE, DRUIDE, MOINE],
 		},
 		{
 			name: ESCAMOTAGE,
@@ -221,14 +222,14 @@ class RulesSkills {
 			label: "Évasion",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, BARDE],
+			classSkillFor: [ROUBLARD, BARDE, MOINE],
 		},
 		{
 			name: INTIMIDATION,
 			label: "Intimidation",
 			modifier: CHARISMA,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, GUERRIER, BARBARE, BARDE, ENSORCELEUR],
+			classSkillFor: [ROUBLARD, GUERRIER, BARBARE, BARDE, ENSORCELEUR, MOINE],
 		},
 		{
 			name: LINGUISTIQUE,
@@ -242,14 +243,14 @@ class RulesSkills {
 			label: "Natation",
 			modifier: STRENGTH,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER, BARBARE, DRUIDE],
+			classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER, BARBARE, DRUIDE, MOINE],
 		},
 		{
 			name: PERCEPTION,
 			label: "Perception",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, METAMORPHE, BARBARE, BARDE, DRUIDE],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, METAMORPHE, BARBARE, BARDE, DRUIDE, MOINE],
 		},
 		{
 			name: PREMIERS_SECOURS,
@@ -263,21 +264,21 @@ class RulesSkills {
 			label: "Profession",
 			modifier: WISDOM,
 			needTraining: true,
-			classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN, GUERRIER, BARDE, DRUIDE, ENSORCELEUR],
+			classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN, GUERRIER, BARDE, DRUIDE, ENSORCELEUR, MOINE],
 		},
 		{
 			name: PSYCHOLOGIE,
 			label: "Psychologie",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, PRETRE, BARDE],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, PRETRE, BARDE, MOINE],
 		},
 		{
 			name: REPRESENTATION,
 			label: "Représentation",
 			modifier: CHARISMA,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, BARDE],
+			classSkillFor: [ROUBLARD, BARDE, MOINE],
 		},
 		{
 			name: SABOTAGE,

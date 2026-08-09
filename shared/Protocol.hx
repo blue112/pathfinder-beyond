@@ -379,6 +379,7 @@ enum CharacterClass {
 	METAMORPHE;
 	MAGICIEN;
 	ENSORCELEUR;
+	MOINE; // Unchained
 	PRETRE;
 }
 
