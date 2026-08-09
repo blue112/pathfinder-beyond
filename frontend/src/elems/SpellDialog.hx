@@ -291,7 +291,8 @@ class SpellDialog extends Popup implements IJSAsync {
 		var clsName = switch (characterClass) {
 			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED: "conjurateur";
 			case BARDE: "barde";
-			case MAGICIEN: "magicien";
+			case DRUIDE: "druide";
+			case MAGICIEN | ENSORCELEUR: "magicien";
 			case PRETRE: "pretre";
 			default: "magicien"; // fallback, shouldn't be reached
 		};

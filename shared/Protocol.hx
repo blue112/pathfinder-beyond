@@ -372,11 +372,13 @@ enum CharacterClass {
 	GUERRIER;
 	BARDE;
 	BARBARE; // Unchained
+	DRUIDE;
 	ROUBLARD; // Unchained
 	CONJURATEUR; // Unchained
 	CONJURATEUR_EIDOLON_BIPED; // Unchained
 	METAMORPHE;
 	MAGICIEN;
+	ENSORCELEUR;
 	PRETRE;
 }
 

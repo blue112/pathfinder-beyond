@@ -16,15 +16,15 @@ enum CharacterACType {
 class Rules {
 	static public function canCastSpells(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case CONJURATEUR | MAGICIEN | PRETRE | BARDE: true;
+			case CONJURATEUR | MAGICIEN | PRETRE | BARDE | DRUIDE | ENSORCELEUR: true;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE: false;
 		};
 	}
 
 	static public function needsSpellPreparation(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case MAGICIEN | PRETRE: true;
-			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE: false;
+			case MAGICIEN | PRETRE | DRUIDE: true;
+			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE | ENSORCELEUR: false;
 		};
 	}
 
@@ -32,8 +32,8 @@ class Rules {
 	static public function getCastingModifier(cls:CharacterClass, char:FullCharacter):Int {
 		return switch (cls) {
 			case MAGICIEN: char.characteristicsMod.int;
-			case PRETRE: char.characteristicsMod.wis;
-			case CONJURATEUR | BARDE: char.characteristicsMod.cha;
+			case PRETRE | DRUIDE: char.characteristicsMod.wis;
+			case CONJURATEUR | BARDE | ENSORCELEUR: char.characteristicsMod.cha;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE: 0;
 		};
 	}
@@ -41,6 +41,7 @@ class Rules {
 	static public function getRacialSpellDCBonus(race:CharacterRace, school:SpellSchool):Int {
 		if (race == GNOME && school == ILLUSION)
 			return 1;
+
 		return 0;
 	}
 
@@ -54,7 +55,7 @@ class Rules {
 		];
 	}
 
-	// Base spell slots for preparation casters (Magicien/Pretre): spell level (0–9) × char level (1–20).
+	// Base spell slots for preparation casters (Magicien/Pretre/Druide): spell level (0–9) × char level (1–20).
 	static var spellSlotBase = [
 		[3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // L0
 		[1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], // L1
@@ -66,6 +67,20 @@ class Rules {
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4], // L7
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 4], // L8
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], // L9
+	];
+
+	// Base spell slots for Ensorceleur: spell level (0–9) × char level (1–20).
+	static var spellSlotBaseEnsorceleur = [
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // L0
+		[3, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // L1
+		[0, 0, 0, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // L2
+		[0, 0, 0, 0, 0, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // L3
+		[0, 0, 0, 0, 0, 0, 0, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // L4
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6], // L5
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 5, 6, 6, 6, 6, 6, 6], // L6
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 5, 6, 6, 6, 6], // L7
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 5, 6, 6], // L8
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 6], // L9
 	];
 
 	// Base spell slots for the Conjurateur/Barde (6-level spontaneous caster, PF1e Summoner table).
@@ -84,7 +99,8 @@ class Rules {
 
 	static function getBaseSlots(cls:CharacterClass, charIdx:Int):Array<Int> {
 		return switch (cls) {
-			case MAGICIEN | PRETRE: [for (L in 0...10) spellSlotBase[L][charIdx]];
+			case MAGICIEN | PRETRE | DRUIDE: [for (L in 0...10) spellSlotBase[L][charIdx]];
+			case ENSORCELEUR: [for (L in 0...10) spellSlotBaseEnsorceleur[L][charIdx]];
 			case CONJURATEUR | BARDE: [for (L in 0...10) spellSlotBaseConjurateurBarde[L][charIdx]];
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		};
@@ -128,6 +144,7 @@ class Rules {
 		ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		CONJURATEUR => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		BARDE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+		DRUIDE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		METAMORPHE => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
 		GUERRIER => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
 		BARBARE => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
@@ -175,6 +192,11 @@ class Rules {
 			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+		],
+		DRUIDE => [
+			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 		],
 		CONJURATEUR_EIDOLON_BIPED => [
 			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9],

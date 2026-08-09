@@ -63,7 +63,7 @@ class RulesSkills {
 			label: "Art de la magie",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, DRUIDE, ENSORCELEUR],
 		},
 		{
 			name: ARTISANAT,
@@ -78,7 +78,9 @@ class RulesSkills {
 				PRETRE,
 				GUERRIER,
 				BARBARE,
-				BARDE
+				BARDE,
+				DRUIDE,
+				ENSORCELEUR
 			],
 		},
 		{
@@ -86,7 +88,7 @@ class RulesSkills {
 			label: "Bluff",
 			modifier: CHARISMA,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, BARDE],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, BARDE, ENSORCELEUR],
 		},
 		{
 			name: CONNAISSANCE_EXPLORATION,
@@ -107,7 +109,7 @@ class RulesSkills {
 			label: "Connaissance (Géographie)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, BARDE],
+			classSkillFor: [CONJURATEUR, MAGICIEN, BARDE, DRUIDE],
 		},
 		{
 			name: CONNAISSANCE_HISTOIRE,
@@ -128,14 +130,14 @@ class RulesSkills {
 			label: "Connaissance (Mystères)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, ENSORCELEUR],
 		},
 		{
 			name: CONNAISSANCE_NATURE,
 			label: "Connaissance (Nature)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, METAMORPHE, MAGICIEN, BARBARE, BARDE],
+			classSkillFor: [CONJURATEUR, METAMORPHE, MAGICIEN, BARBARE, BARDE, DRUIDE],
 		},
 		{
 			name: CONNAISSANCE_NOBLESSE,
@@ -184,21 +186,21 @@ class RulesSkills {
 			label: "Dressage",
 			modifier: CHARISMA,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE],
+			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE, DRUIDE],
 		},
 		{
 			name: EQUITATION,
 			label: "Équitation",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE],
+			classSkillFor: [CONJURATEUR, METAMORPHE, GUERRIER, BARBARE, DRUIDE],
 		},
 		{
 			name: ESCALADE,
 			label: "Escalade",
 			modifier: STRENGTH,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER, BARBARE, BARDE],
+			classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER, BARBARE, BARDE, DRUIDE],
 		},
 		{
 			name: ESCAMOTAGE,
@@ -212,7 +214,7 @@ class RulesSkills {
 			label: "Estimation",
 			modifier: INTELLIGENCE,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, MAGICIEN, PRETRE, BARDE],
+			classSkillFor: [ROUBLARD, MAGICIEN, PRETRE, BARDE, ENSORCELEUR],
 		},
 		{
 			name: EVASION,
@@ -226,7 +228,7 @@ class RulesSkills {
 			label: "Intimidation",
 			modifier: CHARISMA,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, GUERRIER, BARBARE, BARDE],
+			classSkillFor: [ROUBLARD, GUERRIER, BARBARE, BARDE, ENSORCELEUR],
 		},
 		{
 			name: LINGUISTIQUE,
@@ -240,28 +242,28 @@ class RulesSkills {
 			label: "Natation",
 			modifier: STRENGTH,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER, BARBARE],
+			classSkillFor: [ROUBLARD, METAMORPHE, GUERRIER, BARBARE, DRUIDE],
 		},
 		{
 			name: PERCEPTION,
 			label: "Perception",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, METAMORPHE, BARBARE, BARDE],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, METAMORPHE, BARBARE, BARDE, DRUIDE],
 		},
 		{
 			name: PREMIERS_SECOURS,
 			label: "Premiers secours",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [PRETRE],
+			classSkillFor: [PRETRE, DRUIDE],
 		},
 		{
 			name: PROFESSION,
 			label: "Profession",
 			modifier: WISDOM,
 			needTraining: true,
-			classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN, GUERRIER, BARDE],
+			classSkillFor: [ROUBLARD, CONJURATEUR, MAGICIEN, GUERRIER, BARDE, DRUIDE, ENSORCELEUR],
 		},
 		{
 			name: PSYCHOLOGIE,
@@ -289,21 +291,21 @@ class RulesSkills {
 			label: "Survie",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [METAMORPHE, GUERRIER, BARBARE],
+			classSkillFor: [METAMORPHE, GUERRIER, BARBARE, DRUIDE],
 		},
 		{
 			name: UTILISATION_OBJETS_MAGIQUES,
 			label: "Utilisation d'objets magiques",
 			modifier: CHARISMA,
 			needTraining: true,
-			classSkillFor: [ROUBLARD, CONJURATEUR, BARDE],
+			classSkillFor: [ROUBLARD, CONJURATEUR, BARDE, ENSORCELEUR],
 		},
 		{
 			name: VOL,
 			label: "Vol",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [CONJURATEUR, METAMORPHE, MAGICIEN],
+			classSkillFor: [CONJURATEUR, METAMORPHE, MAGICIEN, DRUIDE, ENSORCELEUR],
 		},
 	];
 

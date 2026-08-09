@@ -320,9 +320,9 @@ class FullCharacter {
 
 	public function getHitDice() {
 		return switch (basics.characterClass) {
-			case MAGICIEN:
+			case MAGICIEN, ENSORCELEUR:
 				6;
-			case CONJURATEUR, ROUBLARD, PRETRE, BARDE:
+			case CONJURATEUR, ROUBLARD, PRETRE, BARDE, DRUIDE:
 				8;
 			case CONJURATEUR_EIDOLON_BIPED, METAMORPHE, GUERRIER:
 				10;

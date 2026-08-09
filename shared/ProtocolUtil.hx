@@ -126,6 +126,8 @@ class ProtocolUtil {
 			case METAMORPHE: "Métamorphe";
 			case CONJURATEUR: "Conjurateur";
 			case BARDE: "Barde";
+			case ENSORCELEUR: "Ensorceleur(euse)";
+			case DRUIDE: "Druide";
 			case CONJURATEUR_EIDOLON_BIPED: "Eidolon du Conjurateur";
 			case MAGICIEN: "Magicien(ne)";
 			case PRETRE: "Prêtre(sse)";
@@ -144,8 +146,10 @@ class ProtocolUtil {
 			case METAMORPHE: "metamorphe";
 			case CONJURATEUR: "conjurateur";
 			case BARDE: "barde";
+			case DRUIDE: "druide";
 			case CONJURATEUR_EIDOLON_BIPED: "eidolon_du_conjurateur";
 			case MAGICIEN: "magicien";
+			case ENSORCELEUR: "ensorceleur";
 			case PRETRE: "pretre";
 		};
 		return '/assets/icons/classes/$name.svg';
