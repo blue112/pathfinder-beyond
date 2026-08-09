@@ -369,6 +369,7 @@ enum CharacterRace {
 }
 
 enum CharacterClass {
+	GUERRIER;
 	ROUBLARD; // Unchained
 	CONJURATEUR; // Unchained
 	CONJURATEUR_EIDOLON_BIPED; // Unchained

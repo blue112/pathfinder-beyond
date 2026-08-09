@@ -121,6 +121,7 @@ class ProtocolUtil {
 	static public function classToString(cls:CharacterClass) {
 		return switch (cls) {
 			case ROUBLARD: "Roublard(e)";
+			case GUERRIER: "Guerrier(e)";
 			case METAMORPHE: "Métamorphe";
 			case CONJURATEUR: "Conjurateur";
 			case CONJURATEUR_EIDOLON_BIPED: "Eidolon du Conjurateur";
@@ -136,6 +137,7 @@ class ProtocolUtil {
 	static public function classToIconPath(cls:CharacterClass) {
 		var name = switch (cls) {
 			case ROUBLARD: "roublard";
+			case GUERRIER: "guerrier";
 			case METAMORPHE: "metamorphe";
 			case CONJURATEUR: "conjurateur";
 			case CONJURATEUR_EIDOLON_BIPED: "eidolon_du_conjurateur";

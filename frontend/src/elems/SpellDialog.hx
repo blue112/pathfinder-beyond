@@ -11,11 +11,11 @@ using ProtocolUtil;
 using jsasync.JSAsyncTools;
 
 class SpellDialog extends Popup implements IJSAsync {
-    public function new(characterClass:CharacterClass, maxSpellLevel:Int, onChoice:Spell->Void, ?editSpell:Spell) {
-        super(editSpell != null ? 'Modifier un sort : ${editSpell.name}' : "Ajouter un sort");
-        mainElem.classList.add("spell");
+	public function new(characterClass:CharacterClass, maxSpellLevel:Int, onChoice:Spell->Void, ?editSpell:Spell) {
+		super(editSpell != null ? 'Modifier un sort : ${editSpell.name}' : "Ajouter un sort");
+		mainElem.classList.add("spell");
 
-        getContent().innerHTML = '
+		getContent().innerHTML = '
         <div class="spell-form">
             <div class="spell-row spell-search-row">
                 <label>Rechercher</label>
@@ -145,332 +145,342 @@ class SpellDialog extends Popup implements IJSAsync {
             </div>
         </div>';
 
-        var rangeSelect:SelectElement = cast getContent().querySelector('select[name=range]');
-        var rangeSpecific:InputElement = cast getContent().querySelector('input[name=range-specific]');
-        rangeSelect.addEventListener("change", () -> {
-            if (rangeSelect.value == "SPECIFIC") {
-                rangeSpecific.classList.remove("hidden");
-            } else {
-                rangeSpecific.classList.add("hidden");
-            }
-        });
+		var rangeSelect:SelectElement = cast getContent().querySelector('select[name=range]');
+		var rangeSpecific:InputElement = cast getContent().querySelector('input[name=range-specific]');
+		rangeSelect.addEventListener("change", () -> {
+			if (rangeSelect.value == "SPECIFIC") {
+				rangeSpecific.classList.remove("hidden");
+			} else {
+				rangeSpecific.classList.add("hidden");
+			}
+		});
 
-        var castingTimeSelect:SelectElement = cast getContent().querySelector('select[name=casting-time]');
-        var castingTimeN:InputElement = cast getContent().querySelector('input[name=casting-time-n]');
-        castingTimeSelect.addEventListener("change", () -> {
-            if (castingTimeSelect.value == "N_ROUNDS" || castingTimeSelect.value == "N_MINUTES") {
-                castingTimeN.classList.remove("hidden");
-            } else {
-                castingTimeN.classList.add("hidden");
-            }
-        });
+		var castingTimeSelect:SelectElement = cast getContent().querySelector('select[name=casting-time]');
+		var castingTimeN:InputElement = cast getContent().querySelector('input[name=casting-time-n]');
+		castingTimeSelect.addEventListener("change", () -> {
+			if (castingTimeSelect.value == "N_ROUNDS" || castingTimeSelect.value == "N_MINUTES") {
+				castingTimeN.classList.remove("hidden");
+			} else {
+				castingTimeN.classList.add("hidden");
+			}
+		});
 
-        var durationSelect:SelectElement = cast getContent().querySelector('select[name=duration]');
-        var durationN:InputElement = cast getContent().querySelector('input[name=duration-n]');
-        var saveEffectRow = getContent().querySelector('.save-effect-row');
-        var savingThrowDCRow = getContent().querySelector('.saving-throw-dc-row');
-        var stSelect:SelectElement = cast getContent().querySelector('select[name=saving-throw]');
-        var usesPerDayInput:InputElement = cast getContent().querySelector('input[name=uses-per-day]');
-        saveEffectRow.classList.add("hidden");
-        savingThrowDCRow.classList.add("hidden");
+		var durationSelect:SelectElement = cast getContent().querySelector('select[name=duration]');
+		var durationN:InputElement = cast getContent().querySelector('input[name=duration-n]');
+		var saveEffectRow = getContent().querySelector('.save-effect-row');
+		var savingThrowDCRow = getContent().querySelector('.saving-throw-dc-row');
+		var stSelect:SelectElement = cast getContent().querySelector('select[name=saving-throw]');
+		var usesPerDayInput:InputElement = cast getContent().querySelector('input[name=uses-per-day]');
+		saveEffectRow.classList.add("hidden");
+		savingThrowDCRow.classList.add("hidden");
 
-        usesPerDayInput.addEventListener("input", () -> {
-            var val = Std.parseInt(usesPerDayInput.value);
-            if (val != null && val > 0) {
-                savingThrowDCRow.classList.remove("hidden");
-            } else {
-                savingThrowDCRow.classList.add("hidden");
-            }
-        });
-        stSelect.addEventListener("change", () -> {
-            if (stSelect.value == "") {
-                saveEffectRow.classList.add("hidden");
-            } else {
-                saveEffectRow.classList.remove("hidden");
-            }
-        });
+		usesPerDayInput.addEventListener("input", () -> {
+			var val = Std.parseInt(usesPerDayInput.value);
+			if (val != null && val > 0) {
+				savingThrowDCRow.classList.remove("hidden");
+			} else {
+				savingThrowDCRow.classList.add("hidden");
+			}
+		});
+		stSelect.addEventListener("change", () -> {
+			if (stSelect.value == "") {
+				saveEffectRow.classList.add("hidden");
+			} else {
+				saveEffectRow.classList.remove("hidden");
+			}
+		});
 
-        var canEndRow = getContent().querySelector('.can-end-row');
-        canEndRow.classList.add("hidden");
-        durationSelect.addEventListener("change", () -> {
-            if (durationSelect.value == "N_ROUNDS" || durationSelect.value == "N_MINUTES") {
-                durationN.classList.remove("hidden");
-            } else {
-                durationN.classList.add("hidden");
-            }
-            if (durationSelect.value == "INSTANTANEOUS") {
-                canEndRow.classList.add("hidden");
-            } else {
-                canEndRow.classList.remove("hidden");
-            }
-        });
+		var canEndRow = getContent().querySelector('.can-end-row');
+		canEndRow.classList.add("hidden");
+		durationSelect.addEventListener("change", () -> {
+			if (durationSelect.value == "N_ROUNDS" || durationSelect.value == "N_MINUTES") {
+				durationN.classList.remove("hidden");
+			} else {
+				durationN.classList.add("hidden");
+			}
+			if (durationSelect.value == "INSTANTANEOUS") {
+				canEndRow.classList.add("hidden");
+			} else {
+				canEndRow.classList.remove("hidden");
+			}
+		});
 
-        // Edit mode: hide search, disable name, pre-populate all fields
-        if (editSpell != null) {
-            getContent().querySelector('.spell-search-row').classList.add("hidden");
-            var nameInput:InputElement = cast getContent().querySelector('input[name=name]');
-            nameInput.disabled = true;
-            setValue("name", editSpell.name);
-            setValue("level", Std.string(editSpell.level));
-            setValue("school", editSpell.school.getName());
-            setValue("short-description", editSpell.shortDescription != null ? editSpell.shortDescription : "");
-            setValue("uses-per-day", editSpell.usesPerDay != null ? Std.string(editSpell.usesPerDay) : "");
-            setValue("targets", editSpell.targets);
-            setValue("area-of-effect", editSpell.areaOfEffect != null ? editSpell.areaOfEffect : "");
-            setValue("priority", Std.string(editSpell.priority));
-            setValue("long-description", editSpell.longDescription);
-            setValue("saving-throw-dc", editSpell.savingThrowDC != null ? editSpell.savingThrowDC : "");
+		// Edit mode: hide search, disable name, pre-populate all fields
+		if (editSpell != null) {
+			getContent().querySelector('.spell-search-row').classList.add("hidden");
+			var nameInput:InputElement = cast getContent().querySelector('input[name=name]');
+			nameInput.disabled = true;
+			setValue("name", editSpell.name);
+			setValue("level", Std.string(editSpell.level));
+			setValue("school", editSpell.school.getName());
+			setValue("short-description", editSpell.shortDescription != null ? editSpell.shortDescription : "");
+			setValue("uses-per-day", editSpell.usesPerDay != null ? Std.string(editSpell.usesPerDay) : "");
+			setValue("targets", editSpell.targets);
+			setValue("area-of-effect", editSpell.areaOfEffect != null ? editSpell.areaOfEffect : "");
+			setValue("priority", Std.string(editSpell.priority));
+			setValue("long-description", editSpell.longDescription);
+			setValue("saving-throw-dc", editSpell.savingThrowDC != null ? editSpell.savingThrowDC : "");
 
-            var compVerbal:InputElement = cast getContent().querySelector('input[name=comp-verbal]');
-            var compSomatic:InputElement = cast getContent().querySelector('input[name=comp-somatic]');
-            var compMaterial:InputElement = cast getContent().querySelector('input[name=comp-material]');
-            compVerbal.checked = editSpell.components.indexOf(VERBAL) >= 0;
-            compSomatic.checked = editSpell.components.indexOf(SOMATIC) >= 0;
-            compMaterial.checked = editSpell.components.indexOf(MATERIAL) >= 0;
+			var compVerbal:InputElement = cast getContent().querySelector('input[name=comp-verbal]');
+			var compSomatic:InputElement = cast getContent().querySelector('input[name=comp-somatic]');
+			var compMaterial:InputElement = cast getContent().querySelector('input[name=comp-material]');
+			compVerbal.checked = editSpell.components.indexOf(VERBAL) >= 0;
+			compSomatic.checked = editSpell.components.indexOf(SOMATIC) >= 0;
+			compMaterial.checked = editSpell.components.indexOf(MATERIAL) >= 0;
 
-            var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
-            srInput.checked = editSpell.spellResistance;
-            var canEndInput:InputElement = cast getContent().querySelector('input[name=can-end-voluntarily]');
-            canEndInput.checked = editSpell.canEndVoluntarily;
+			var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
+			srInput.checked = editSpell.spellResistance;
+			var canEndInput:InputElement = cast getContent().querySelector('input[name=can-end-voluntarily]');
+			canEndInput.checked = editSpell.canEndVoluntarily;
 
-            switch (editSpell.range) {
-                case SPECIFIC(cases):
-                    setValue("range", "SPECIFIC");
-                    setValue("range-specific", cases);
-                    rangeSpecific.classList.remove("hidden");
-                default:
-                    setValue("range", editSpell.range.getName());
-            }
+			switch (editSpell.range) {
+				case SPECIFIC(cases):
+					setValue("range", "SPECIFIC");
+					setValue("range-specific", cases);
+					rangeSpecific.classList.remove("hidden");
+				default:
+					setValue("range", editSpell.range.getName());
+			}
 
-            switch (editSpell.castingTime) {
-                case N_ROUNDS(n):
-                    setValue("casting-time", "N_ROUNDS");
-                    setValue("casting-time-n", n);
-                    castingTimeN.classList.remove("hidden");
-                case N_MINUTES(n):
-                    setValue("casting-time", "N_MINUTES");
-                    setValue("casting-time-n", n);
-                    castingTimeN.classList.remove("hidden");
-                default:
-                    setValue("casting-time", editSpell.castingTime.getName());
-            }
+			switch (editSpell.castingTime) {
+				case N_ROUNDS(n):
+					setValue("casting-time", "N_ROUNDS");
+					setValue("casting-time-n", n);
+					castingTimeN.classList.remove("hidden");
+				case N_MINUTES(n):
+					setValue("casting-time", "N_MINUTES");
+					setValue("casting-time-n", n);
+					castingTimeN.classList.remove("hidden");
+				default:
+					setValue("casting-time", editSpell.castingTime.getName());
+			}
 
-            switch (editSpell.duration) {
-                case N_ROUNDS(n):
-                    setValue("duration", "N_ROUNDS");
-                    setValue("duration-n", n);
-                    durationN.classList.remove("hidden");
-                    canEndRow.classList.remove("hidden");
-                case N_MINUTES(n):
-                    setValue("duration", "N_MINUTES");
-                    setValue("duration-n", n);
-                    durationN.classList.remove("hidden");
-                    canEndRow.classList.remove("hidden");
-                case CONCENTRATION:
-                    setValue("duration", "CONCENTRATION");
-                    canEndRow.classList.remove("hidden");
-                case INSTANTANEOUS:
-                    setValue("duration", "INSTANTANEOUS");
-            }
+			switch (editSpell.duration) {
+				case N_ROUNDS(n):
+					setValue("duration", "N_ROUNDS");
+					setValue("duration-n", n);
+					durationN.classList.remove("hidden");
+					canEndRow.classList.remove("hidden");
+				case N_MINUTES(n):
+					setValue("duration", "N_MINUTES");
+					setValue("duration-n", n);
+					durationN.classList.remove("hidden");
+					canEndRow.classList.remove("hidden");
+				case CONCENTRATION:
+					setValue("duration", "CONCENTRATION");
+					canEndRow.classList.remove("hidden");
+				case INSTANTANEOUS:
+					setValue("duration", "INSTANTANEOUS");
+			}
 
-            if (editSpell.savingThrowType != null) {
-                stSelect.value = editSpell.savingThrowType.getName();
-                saveEffectRow.classList.remove("hidden");
-                if (editSpell.saveEffect != null) setValue("save-effect", editSpell.saveEffect.getName());
-            }
-            if (editSpell.usesPerDay != null && editSpell.usesPerDay > 0) {
-                savingThrowDCRow.classList.remove("hidden");
-            }
-            if (editSpell.savingThrowType != null) {
-                savingThrowDCRow.classList.remove("hidden");
-            }
-        }
+			if (editSpell.savingThrowType != null) {
+				stSelect.value = editSpell.savingThrowType.getName();
+				saveEffectRow.classList.remove("hidden");
+				if (editSpell.saveEffect != null)
+					setValue("save-effect", editSpell.saveEffect.getName());
+			}
+			if (editSpell.usesPerDay != null && editSpell.usesPerDay > 0) {
+				savingThrowDCRow.classList.remove("hidden");
+			}
+			if (editSpell.savingThrowType != null) {
+				savingThrowDCRow.classList.remove("hidden");
+			}
+		}
 
-        // Autocomplete setup
-        var clsName = switch (characterClass) {
-            case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED: "conjurateur";
-            case MAGICIEN: "magicien";
-            case PRETRE: "pretre";
-            case ROUBLARD | METAMORPHE: "magicien"; // fallback, shouldn't be reached
-        };
-        var searchInput:InputElement = cast getContent().querySelector('input[name=spell-search]');
-        var suggestions = getContent().querySelector('ul.spell-suggestions');
-        var spellIndex:Array<Dynamic> = [];
+		// Autocomplete setup
+		var clsName = switch (characterClass) {
+			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED: "conjurateur";
+			case MAGICIEN: "magicien";
+			case PRETRE: "pretre";
+			case ROUBLARD | METAMORPHE | GUERRIER: "magicien"; // fallback, shouldn't be reached
+		};
+		var searchInput:InputElement = cast getContent().querySelector('input[name=spell-search]');
+		var suggestions = getContent().querySelector('ul.spell-suggestions');
+		var spellIndex:Array<Dynamic> = [];
 
-        Api.getSpells(clsName, maxSpellLevel).then(index -> {
-            spellIndex = index;
-        });
+		Api.getSpells(clsName, maxSpellLevel).then(index -> {
+			spellIndex = index;
+		});
 
-        function selectSpell(name:String) {
-            searchInput.value = name;
-            suggestions.classList.add("hidden");
-            Api.getSpellDetail(clsName, name).then(spell -> {
-                setValue("name", spell.name);
-                setValue("level", Std.string(spell.level));
-                if (spell.school != null) setValue("school", spell.school);
-                if (spell.shortDesc != null) setValue("short-description", spell.shortDesc);
-                if (spell.description != null) setValue("long-description", spell.description);
-                var comps:Array<String> = if (spell.components != null) spell.components else [];
-                var compVerbal:InputElement = cast getContent().querySelector('input[name=comp-verbal]');
-                var compSomatic:InputElement = cast getContent().querySelector('input[name=comp-somatic]');
-                var compMaterial:InputElement = cast getContent().querySelector('input[name=comp-material]');
-                compVerbal.checked = comps.indexOf("VERBAL") >= 0;
-                compSomatic.checked = comps.indexOf("SOMATIC") >= 0;
-                compMaterial.checked = comps.indexOf("MATERIAL") >= 0;
-                if (spell.savingThrow != null) {
-                    stSelect.value = spell.savingThrow;
-                    saveEffectRow.classList.remove("hidden");
-                    if (spell.saveEffect != null) setValue("save-effect", spell.saveEffect);
-                }
-                var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
-                srInput.checked = spell.spellResistance == true;
-                if (spell.target != null) setValue("targets", spell.target);
-                if (spell.range != null) {
-                    var r = spell.range.toLowerCase().trim();
-                    if (r.startsWith("personnelle") || r.startsWith("personelle")) {
-                        setValue("range", "PERSONAL");
-                        rangeSpecific.classList.add("hidden");
-                    } else if (r.startsWith("contact")) {
-                        setValue("range", "TOUCH");
-                        rangeSpecific.classList.add("hidden");
-                    } else if (r.startsWith("courte")) {
-                        setValue("range", "CLOSE");
-                        rangeSpecific.classList.add("hidden");
-                    } else if (r.startsWith("moyenne")) {
-                        setValue("range", "MEDIUM");
-                        rangeSpecific.classList.add("hidden");
-                    } else if (r.startsWith("longue")) {
-                        setValue("range", "LONG");
-                        rangeSpecific.classList.add("hidden");
-                    } else {
-                        setValue("range", "SPECIFIC");
-                        setValue("range-specific", spell.range.trim());
-                        rangeSpecific.classList.remove("hidden");
-                    }
-                }
-                if (spell.duration != null) {
-                    var rawDuration = spell.duration.toLowerCase().trim();
-                    var canEndInput:InputElement = cast getContent().querySelector('input[name=can-end-voluntarily]');
-                    canEndInput.checked = rawDuration.indexOf("(t)") >= 0;
-                    // Strip trailing dismissal marker, e.g. " (T)"
-                    var d = ~/\s*\([^)]*\)\s*$/.replace(rawDuration, "").trim();
-                    var reLevel = ~/^(\d+) (rounds?|min(?:utes?)?)\/niveau$/;
-                    var reFixed = ~/^(\d+) (rounds?|min(?:utes?)?)$/;
-                    if (d == "instantanée" || d == "instantanee") {
-                        setValue("duration", "INSTANTANEOUS");
-                        durationN.classList.add("hidden");
-                        canEndRow.classList.add("hidden");
-                    } else if (d.startsWith("concentration")) {
-                        setValue("duration", "CONCENTRATION");
-                        durationN.classList.add("hidden");
-                        canEndRow.classList.remove("hidden");
-                    } else if (reLevel.match(d)) {
-                        var x = Std.parseInt(reLevel.matched(1));
-                        var isMinutes = reLevel.matched(2).startsWith("min");
-                        setValue("duration", isMinutes ? "N_MINUTES" : "N_ROUNDS");
-                        setValue("duration-n", x == 1 ? "NLS" : '$x*NLS');
-                        durationN.classList.remove("hidden");
-                        canEndRow.classList.remove("hidden");
-                    } else if (reFixed.match(d)) {
-                        var x = reFixed.matched(1);
-                        var isMinutes = reFixed.matched(2).startsWith("min");
-                        setValue("duration", isMinutes ? "N_MINUTES" : "N_ROUNDS");
-                        setValue("duration-n", x);
-                        durationN.classList.remove("hidden");
-                        canEndRow.classList.remove("hidden");
-                    }
-                }
-            });
-        }
+		function selectSpell(name:String) {
+			searchInput.value = name;
+			suggestions.classList.add("hidden");
+			Api.getSpellDetail(clsName, name).then(spell -> {
+				setValue("name", spell.name);
+				setValue("level", Std.string(spell.level));
+				if (spell.school != null)
+					setValue("school", spell.school);
+				if (spell.shortDesc != null)
+					setValue("short-description", spell.shortDesc);
+				if (spell.description != null)
+					setValue("long-description", spell.description);
+				var comps:Array<String> = if (spell.components != null) spell.components else [];
+				var compVerbal:InputElement = cast getContent().querySelector('input[name=comp-verbal]');
+				var compSomatic:InputElement = cast getContent().querySelector('input[name=comp-somatic]');
+				var compMaterial:InputElement = cast getContent().querySelector('input[name=comp-material]');
+				compVerbal.checked = comps.indexOf("VERBAL") >= 0;
+				compSomatic.checked = comps.indexOf("SOMATIC") >= 0;
+				compMaterial.checked = comps.indexOf("MATERIAL") >= 0;
+				if (spell.savingThrow != null) {
+					stSelect.value = spell.savingThrow;
+					saveEffectRow.classList.remove("hidden");
+					if (spell.saveEffect != null)
+						setValue("save-effect", spell.saveEffect);
+				}
+				var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
+				srInput.checked = spell.spellResistance == true;
+				if (spell.target != null)
+					setValue("targets", spell.target);
+				if (spell.range != null) {
+					var r = spell.range.toLowerCase().trim();
+					if (r.startsWith("personnelle") || r.startsWith("personelle")) {
+						setValue("range", "PERSONAL");
+						rangeSpecific.classList.add("hidden");
+					} else if (r.startsWith("contact")) {
+						setValue("range", "TOUCH");
+						rangeSpecific.classList.add("hidden");
+					} else if (r.startsWith("courte")) {
+						setValue("range", "CLOSE");
+						rangeSpecific.classList.add("hidden");
+					} else if (r.startsWith("moyenne")) {
+						setValue("range", "MEDIUM");
+						rangeSpecific.classList.add("hidden");
+					} else if (r.startsWith("longue")) {
+						setValue("range", "LONG");
+						rangeSpecific.classList.add("hidden");
+					} else {
+						setValue("range", "SPECIFIC");
+						setValue("range-specific", spell.range.trim());
+						rangeSpecific.classList.remove("hidden");
+					}
+				}
+				if (spell.duration != null) {
+					var rawDuration = spell.duration.toLowerCase().trim();
+					var canEndInput:InputElement = cast getContent().querySelector('input[name=can-end-voluntarily]');
+					canEndInput.checked = rawDuration.indexOf("(t)") >= 0;
+					// Strip trailing dismissal marker, e.g. " (T)"
+					var d = ~/\s*\([^)]*\)\s*$/.replace(rawDuration, "").trim();
+					var reLevel = ~/^(\d+) (rounds?|min(?:utes?)?)\/niveau$/;
+					var reFixed = ~/^(\d+) (rounds?|min(?:utes?)?)$/;
+					if (d == "instantanée" || d == "instantanee") {
+						setValue("duration", "INSTANTANEOUS");
+						durationN.classList.add("hidden");
+						canEndRow.classList.add("hidden");
+					} else if (d.startsWith("concentration")) {
+						setValue("duration", "CONCENTRATION");
+						durationN.classList.add("hidden");
+						canEndRow.classList.remove("hidden");
+					} else if (reLevel.match(d)) {
+						var x = Std.parseInt(reLevel.matched(1));
+						var isMinutes = reLevel.matched(2).startsWith("min");
+						setValue("duration", isMinutes ? "N_MINUTES" : "N_ROUNDS");
+						setValue("duration-n", x == 1 ? "NLS" : '$x*NLS');
+						durationN.classList.remove("hidden");
+						canEndRow.classList.remove("hidden");
+					} else if (reFixed.match(d)) {
+						var x = reFixed.matched(1);
+						var isMinutes = reFixed.matched(2).startsWith("min");
+						setValue("duration", isMinutes ? "N_MINUTES" : "N_ROUNDS");
+						setValue("duration-n", x);
+						durationN.classList.remove("hidden");
+						canEndRow.classList.remove("hidden");
+					}
+				}
+			});
+		}
 
-        function normalize(s:String):String {
-            return js.Syntax.code("{0}.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase()", s);
-        }
+		function normalize(s:String):String {
+			return js.Syntax.code("{0}.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase()", s);
+		}
 
-        searchInput.addEventListener("input", () -> {
-            var query = normalize(searchInput.value.trim());
-            suggestions.innerHTML = "";
-            if (query.length < 2) {
-                suggestions.classList.add("hidden");
-                return;
-            }
-            var matches = spellIndex.filter(s -> normalize(s.name).indexOf(query) >= 0);
-            if (matches.length == 0) {
-                suggestions.classList.add("hidden");
-                return;
-            }
-            if (matches.length > 10) matches = matches.slice(0, 10);
-            suggestions.classList.remove("hidden");
-            for (s in matches) {
-                var li = Browser.document.createLIElement();
-                li.innerText = '${s.name} (niv. ${s.level})';
-                li.addEventListener("click", () -> selectSpell(s.name));
-                suggestions.appendChild(li);
-            }
-        });
+		searchInput.addEventListener("input", () -> {
+			var query = normalize(searchInput.value.trim());
+			suggestions.innerHTML = "";
+			if (query.length < 2) {
+				suggestions.classList.add("hidden");
+				return;
+			}
+			var matches = spellIndex.filter(s -> normalize(s.name).indexOf(query) >= 0);
+			if (matches.length == 0) {
+				suggestions.classList.add("hidden");
+				return;
+			}
+			if (matches.length > 10)
+				matches = matches.slice(0, 10);
+			suggestions.classList.remove("hidden");
+			for (s in matches) {
+				var li = Browser.document.createLIElement();
+				li.innerText = '${s.name} (niv. ${s.level})';
+				li.addEventListener("click", () -> selectSpell(s.name));
+				suggestions.appendChild(li);
+			}
+		});
 
-        getContent().querySelector("a.validate").addEventListener("click", () -> {
-            var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
-            var canEndInput:InputElement = cast getContent().querySelector('input[name=can-end-voluntarily]');
-            var compVerbal:InputElement = cast getContent().querySelector('input[name=comp-verbal]');
-            var compSomatic:InputElement = cast getContent().querySelector('input[name=comp-somatic]');
-            var compMaterial:InputElement = cast getContent().querySelector('input[name=comp-material]');
+		getContent().querySelector("a.validate").addEventListener("click", () -> {
+			var srInput:InputElement = cast getContent().querySelector('input[name=spell-resistance]');
+			var canEndInput:InputElement = cast getContent().querySelector('input[name=can-end-voluntarily]');
+			var compVerbal:InputElement = cast getContent().querySelector('input[name=comp-verbal]');
+			var compSomatic:InputElement = cast getContent().querySelector('input[name=comp-somatic]');
+			var compMaterial:InputElement = cast getContent().querySelector('input[name=comp-material]');
 
-            var components:Array<SpellComponent> = [];
-            if (compVerbal.checked) components.push(VERBAL);
-            if (compSomatic.checked) components.push(SOMATIC);
-            if (compMaterial.checked) components.push(MATERIAL);
+			var components:Array<SpellComponent> = [];
+			if (compVerbal.checked)
+				components.push(VERBAL);
+			if (compSomatic.checked)
+				components.push(SOMATIC);
+			if (compMaterial.checked)
+				components.push(MATERIAL);
 
-            var castingTime:SpellCastingTime = if (castingTimeSelect.value == "N_ROUNDS") {
-                N_ROUNDS(castingTimeN.value);
-            } else if (castingTimeSelect.value == "N_MINUTES") {
-                N_MINUTES(castingTimeN.value);
-            } else {
-                SpellCastingTime.createByName(castingTimeSelect.value);
-            };
+			var castingTime:SpellCastingTime = if (castingTimeSelect.value == "N_ROUNDS") {
+				N_ROUNDS(castingTimeN.value);
+			} else if (castingTimeSelect.value == "N_MINUTES") {
+				N_MINUTES(castingTimeN.value);
+			} else {
+				SpellCastingTime.createByName(castingTimeSelect.value);
+			};
 
-            var duration:SpellDuration = if (durationSelect.value == "N_ROUNDS") {
-                N_ROUNDS(durationN.value);
-            } else if (durationSelect.value == "N_MINUTES") {
-                N_MINUTES(durationN.value);
-            } else {
-                SpellDuration.createByName(durationSelect.value);
-            };
+			var duration:SpellDuration = if (durationSelect.value == "N_ROUNDS") {
+				N_ROUNDS(durationN.value);
+			} else if (durationSelect.value == "N_MINUTES") {
+				N_MINUTES(durationN.value);
+			} else {
+				SpellDuration.createByName(durationSelect.value);
+			};
 
-            var range:SpellRange = if (rangeSelect.value == "SPECIFIC") {
-                SPECIFIC(rangeSpecific.value);
-            } else {
-                SpellRange.createByName(rangeSelect.value);
-            };
+			var range:SpellRange = if (rangeSelect.value == "SPECIFIC") {
+				SPECIFIC(rangeSpecific.value);
+			} else {
+				SpellRange.createByName(rangeSelect.value);
+			};
 
-            var shortDescVal = inputValue("short-description");
-            var usesVal = inputValue("uses-per-day");
-            var aoeVal = inputValue("area-of-effect");
-            var dcVal = inputValue("saving-throw-dc");
+			var shortDescVal = inputValue("short-description");
+			var usesVal = inputValue("uses-per-day");
+			var aoeVal = inputValue("area-of-effect");
+			var dcVal = inputValue("saving-throw-dc");
 
-            var spell:Spell = {
-                name: inputValue("name"),
-                shortDescription: if (shortDescVal == "") null else shortDescVal,
-                school: SpellSchool.createByName(inputValue("school")),
-                level: Std.parseInt(inputValue("level")),
-                usesPerDay: if (usesVal == "") null else Std.parseInt(usesVal),
-                savingThrowType: if (stSelect.value == "") null else SavingThrow.createByName(stSelect.value),
-                saveEffect: if (inputValue("save-effect") == "") null else SpellSaveEffect.createByName(inputValue("save-effect")),
-                spellResistance: srInput.checked,
-                targets: inputValue("targets"),
-                castingTime: castingTime,
-                duration: duration,
-                canEndVoluntarily: durationSelect.value != "INSTANTANEOUS" && canEndInput.checked,
-                components: components,
-                areaOfEffect: if (aoeVal == "") null else aoeVal,
-                range: range,
-                longDescription: inputValue("long-description"),
-                priority: Std.parseInt(inputValue("priority")),
-                savingThrowDC: if (dcVal == "") null else dcVal,
-            };
+			var spell:Spell = {
+				name: inputValue("name"),
+				shortDescription: if (shortDescVal == "") null else shortDescVal,
+				school: SpellSchool.createByName(inputValue("school")),
+				level: Std.parseInt(inputValue("level")),
+				usesPerDay: if (usesVal == "") null else Std.parseInt(usesVal),
+				savingThrowType: if (stSelect.value == "") null else SavingThrow.createByName(stSelect.value),
+				saveEffect: if (inputValue("save-effect") == "") null else SpellSaveEffect.createByName(inputValue("save-effect")),
+				spellResistance: srInput.checked,
+				targets: inputValue("targets"),
+				castingTime: castingTime,
+				duration: duration,
+				canEndVoluntarily: durationSelect.value != "INSTANTANEOUS" && canEndInput.checked,
+				components: components,
+				areaOfEffect: if (aoeVal == "") null else aoeVal,
+				range: range,
+				longDescription: inputValue("long-description"),
+				priority: Std.parseInt(inputValue("priority")),
+				savingThrowDC: if (dcVal == "") null else dcVal,
+			};
 
-            onChoice(spell);
-            close();
-        });
-    }
+			onChoice(spell);
+			close();
+		});
+	}
 }
