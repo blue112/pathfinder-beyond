@@ -290,9 +290,10 @@ class SpellDialog extends Popup implements IJSAsync {
 		// Autocomplete setup
 		var clsName = switch (characterClass) {
 			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED: "conjurateur";
+			case BARDE: "barde";
 			case MAGICIEN: "magicien";
 			case PRETRE: "pretre";
-			case ROUBLARD | METAMORPHE | GUERRIER: "magicien"; // fallback, shouldn't be reached
+			default: "magicien"; // fallback, shouldn't be reached
 		};
 		var searchInput:InputElement = cast getContent().querySelector('input[name=spell-search]');
 		var suggestions = getContent().querySelector('ul.spell-suggestions');

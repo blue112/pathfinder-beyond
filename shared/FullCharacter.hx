@@ -322,10 +322,12 @@ class FullCharacter {
 		return switch (basics.characterClass) {
 			case MAGICIEN:
 				6;
-			case CONJURATEUR, ROUBLARD, PRETRE:
+			case CONJURATEUR, ROUBLARD, PRETRE, BARDE:
 				8;
 			case CONJURATEUR_EIDOLON_BIPED, METAMORPHE, GUERRIER:
 				10;
+			case BARBARE:
+				12;
 		}
 	}
 
