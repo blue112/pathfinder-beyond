@@ -294,7 +294,7 @@ class SpellDialog extends Popup implements IJSAsync {
 			case DRUIDE: "druide";
 			case PALADIN: "paladin";
 			case MAGICIEN | ENSORCELEUR: "magicien";
-			case PRETRE: "pretre";
+			case PRETRE | ORACLE: "pretre";
 			default: "magicien"; // fallback, shouldn't be reached
 		};
 		var searchInput:InputElement = cast getContent().querySelector('input[name=spell-search]');

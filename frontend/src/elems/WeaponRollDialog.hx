@@ -8,7 +8,6 @@ class WeaponRollDialog extends Popup {
 		mainElem.classList.add("alert");
 
 		var attackRoll = dice(20);
-		attackRoll = 1; // Hack
 		var isCriticalSuccess = weapon.criticalNums.contains(attackRoll);
 		var isCriticalFailure = attackRoll == 1;
 		var attackTotal = attackRoll + weapon.attackBonus;

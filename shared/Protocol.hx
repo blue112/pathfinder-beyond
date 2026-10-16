@@ -366,6 +366,7 @@ enum CharacterRace {
 	GNOME;
 	HALF_ORC;
 	ANGEL;
+	HALFELIN;
 }
 
 enum CharacterClass {
@@ -382,6 +383,7 @@ enum CharacterClass {
 	MOINE; // Unchained
 	PRETRE;
 	PALADIN;
+	ORACLE;
 }
 
 enum CharacterAlignement {

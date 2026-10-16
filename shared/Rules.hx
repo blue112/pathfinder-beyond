@@ -16,7 +16,7 @@ enum CharacterACType {
 class Rules {
 	static public function canCastSpells(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case CONJURATEUR | MAGICIEN | PRETRE | BARDE | DRUIDE | ENSORCELEUR | PALADIN: true;
+			case CONJURATEUR | MAGICIEN | PRETRE | ORACLE | BARDE | DRUIDE | ENSORCELEUR | PALADIN: true;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: false;
 		};
 	}
@@ -24,7 +24,7 @@ class Rules {
 	static public function needsSpellPreparation(cls:CharacterClass):Bool {
 		return switch (cls) {
 			case MAGICIEN | PRETRE | DRUIDE | PALADIN: true;
-			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE | ENSORCELEUR | MOINE: false;
+			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE | ENSORCELEUR | MOINE | ORACLE: false;
 		};
 	}
 
@@ -33,7 +33,7 @@ class Rules {
 		return switch (cls) {
 			case MAGICIEN: char.characteristicsMod.int;
 			case PRETRE | DRUIDE: char.characteristicsMod.wis;
-			case CONJURATEUR | BARDE | ENSORCELEUR | PALADIN: char.characteristicsMod.cha;
+			case CONJURATEUR | BARDE | ENSORCELEUR | PALADIN | ORACLE: char.characteristicsMod.cha;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: 0;
 		};
 	}
@@ -109,7 +109,7 @@ class Rules {
 	static function getBaseSlots(cls:CharacterClass, charIdx:Int):Array<Int> {
 		return switch (cls) {
 			case MAGICIEN | PRETRE | DRUIDE: [for (L in 0...10) spellSlotBase[L][charIdx]];
-			case ENSORCELEUR: [for (L in 0...10) spellSlotBaseEnsorceleur[L][charIdx]];
+			case ENSORCELEUR | ORACLE: [for (L in 0...10) spellSlotBaseEnsorceleur[L][charIdx]];
 			case CONJURATEUR | BARDE: [for (L in 0...10) spellSlotBaseConjurateurBarde[L][charIdx]];
 			case PALADIN: [for (L in 0...10) spellSlotBaseConjurateurPaladin[L][charIdx]];
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -153,6 +153,7 @@ class Rules {
 	static var bbaTables = [
 		ROUBLARD => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		CONJURATEUR => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+		ENSORCELEUR => [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
 		BARDE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		DRUIDE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		METAMORPHE => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
@@ -162,6 +163,7 @@ class Rules {
 		CONJURATEUR_EIDOLON_BIPED => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
 		MAGICIEN => [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
 		PRETRE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+		ORACLE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 	];
 	static var savingThrowTables = [
 		ROUBLARD => [
@@ -177,6 +179,11 @@ class Rules {
 		PRETRE => [
 			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+		],
+		ORACLE => [
+			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 		],
 		METAMORPHE => [
@@ -200,6 +207,11 @@ class Rules {
 			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 		],
 		CONJURATEUR => [
+			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+		],
+		ENSORCELEUR => [
 			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 			VIGOR => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],

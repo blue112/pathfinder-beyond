@@ -133,6 +133,7 @@ class ProtocolUtil {
 			case CONJURATEUR_EIDOLON_BIPED: "Eidolon du Conjurateur";
 			case MAGICIEN: "Magicien(ne)";
 			case PRETRE: "Prêtre(sse)";
+			case ORACLE: "Oracle";
 		}
 	}
 
@@ -147,6 +148,7 @@ class ProtocolUtil {
 			case BARBARE: "barbare";
 			case METAMORPHE: "metamorphe";
 			case CONJURATEUR: "conjurateur";
+			case ORACLE: "oracle";
 			case BARDE: "barde";
 			case MOINE: "moine";
 			case DRUIDE: "druide";
@@ -203,6 +205,7 @@ class ProtocolUtil {
 			case GNOME: "Gnome";
 			case HALF_ORC: "Demi-orque";
 			case ANGEL: "Ange";
+			case HALFELIN: "Halfelin";
 		};
 	}
 

@@ -63,7 +63,7 @@ class RulesSkills {
 			label: "Art de la magie",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, DRUIDE, ENSORCELEUR, PALADIN],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, DRUIDE, ENSORCELEUR, PALADIN, ORACLE],
 		},
 		{
 			name: ARTISANAT,
@@ -82,7 +82,8 @@ class RulesSkills {
 				DRUIDE,
 				ENSORCELEUR,
 				MOINE,
-				PALADIN
+				PALADIN,
+				ORACLE
 			],
 		},
 		{
@@ -118,7 +119,7 @@ class RulesSkills {
 			label: "Connaissance (Histoire)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, MOINE],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, MOINE, ORACLE],
 		},
 		{
 			name: CONNAISSANCE_INGENIERIE,
@@ -153,14 +154,14 @@ class RulesSkills {
 			label: "Connaissance (Plans)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, CONJURATEUR_EIDOLON_BIPED, MAGICIEN, PRETRE, BARDE],
+			classSkillFor: [CONJURATEUR, CONJURATEUR_EIDOLON_BIPED, MAGICIEN, PRETRE, BARDE, ORACLE],
 		},
 		{
 			name: CONNAISSANCE_RELIGION,
 			label: "Connaissance (Religion)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, MOINE, PALADIN],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, MOINE, PALADIN, ORACLE],
 		},
 		{
 			name: DEGUISEMENT,
@@ -174,7 +175,7 @@ class RulesSkills {
 			label: "Diplomatie",
 			modifier: CHARISMA,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, PRETRE, BARDE, PALADIN],
+			classSkillFor: [ROUBLARD, PRETRE, BARDE, PALADIN, ORACLE],
 		},
 		{
 			name: DISCRETION,
@@ -258,7 +259,7 @@ class RulesSkills {
 			label: "Premiers secours",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [PRETRE, DRUIDE, PALADIN],
+			classSkillFor: [PRETRE, DRUIDE, PALADIN, ORACLE],
 		},
 		{
 			name: PROFESSION,
@@ -274,6 +275,7 @@ class RulesSkills {
 				DRUIDE,
 				ENSORCELEUR,
 				MOINE,
+				ORACLE,
 				PALADIN
 			],
 		},
@@ -282,7 +284,7 @@ class RulesSkills {
 			label: "Psychologie",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, PRETRE, BARDE, MOINE, PALADIN],
+			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, PRETRE, BARDE, MOINE, PALADIN, ORACLE],
 		},
 		{
 			name: REPRESENTATION,
