@@ -83,10 +83,11 @@ class SpellListPopup extends Popup {
 	}
 
 	public function render() {
+		var spellRegister = if (isForMainClass) character.spell_register else character.secondary_spell_register;
 		var needsPrep = character.needsSpellPreparation();
 		var slots = Rules.getSpellSlots(currentClass, character);
-		var spells = character.spells;
-		var preparedSpells = character.preparedSpells;
+		var spells = spellRegister.spells;
+		var preparedSpells = spellRegister.preparedSpells;
 
 		var content = getContent();
 		content.innerHTML = "";
@@ -107,7 +108,7 @@ class SpellListPopup extends Popup {
 
 		var isSpontaneous = character.canCastSpells() && !needsPrep;
 
-		if (needsPrep && !character.preparationLocked) {
+		if (needsPrep && !spellRegister.preparationLocked) {
 			var header = Browser.document.createParagraphElement();
 			header.className = "prep-phase-header";
 			header.innerText = "Phase de préparation";
@@ -138,7 +139,7 @@ class SpellListPopup extends Popup {
 					new YesNoAlert("Terminer la préparation",
 						"Confirmer la fin de la préparation des sorts ? Vous ne pourrez plus modifier vos sorts préparés jusqu'au prochain nouveau jour.",
 						() -> {
-							pushEvent(SPELL_EVENT(FINISH_SPELL_PREPARATION));
+							pushEvent(SPELL_EVENT(FINISH_SPELL_PREPARATION, isForMainClass));
 						});
 				});
 				content.appendChild(endBtn);
@@ -151,7 +152,7 @@ class SpellListPopup extends Popup {
 			for (spellLevel in 1...10) {
 				if (slots[spellLevel] == 0)
 					continue;
-				var used = character.usedSlots.exists(spellLevel) ? character.usedSlots.get(spellLevel) : 0;
+				var used = spellRegister.usedSlots.exists(spellLevel) ? spellRegister.usedSlots.get(spellLevel) : 0;
 				var remaining = slots[spellLevel] - used;
 				var badge = Browser.document.createSpanElement();
 				badge.className = 'slot-badge ${if (remaining > 0) "full" else "incomplete"}';
@@ -162,8 +163,8 @@ class SpellListPopup extends Popup {
 		}
 
 		var hasPowers = spells.filter(s -> s.usesPerDay != null && s.usesPerDay > 0).length > 0;
-		var showAvailable = (needsPrep && character.preparationLocked) || hasPowers;
-		var inPrep = needsPrep && !character.preparationLocked;
+		var showAvailable = (needsPrep && spellRegister.preparationLocked) || hasPowers;
+		var inPrep = needsPrep && !spellRegister.preparationLocked;
 		var ulClass = if (inPrep && hasPowers) "spell-list-ul has-prep has-available" else if (inPrep) "spell-list-ul has-prep" else if (showAvailable)
 			"spell-list-ul has-available" else "spell-list-ul";
 		var ul = Browser.document.createUListElement();
@@ -174,8 +175,8 @@ class SpellListPopup extends Popup {
 			var originalIndex = spells.indexOf(spell);
 			var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
 
-			if (needsPrep && character.preparationLocked && !showUnprepared && !isPower) {
-				if (!character.lockedPreparedIndices.contains(originalIndex))
+			if (needsPrep && spellRegister.preparationLocked && !showUnprepared && !isPower) {
+				if (!spellRegister.lockedPreparedIndices.contains(originalIndex))
 					continue;
 			}
 
@@ -239,7 +240,7 @@ class SpellListPopup extends Popup {
 			}
 			nameCell.addEventListener("click", () -> {
 				close();
-				new SpellDetailPopup(spell, originalIndex, character, pushEvent, ficheId,
+				new SpellDetailPopup(spell, originalIndex, character, isForMainClass, pushEvent, ficheId,
 					() -> new SpellListPopup(character, isForMainClass, pushEvent, register, ficheId));
 			});
 			li.appendChild(nameCell);
@@ -258,7 +259,7 @@ class SpellListPopup extends Popup {
 				minusBtn.innerText = "−";
 				minusBtn.addEventListener("click", () -> {
 					if (prepCount > 0)
-						pushEvent(SPELL_EVENT(UNPREPARE_SPELL(originalIndex)));
+						pushEvent(SPELL_EVENT(UNPREPARE_SPELL(originalIndex), isForMainClass));
 				});
 
 				var plusBtn = Browser.document.createAnchorElement();
@@ -273,7 +274,7 @@ class SpellListPopup extends Popup {
 						}
 					}
 					if (targetSlot >= 0)
-						pushEvent(SPELL_EVENT(PREPARE_SPELL(originalIndex, targetSlot)));
+						pushEvent(SPELL_EVENT(PREPARE_SPELL(originalIndex, targetSlot), isForMainClass));
 				});
 
 				prepControls.appendChild(countSpan);
@@ -293,7 +294,7 @@ class SpellListPopup extends Popup {
 				validateBtn.innerText = "✓";
 				validateBtn.addEventListener("click", () -> {
 					var val = Std.parseInt(input.value);
-					pushEvent(SPELL_EVENT(SET_SPELL_PRIORITY(originalIndex, val)));
+					pushEvent(SPELL_EVENT(SET_SPELL_PRIORITY(originalIndex, val), isForMainClass));
 				});
 				priorityCell.appendChild(input);
 				priorityCell.appendChild(validateBtn);
@@ -306,7 +307,7 @@ class SpellListPopup extends Popup {
 			deleteBtn.innerText = "×";
 			deleteBtn.addEventListener("click", () -> {
 				new YesNoAlert("Effacer un sort", 'Supprimer le sort "${spell.name}" ?', () -> {
-					pushEvent(SPELL_EVENT(REMOVE_SPELL(originalIndex)));
+					pushEvent(SPELL_EVENT(REMOVE_SPELL(originalIndex), isForMainClass));
 					close();
 				});
 			});
@@ -320,7 +321,7 @@ class SpellListPopup extends Popup {
 		addBtn.innerText = "Ajouter un sort";
 		var maxSpellLevel = Rules.getMaxSpellLevel(currentClass, character);
 		addBtn.addEventListener("click", () -> {
-			new SpellDialog(currentClass, maxSpellLevel, (spell) -> pushEvent(SPELL_EVENT(ADD_SPELL(spell))));
+			new SpellDialog(currentClass, maxSpellLevel, (spell) -> pushEvent(SPELL_EVENT(ADD_SPELL(spell), isForMainClass)));
 		});
 		content.appendChild(addBtn);
 	}

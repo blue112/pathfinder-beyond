@@ -302,7 +302,11 @@ class Rules {
 	}
 
 	static public function getBBA(char:FullCharacter) {
-		return bbaTables.get(char.basics.characterClass)[char.level - 1];
+		var firstClassBBA = bbaTables.get(char.basics.characterClass)[char.level - char.secondary_class_levels - 1];
+		if (char.secondary_class == null)
+			return firstClassBBA;
+		else
+			return firstClassBBA + bbaTables.get(char.secondary_class)[char.secondary_class_levels - 1];
 	}
 
 	static public function getSavingThrowCarac(st:SavingThrow) {

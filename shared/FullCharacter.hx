@@ -6,6 +6,14 @@ using Rules;
 using ProtocolUtil;
 using Std;
 
+typedef SpellRegister = {
+	public var spells:Array<Spell>;
+	public var preparedSpells:Array<PreparedSpell>;
+	public var preparationLocked:Bool;
+	public var lockedPreparedIndices:Array<Int>;
+	public var usedSlots:Map<Int, Int>;
+};
+
 class FullCharacter {
 	public var basics:BasicFicheData;
 
@@ -34,13 +42,10 @@ class FullCharacter {
 	public var inventory:Array<InventoryItem>;
 	public var damageResistances:Map<DamageType, Int>;
 	public var speed_mod:Int;
-	public var spells:Array<Spell>;
-	public var secondary_spells:Array<Spell>;
-	public var preparedSpells:Array<PreparedSpell>;
-	public var preparationLocked:Bool;
-	public var lockedPreparedIndices:Array<Int>;
+
+	public var spell_register:SpellRegister;
+	public var secondary_spell_register:SpellRegister;
 	public var usedPowers:Map<Int, Int>;
-	public var usedSlots:Map<Int, Int>;
 	public var firedWeapons:Map<Int, Bool>;
 	public var favoriteMagicSchool:Null<SpellSchool>;
 	public var priestDomains:Null<Array<PriestDomain>>;
@@ -71,13 +76,21 @@ class FullCharacter {
 		this.bank_po = 0;
 		this.damageResistances = new Map();
 		this.speed_mod = 0;
-		this.spells = [];
-		this.secondary_spells = [];
-		this.preparedSpells = [];
-		this.preparationLocked = false;
-		this.lockedPreparedIndices = [];
+		this.spell_register = {
+			spells: [],
+			usedSlots: new Map(),
+			lockedPreparedIndices: [],
+			preparationLocked: false,
+			preparedSpells: []
+		};
+		this.secondary_spell_register = {
+			spells: [],
+			usedSlots: new Map(),
+			lockedPreparedIndices: [],
+			preparationLocked: false,
+			preparedSpells: []
+		};
 		this.usedPowers = new Map();
-		this.usedSlots = new Map();
 		this.firedWeapons = new Map();
 		this.feats = [];
 		this.currentAnimalForm = 0;
@@ -211,73 +224,87 @@ class FullCharacter {
 			case REMOVE_INVENTORY_ITEM(item):
 				inventory.splice(item, 1);
 			case SPELL_EVENT(ADD_SPELL(spell), mainClass):
-				if (mainClass)
-					spells.push(Reflect.copy(spell));
-				else
-					secondary_spells.push(Reflect.copy(spell));
-			case SPELL_EVENT(REMOVE_SPELL(index)):
-				spells.splice(index, 1);
-			case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel)):
-				if (!preparationLocked)
-					preparedSpells.push({spellIndex: spellIndex, slotLevel: slotLevel});
-			case SPELL_EVENT(UNPREPARE_SPELL(spellIndex)):
-				if (!preparationLocked) {
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+				spellRegister.spells.push(Reflect.copy(spell));
+			case SPELL_EVENT(REMOVE_SPELL(index), mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+				spellRegister.spells.splice(index, 1);
+			case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel), mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+				if (!spellRegister.preparationLocked)
+					spellRegister.preparedSpells.push({spellIndex: spellIndex, slotLevel: slotLevel});
+			case SPELL_EVENT(UNPREPARE_SPELL(spellIndex), mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+				if (!spellRegister.preparationLocked) {
 					var idx = -1;
-					for (i in 0...preparedSpells.length) {
-						if (preparedSpells[i].spellIndex == spellIndex)
+					for (i in 0...spellRegister.preparedSpells.length) {
+						if (spellRegister.preparedSpells[i].spellIndex == spellIndex)
 							idx = i;
 					}
 					if (idx >= 0)
-						preparedSpells.splice(idx, 1);
+						spellRegister.preparedSpells.splice(idx, 1);
 				}
-			case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)):
-				if (spells[spellIndex].dices == null)
-					spells[spellIndex].dices = [];
-				spells[spellIndex].dices.push(dice);
-			case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, diceIndex)):
-				spells[spellIndex].dices.splice(diceIndex, 1);
-			case SPELL_EVENT(CAST_SPELL(spellIndex)):
-				var spell = spells[spellIndex];
+			case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice), mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+				if (spellRegister.spells[spellIndex].dices == null)
+					spellRegister.spells[spellIndex].dices = [];
+				spellRegister.spells[spellIndex].dices.push(dice);
+			case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, diceIndex), mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+
+				spellRegister.spells[spellIndex].dices.splice(diceIndex, 1);
+			case SPELL_EVENT(CAST_SPELL(spellIndex), mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+
+				var spell = spellRegister.spells[spellIndex];
 				if (spell.usesPerDay != null) {
 					usedPowers.set(spellIndex, (usedPowers.exists(spellIndex) ? usedPowers.get(spellIndex) : 0) + 1);
 				} else if (spell.level == 0) {
 					// Cantrips are unlimited — no slot consumed
 				} else if (needsSpellPreparation()) {
 					var idx = -1;
-					for (i in 0...preparedSpells.length) {
-						if (preparedSpells[i].spellIndex == spellIndex)
+					for (i in 0...spellRegister.preparedSpells.length) {
+						if (spellRegister.preparedSpells[i].spellIndex == spellIndex)
 							idx = i;
 					}
 					if (idx >= 0)
-						preparedSpells.splice(idx, 1);
+						spellRegister.preparedSpells.splice(idx, 1);
 				} else {
 					// Use the lowest available slot ≥ spell level
-					var slots = Rules.getSpellSlots(basics.characterClass, this);
+					var slots = Rules.getSpellSlots(if (mainClass) basics.characterClass else secondary_class, this);
 					var slotLevel = spell.level;
 					for (lvl in spell.level...10) {
-						var rem = slots[lvl] - (usedSlots.exists(lvl) ? usedSlots.get(lvl) : 0);
+						var rem = slots[lvl] - (spellRegister.usedSlots.exists(lvl) ? spellRegister.usedSlots.get(lvl) : 0);
 						if (rem > 0) {
 							slotLevel = lvl;
 							break;
 						}
 					}
-					usedSlots.set(slotLevel, (usedSlots.exists(slotLevel) ? usedSlots.get(slotLevel) : 0) + 1);
+					spellRegister.usedSlots.set(slotLevel, (spellRegister.usedSlots.exists(slotLevel) ? spellRegister.usedSlots.get(slotLevel) : 0) + 1);
 				}
-			case SPELL_EVENT(EDIT_SPELL(index, spell)):
+			case SPELL_EVENT(EDIT_SPELL(index, spell), mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+
 				var edited = Reflect.copy(spell);
-				edited.dices = spells[index].dices;
-				spells[index] = edited;
-			case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority)):
-				spells[spellIndex].priority = priority;
-			case SPELL_EVENT(FINISH_SPELL_PREPARATION):
-				preparationLocked = true;
-				lockedPreparedIndices = preparedSpells.map(p -> p.spellIndex);
+				edited.dices = spellRegister.spells[index].dices;
+				spellRegister.spells[index] = edited;
+			case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority), mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+
+				spellRegister.spells[spellIndex].priority = priority;
+			case SPELL_EVENT(FINISH_SPELL_PREPARATION, mainClass):
+				var spellRegister = if (mainClass) spell_register else secondary_spell_register;
+
+				spellRegister.preparationLocked = true;
+				spellRegister.lockedPreparedIndices = spellRegister.preparedSpells.map(p -> p.spellIndex);
 			case NEW_DAY:
-				preparedSpells = [];
-				preparationLocked = false;
-				lockedPreparedIndices = [];
+				for (spellRegister in [spell_register, secondary_spell_register]) {
+					spellRegister.preparedSpells = [];
+					spellRegister.preparationLocked = false;
+					spellRegister.lockedPreparedIndices = [];
+					spellRegister.usedSlots = new Map();
+				}
 				usedPowers = new Map();
-				usedSlots = new Map();
 				current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
 			case SET_FAVORITE_MAGIC_SCHOOL(school):
 				favoriteMagicSchool = school;

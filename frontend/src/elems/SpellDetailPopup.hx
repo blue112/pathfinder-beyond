@@ -9,10 +9,12 @@ using Rules;
 class SpellDetailPopup extends Popup {
 	var onBack:Void->Void;
 
-	public function new(spell:Spell, spellIndex:Int, character:FullCharacter, spellClass:CharacterClass, pushEvent:FicheEventType->Void, ficheId:String,
+	public function new(spell:Spell, spellIndex:Int, character:FullCharacter, isForMainClass:Bool, pushEvent:FicheEventType->Void, ficheId:String,
 			onBack:Void->Void) {
 		super(spell.name);
 		this.onBack = onBack;
+		var spellClass = if (isForMainClass) character.basics.characterClass else character.secondary_class;
+		var spellRegister = if (isForMainClass) character.spell_register else character.secondary_spell_register;
 		mainElem.classList.add("spell-detail");
 
 		var main = mainElem.querySelector(".main");
@@ -108,7 +110,7 @@ class SpellDetailPopup extends Popup {
 			del.className = "spell-dice-del";
 			del.innerText = "×";
 			del.addEventListener("click", () -> {
-				pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di)));
+				pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di), isForMainClass));
 				dicesSection.removeChild(row);
 			});
 			row.appendChild(label);
@@ -122,7 +124,7 @@ class SpellDetailPopup extends Popup {
 		addDiceBtn.addEventListener("click", () -> {
 			new elems.SpellDiceDialog(spell.name, (dice) -> {
 				var di = currentDiceCount++;
-				pushEvent(SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)));
+				pushEvent(SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice), isForMainClass));
 				var row = Browser.document.createDivElement();
 				row.className = "spell-dice-item";
 				var label = Browser.document.createSpanElement();
@@ -131,7 +133,7 @@ class SpellDetailPopup extends Popup {
 				del.className = "spell-dice-del";
 				del.innerText = "×";
 				del.addEventListener("click", () -> {
-					pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di)));
+					pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di), isForMainClass));
 					dicesSection.removeChild(row);
 				});
 				row.appendChild(label);
@@ -146,8 +148,8 @@ class SpellDetailPopup extends Popup {
 		editBtn.addEventListener("click", () -> {
 			closeSilent();
 			new elems.SpellDialog(spellClass, maxSpellLevel, (edited) -> {
-				pushEvent(SPELL_EVENT(EDIT_SPELL(spellIndex, edited)));
-				new elems.SpellDetailPopup(edited, spellIndex, character, pushEvent, ficheId, onBack);
+				pushEvent(SPELL_EVENT(EDIT_SPELL(spellIndex, edited), isForMainClass));
+				new elems.SpellDetailPopup(edited, spellIndex, character, isForMainClass, pushEvent, ficheId, onBack);
 			}, spell);
 		});
 
@@ -166,14 +168,14 @@ class SpellDetailPopup extends Popup {
 				castBtn.appendChild(usageSpan);
 				castBtn.addEventListener("click", () -> {
 					new YesNoAlert("Utiliser le pouvoir", 'Confirmer l\'utilisation de "${spell.name}" ?', () -> {
-						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex), isForMainClass));
 						closeSilent();
-						new elems.SpellCastPopup(spell, character, ficheId);
+						new elems.SpellCastPopup(spell, character, spellClass, ficheId);
 					});
 				});
 			}
 		} else if (spell.level == 0) {
-			var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
+			var preparedCount = spellRegister.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
 			var canCast = isSpontaneous || preparedCount > 0;
 			if (!canCast) {
 				castBtn.classList.add("disabled");
@@ -184,9 +186,9 @@ class SpellDetailPopup extends Popup {
 				castBtn.appendChild(usageSpan);
 				castBtn.addEventListener("click", () -> {
 					new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ?', () -> {
-						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex), isForMainClass));
 						closeSilent();
-						new elems.SpellCastPopup(spell, character, ficheId);
+						new elems.SpellCastPopup(spell, character, spellClass, ficheId);
 					});
 				});
 			}
@@ -195,7 +197,7 @@ class SpellDetailPopup extends Popup {
 			// Find the lowest available slot at or above spell level
 			var availableSlotLevel:Null<Int> = null;
 			for (lvl in spell.level...10) {
-				var rem = slots[lvl] - (character.usedSlots.exists(lvl) ? character.usedSlots.get(lvl) : 0);
+				var rem = slots[lvl] - (spellRegister.usedSlots.exists(lvl) ? spellRegister.usedSlots.get(lvl) : 0);
 				if (rem > 0) {
 					availableSlotLevel = lvl;
 					break;
@@ -204,7 +206,8 @@ class SpellDetailPopup extends Popup {
 			if (availableSlotLevel == null) {
 				castBtn.classList.add("disabled");
 			} else {
-				var remaining = slots[availableSlotLevel] - (character.usedSlots.exists(availableSlotLevel) ? character.usedSlots.get(availableSlotLevel) : 0);
+				var remaining = slots[availableSlotLevel]
+					- (spellRegister.usedSlots.exists(availableSlotLevel) ? spellRegister.usedSlots.get(availableSlotLevel) : 0);
 				var usageSpan = Browser.document.createSpanElement();
 				usageSpan.className = "cast-usage";
 				var slotDesc = if (availableSlotLevel == spell.level)
@@ -216,14 +219,14 @@ class SpellDetailPopup extends Popup {
 					var slotMsg = if (availableSlotLevel == spell.level) 'Un emplacement de niveau ${spell.level} sera consommé.' else
 						'Aucun emplacement de niveau ${spell.level} disponible — un emplacement de niveau $availableSlotLevel sera consommé.';
 					new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? $slotMsg', () -> {
-						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex), isForMainClass));
 						closeSilent();
-						new elems.SpellCastPopup(spell, character, ficheId);
+						new elems.SpellCastPopup(spell, character, spellClass, ficheId);
 					});
 				});
 			}
 		} else {
-			var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
+			var preparedCount = spellRegister.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
 			if (preparedCount == 0) {
 				castBtn.classList.add("disabled");
 			} else {
@@ -233,9 +236,9 @@ class SpellDetailPopup extends Popup {
 				castBtn.appendChild(usageSpan);
 				castBtn.addEventListener("click", () -> {
 					new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? L\'emplacement de sort sera consommé.', () -> {
-						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex), isForMainClass));
 						closeSilent();
-						new elems.SpellCastPopup(spell, character, ficheId);
+						new elems.SpellCastPopup(spell, character, spellClass, ficheId);
 					});
 				});
 			}
@@ -251,9 +254,9 @@ class SpellDetailPopup extends Popup {
 					siBtn.addEventListener("click", () -> {
 						new YesNoAlert("Invocation spontanée", 'Remplacer "${spell.name}" par "${healSpell.name}" ? L\'emplacement de sort sera consommé.',
 							() -> {
-								pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+								pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex), isForMainClass));
 								closeSilent();
-								new elems.SpellCastPopup(healSpell, character, ficheId);
+								new elems.SpellCastPopup(healSpell, character, spellClass, ficheId);
 							});
 					});
 				}

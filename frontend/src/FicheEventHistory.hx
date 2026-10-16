@@ -101,27 +101,27 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case REMOVE_INVENTORY_ITEM(item_n):
 					var item = currentItems.splice(item_n, 1)[0];
 					'Suppression d\'un objet de l\'inventaire: ${item.name.htmlEscape()}';
-				case SPELL_EVENT(ADD_SPELL(spell)):
+				case SPELL_EVENT(ADD_SPELL(spell), _):
 					currentSpells.push(Reflect.copy(spell));
 					'Ajout d\'un sort: ${spell.name.htmlEscape()} (niv.${spell.level}, ${spell.school.spellSchoolToString()})';
-				case SPELL_EVENT(REMOVE_SPELL(index)):
+				case SPELL_EVENT(REMOVE_SPELL(index), _):
 					var spell = currentSpells.splice(index, 1)[0];
 					'Suppression d\'un sort: ${spell.name.htmlEscape()}';
-				case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel)):
+				case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel), _):
 					'Préparation d\'un sort: ${currentSpells[spellIndex].name.htmlEscape()} (emplacement niv.$slotLevel)';
-				case SPELL_EVENT(UNPREPARE_SPELL(spellIndex)):
+				case SPELL_EVENT(UNPREPARE_SPELL(spellIndex), _):
 					'Dépréparation d\'un sort: ${currentSpells[spellIndex].name.htmlEscape()}';
-				case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)):
+				case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice), _):
 					'Dé ajouté à ${currentSpells[spellIndex].name.htmlEscape()}: ${dice.reason.htmlEscape()} (${dice.diceType.spellDiceTypeToString()})';
-				case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, _)):
+				case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, _), _):
 					'Dé retiré de ${currentSpells[spellIndex].name.htmlEscape()}';
-				case SPELL_EVENT(CAST_SPELL(spellIndex)):
+				case SPELL_EVENT(CAST_SPELL(spellIndex), _):
 					'Sort lancé: ${currentSpells[spellIndex].name.htmlEscape()}';
-				case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority)):
+				case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority), _):
 					'Priorité du sort ${currentSpells[spellIndex].name.htmlEscape()} modifiée : $priority';
-				case SPELL_EVENT(EDIT_SPELL(index, spell)):
+				case SPELL_EVENT(EDIT_SPELL(index, spell), _):
 					'Modification d\'un sort : ${spell.name.htmlEscape()}';
-				case SPELL_EVENT(FINISH_SPELL_PREPARATION):
+				case SPELL_EVENT(FINISH_SPELL_PREPARATION, _):
 					'Fin de la phase de préparation des sorts';
 				case NEW_DAY:
 					'Nouveau jour';

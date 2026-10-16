@@ -830,7 +830,8 @@ class Fiche implements IJSAsync {
 	private function updateFiche() {
 		if (currentSpellPopup != null)
 			currentSpellPopup.render();
-		elems.SpellCastPopup.registerFieldNames(character.spells, fieldsNames);
+		elems.SpellCastPopup.registerFieldNames(character.spell_register.spells, fieldsNames);
+		elems.SpellCastPopup.registerFieldNames(character.secondary_spell_register.spells, fieldsNames);
 		updateBasics();
 		var spellsSection = mainElem.querySelector("section.spells-section");
 		if (character.canCastSpells()) {
