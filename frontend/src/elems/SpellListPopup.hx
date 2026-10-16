@@ -13,10 +13,16 @@ class SpellListPopup extends Popup {
 	var ficheId:String;
 	var editingPriorities:Bool = false;
 	var showUnprepared:Bool = false;
+	var isForMainClass:Bool;
+	var currentClass:CharacterClass;
 
-	public function new(character:FullCharacter, pushEvent:FicheEventType->Void, register:(Null<SpellListPopup>) -> Void, ficheId:String) {
-		super("Sorts");
+	public function new(character:FullCharacter, isForMainClass:Bool, pushEvent:FicheEventType->Void, register:(Null<SpellListPopup>) -> Void, ficheId:String) {
+		this.currentClass = if (isForMainClass) character.basics.characterClass else character.secondary_class;
+		var className = currentClass.classToString();
+
+		super('Sorts de ${className}');
 		this.character = character;
+		this.isForMainClass = isForMainClass;
 		this.pushEvent = pushEvent;
 		this.register = register;
 		this.ficheId = ficheId;
@@ -32,7 +38,7 @@ class SpellListPopup extends Popup {
 		});
 		mainElem.querySelector(".main").appendChild(editBtn);
 
-		if (character.basics.characterClass.needsSpellPreparation()) {
+		if (currentClass.needsSpellPreparation()) {
 			var unpreparedBtn = Browser.document.createAnchorElement();
 			unpreparedBtn.className = "show-unprepared-btn";
 			unpreparedBtn.innerText = "Voir les sorts non préparés";
@@ -46,7 +52,7 @@ class SpellListPopup extends Popup {
 
 		register(this);
 
-		if (character.basics.characterClass == MAGICIEN && character.favoriteMagicSchool == null) {
+		if (currentClass == MAGICIEN && character.favoriteMagicSchool == null) {
 			var schools = [
 				ABJURATION,
 				CONJURATION,
@@ -61,7 +67,7 @@ class SpellListPopup extends Popup {
 				(vals) -> pushEvent(SET_FAVORITE_MAGIC_SCHOOL(SpellSchool.createByName(vals[0]))));
 		}
 
-		if (character.basics.characterClass == PRETRE && character.priestDomains == null) {
+		if (currentClass == PRETRE && character.priestDomains == null) {
 			var domainOptions = PriestDomain.createAll().map(d -> {value: d.getName(), label: d.priestDomainToString()});
 			domainOptions.sort((a, b) -> a.label < b.label ? -1 : 1);
 			new SelectChoicePopup("Choisir deux domaines", domainOptions, 2,
@@ -77,8 +83,8 @@ class SpellListPopup extends Popup {
 	}
 
 	public function render() {
-		var needsPrep = character.basics.characterClass.needsSpellPreparation();
-		var slots = Rules.getSpellSlots(character.basics.characterClass, character);
+		var needsPrep = character.needsSpellPreparation();
+		var slots = Rules.getSpellSlots(currentClass, character);
 		var spells = character.spells;
 		var preparedSpells = character.preparedSpells;
 
@@ -99,7 +105,7 @@ class SpellListPopup extends Popup {
 			return (if (a.priority == null) 0 else a.priority) - (if (b.priority == null) 0 else b.priority);
 		});
 
-		var isSpontaneous = character.basics.characterClass.canCastSpells() && !needsPrep;
+		var isSpontaneous = character.canCastSpells() && !needsPrep;
 
 		if (needsPrep && !character.preparationLocked) {
 			var header = Browser.document.createParagraphElement();
@@ -196,9 +202,7 @@ class SpellListPopup extends Popup {
 						availSpan.innerText = "∞";
 					} else {
 						availSpan.className = 'spell-available ${if (count > 0) "has-charges" else "empty"}';
-						if (character.basics.characterClass == PRETRE
-							&& spell.level > 0
-							&& Rules.getSpontaneousHealSpell(spell.level) != null) {
+						if (currentClass == PRETRE && spell.level > 0 && Rules.getSpontaneousHealSpell(spell.level) != null) {
 							var siIcon = Browser.document.createSpanElement();
 							siIcon.className = "si-icon";
 							siIcon.title = "Invocation spontanée disponible";
@@ -235,7 +239,8 @@ class SpellListPopup extends Popup {
 			}
 			nameCell.addEventListener("click", () -> {
 				close();
-				new SpellDetailPopup(spell, originalIndex, character, pushEvent, ficheId, () -> new SpellListPopup(character, pushEvent, register, ficheId));
+				new SpellDetailPopup(spell, originalIndex, character, pushEvent, ficheId,
+					() -> new SpellListPopup(character, isForMainClass, pushEvent, register, ficheId));
 			});
 			li.appendChild(nameCell);
 
@@ -313,9 +318,9 @@ class SpellListPopup extends Popup {
 		var addBtn = Browser.document.createAnchorElement();
 		addBtn.className = "add-new";
 		addBtn.innerText = "Ajouter un sort";
-		var maxSpellLevel = Rules.getMaxSpellLevel(character.basics.characterClass, character);
+		var maxSpellLevel = Rules.getMaxSpellLevel(currentClass, character);
 		addBtn.addEventListener("click", () -> {
-			new SpellDialog(character.basics.characterClass, maxSpellLevel, (spell) -> pushEvent(SPELL_EVENT(ADD_SPELL(spell))));
+			new SpellDialog(currentClass, maxSpellLevel, (spell) -> pushEvent(SPELL_EVENT(ADD_SPELL(spell))));
 		});
 		content.appendChild(addBtn);
 	}

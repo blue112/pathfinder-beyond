@@ -18,6 +18,8 @@ enum FicheEventType {
 	REMOVE_DAMAGE_RESISTANCE(damageType:DamageType);
 	CHANGE_MAX_HP(amount:Int);
 	LEVEL_UP(hpDice:Int);
+	ADD_NEW_CLASS(cls:CharacterClass);
+	LEVEL_UP_SECONDARY_CLASS(hpDice:Int);
 	ADD_CLASS_SKILL(skill:SkillType);
 	SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
 	SET_SAVING_THROW_MODIFIER(st:SavingThrow, mod:Int);
@@ -38,7 +40,7 @@ enum FicheEventType {
 	REMOVE_INVENTORY_ITEM(item:Int);
 	CHANGE_ITEM_NAME(item:Int, newName:String);
 	CHANGE_ITEM_PRIORITY(item:Int, priority:Int);
-	SPELL_EVENT(event:SpellEventType);
+	SPELL_EVENT(event:SpellEventType, mainClass:Bool);
 	NEW_DAY;
 	SET_FAVORITE_MAGIC_SCHOOL(school:SpellSchool);
 	SET_PRIEST_DOMAIN(domain1:PriestDomain, domain2:PriestDomain);

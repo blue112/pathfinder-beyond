@@ -4,7 +4,6 @@ import js.Browser;
 import js.html.InputElement;
 import js.html.SelectElement;
 import Protocol;
-import ProtocolUtil;
 import jsasync.IJSAsync;
 
 using ProtocolUtil;

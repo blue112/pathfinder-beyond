@@ -16,6 +16,10 @@ class FullCharacter {
 	public var max_hp_modifier:Int;
 	public var levelUpDices:Array<Int>;
 	public var level:Int;
+
+	public var secondary_class:CharacterClass;
+	public var secondary_class_levels:Int;
+
 	public var additionalClassSkills:Array<SkillType>;
 	public var skillModifiers:Map<SkillType, Int>;
 	public var savingThrowModifiers:Map<SavingThrow, Int>;
@@ -31,6 +35,7 @@ class FullCharacter {
 	public var damageResistances:Map<DamageType, Int>;
 	public var speed_mod:Int;
 	public var spells:Array<Spell>;
+	public var secondary_spells:Array<Spell>;
 	public var preparedSpells:Array<PreparedSpell>;
 	public var preparationLocked:Bool;
 	public var lockedPreparedIndices:Array<Int>;
@@ -49,6 +54,8 @@ class FullCharacter {
 		this.current_hp = 0;
 		this.levelUpDices = [];
 		this.level = 1;
+		this.secondary_class = null;
+		this.secondary_class_levels = 0;
 		this.max_hp_modifier = 0;
 		this.additionalClassSkills = [];
 		this.skillModifiers = new Map();
@@ -65,6 +72,7 @@ class FullCharacter {
 		this.damageResistances = new Map();
 		this.speed_mod = 0;
 		this.spells = [];
+		this.secondary_spells = [];
 		this.preparedSpells = [];
 		this.preparationLocked = false;
 		this.lockedPreparedIndices = [];
@@ -135,7 +143,14 @@ class FullCharacter {
 				firedWeapons.remove(index);
 			case LEVEL_UP(hp_dice):
 				level += 1;
-				hp_dice = Math.min(hp_dice, getHitDice()).int();
+				hp_dice = Math.min(hp_dice, getHitDice(true)).int();
+				levelUpDices.push(hp_dice);
+			case ADD_NEW_CLASS(cls):
+				this.secondary_class = cls;
+			case LEVEL_UP_SECONDARY_CLASS(hp_dice):
+				level += 1;
+				secondary_class_levels += 1;
+				hp_dice = Math.min(hp_dice, getHitDice(false)).int();
 				levelUpDices.push(hp_dice);
 			case TRAIN_SKILL(skill):
 				skillRanks.push(skill);
@@ -195,8 +210,11 @@ class FullCharacter {
 				inventory[item].priority = priority;
 			case REMOVE_INVENTORY_ITEM(item):
 				inventory.splice(item, 1);
-			case SPELL_EVENT(ADD_SPELL(spell)):
-				spells.push(Reflect.copy(spell));
+			case SPELL_EVENT(ADD_SPELL(spell), mainClass):
+				if (mainClass)
+					spells.push(Reflect.copy(spell));
+				else
+					secondary_spells.push(Reflect.copy(spell));
 			case SPELL_EVENT(REMOVE_SPELL(index)):
 				spells.splice(index, 1);
 			case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel)):
@@ -224,7 +242,7 @@ class FullCharacter {
 					usedPowers.set(spellIndex, (usedPowers.exists(spellIndex) ? usedPowers.get(spellIndex) : 0) + 1);
 				} else if (spell.level == 0) {
 					// Cantrips are unlimited — no slot consumed
-				} else if (basics.characterClass.needsSpellPreparation()) {
+				} else if (needsSpellPreparation()) {
 					var idx = -1;
 					for (i in 0...preparedSpells.length) {
 						if (preparedSpells[i].spellIndex == spellIndex)
@@ -283,8 +301,29 @@ class FullCharacter {
 		}
 	}
 
+	public function needsSpellPreparation() {
+		if (secondary_class != null && Rules.needsSpellPreparation(secondary_class))
+			return true;
+
+		return Rules.needsSpellPreparation(basics.characterClass);
+	}
+
+	public function canCastSpells() {
+		if (secondary_class != null && Rules.canCastSpells(secondary_class))
+			return true;
+
+		return Rules.canCastSpells(basics.characterClass);
+	}
+
 	public function getNLS() {
-		return Std.int(Math.max(0, level + getTempMods([NEGATIVE_LEVEL]).sum()));
+		// Only consider classes that can throw spells
+		var levels = 0;
+		if (Rules.canCastSpells(basics.characterClass))
+			levels += level - secondary_class_levels;
+		if (Rules.canCastSpells(secondary_class))
+			levels += secondary_class_levels;
+
+		return Std.int(Math.max(0, levels + getTempMods([NEGATIVE_LEVEL]).sum()));
 	}
 
 	private function updateCharacts() {
@@ -318,8 +357,8 @@ class FullCharacter {
 		return level;
 	}
 
-	public function getHitDice() {
-		return switch (basics.characterClass) {
+	public function getHitDice(mainClass:Bool) {
+		return switch (if (mainClass) basics.characterClass else secondary_class) {
 			case MAGICIEN, ENSORCELEUR:
 				6;
 			case CONJURATEUR, ROUBLARD, PRETRE, ORACLE, BARDE, DRUIDE:
@@ -333,12 +372,15 @@ class FullCharacter {
 
 	public function getMaxHitPoints() {
 		var predilectionClassBonus = if (basics.usePredilectionHP) 1 else 0;
-		var hd = getHitDice();
+		var hd = getHitDice(true); // First level
 		var total = hd + predilectionClassBonus + characteristicsMod.con;
 
 		// Add predilection bonus and cons
 		for (i in 1...getNumberHitDice()) {
-			total += predilectionClassBonus + characteristicsMod.con;
+			if (i >= secondary_class_levels) { // Only for primary class
+				total += predilectionClassBonus;
+			}
+			total += characteristicsMod.con;
 		}
 		for (dice in levelUpDices) {
 			total += dice;

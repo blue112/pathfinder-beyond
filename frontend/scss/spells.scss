@@ -15,6 +15,10 @@ section.spells-section {
         &:hover {
             background: color.adjust($color: variables.$backgroundColor, $lightness: -5%);
         }
+
+        &.hide {
+            display: none;
+        }
     }
 }
 
@@ -52,8 +56,8 @@ section.spells-section {
             flex-shrink: 0;
         }
 
-        input[type=text],
-        input[type=number],
+        input[type="text"],
+        input[type="number"],
         select {
             flex: 1;
             padding: 5px 8px;
@@ -77,7 +81,7 @@ section.spells-section {
             position: relative;
             flex: 1;
 
-            input[type=text] {
+            input[type="text"] {
                 width: 100%;
                 box-sizing: border-box;
                 border-color: #7a9ec2;
@@ -100,7 +104,7 @@ section.spells-section {
                 list-style: none;
                 margin: 0;
                 padding: 0;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
                 li {
                     padding: 7px 10px;
@@ -108,8 +112,12 @@ section.spells-section {
                     font-size: 0.95em;
                     border-bottom: 1px solid #f0f0f0;
 
-                    &:last-child { border-bottom: none; }
-                    &:hover { background: #f5f5f5; }
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                    &:hover {
+                        background: #f5f5f5;
+                    }
                 }
             }
         }
@@ -337,13 +345,17 @@ section.spells-section {
         &.has-priority.has-available li {
             grid-template-columns: auto 55px 110px 1fr auto 30px;
 
-            a.delete { grid-column: 6; }
+            a.delete {
+                grid-column: 6;
+            }
         }
 
         &.has-priority.has-prep.has-available li {
             grid-template-columns: auto 55px 110px 1fr auto auto 30px;
 
-            a.delete { grid-column: 7; }
+            a.delete {
+                grid-column: 7;
+            }
         }
 
         li {
@@ -471,7 +483,7 @@ section.spells-section {
                 border: 1px solid #ccc;
                 background: #fafafa;
 
-                input[type=number] {
+                input[type="number"] {
                     width: 55px;
                     padding: 3px 5px;
                     font-size: 0.85em;
@@ -576,13 +588,18 @@ section.spells-section {
             .cast-sr-yes {
                 background: #e6a800;
                 color: white;
-                &:hover { opacity: 0.85; }
+                &:hover {
+                    opacity: 0.85;
+                }
             }
 
             .cast-sr-no {
                 border: 1px solid #aaa;
                 color: #555;
-                &:hover { border-color: #555; color: #222; }
+                &:hover {
+                    border-color: #555;
+                    color: #222;
+                }
             }
         }
 
@@ -767,7 +784,8 @@ section.spells-section {
         gap: 0;
         margin: 0;
 
-        dt, dd {
+        dt,
+        dd {
             padding: 7px 10px;
             border-bottom: 1px solid #eee;
             margin: 0;
@@ -871,7 +889,6 @@ section.spells-section {
                 font-size: 0.8em;
                 opacity: 0.7;
             }
-
 
             &.disabled {
                 background: #aaa;

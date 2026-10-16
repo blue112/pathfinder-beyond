@@ -55,7 +55,7 @@ class SpellCastPopup extends Popup {
 		};
 	}
 
-	public function new(spell:Spell, character:FullCharacter, ficheId:String) {
+	public function new(spell:Spell, character:FullCharacter, spellClass:CharacterClass, ficheId:String) {
 		super(spell.name);
 		mainElem.classList.add("spell-cast");
 
@@ -134,7 +134,7 @@ class SpellCastPopup extends Popup {
 				else
 					"";
 			} else {
-				var mod = Rules.getCastingModifier(character.basics.characterClass, character);
+				var mod = Rules.getCastingModifier(spellClass, character);
 				var racialBonus = Rules.getRacialSpellDCBonus(character.basics.race, spell.school);
 				'DD ${10 + spell.level + mod + racialBonus}';
 			};
@@ -207,10 +207,8 @@ class SpellCastPopup extends Popup {
 							var statMod = if (d.diceType.match(CONTACT_MELEE)) character.characteristicsMod.str else character.characteristicsMod.dex;
 							var size = Rules.getSizeMod(character, false);
 							var negLvl = character.getTempMods([NEGATIVE_LEVEL]).sum(); // negative value
-							var mods = if (size != 0 && negLvl != 0) [bba, statMod, size, negLvl]
-								else if (size != 0) [bba, statMod, size]
-								else if (negLvl != 0) [bba, statMod, negLvl]
-								else [bba, statMod];
+							var mods = if (size != 0 && negLvl != 0) [bba, statMod, size, negLvl] else if (size != 0) [bba, statMod, size] else
+								if (negLvl != 0) [bba, statMod, negLvl] else [bba, statMod];
 							var totalMod = mods.fold((m, acc) -> m + acc, 0);
 							var fieldId = if (d.diceType.match(CONTACT_MELEE)) "contact-cac" else "contact-distance";
 							Api.rollDice(ficheId, 20, totalMod, fieldId).then(res -> {
@@ -241,7 +239,8 @@ class SpellCastPopup extends Popup {
 							}
 							var singleFaceType = [for (_ in faces.keys()) true].length <= 1;
 							Api.rollDice(ficheId, parsed.faces, parsed.flatMod, fieldId, parsed.count).then(res -> {
-								if (singleFaceType) Dice.roll([parsed.flatMod], res.result, parsed.faces, null, parsed.count);
+								if (singleFaceType)
+									Dice.roll([parsed.flatMod], res.result, parsed.faces, null, parsed.count);
 								var diceStr = '${parsed.count}d${parsed.faces}';
 								var total = res.result + parsed.flatMod;
 								resultSpan.innerText = if (parsed.flatMod != 0) {

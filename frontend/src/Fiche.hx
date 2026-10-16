@@ -132,8 +132,14 @@ class Fiche implements IJSAsync {
 					pushEvent(CHANGE_BANK_MONEY(value));
 			});
 		});
-		mainElem.querySelector(".spells-btn").addEventListener("click", (_) -> {
-			new elems.SpellListPopup(character, pushEvent, (p) -> {
+		mainElem.querySelector(".spells-btn.primary").addEventListener("click", (_) -> {
+			var isMainClass = character.basics.characterClass.canCastSpells();
+			new elems.SpellListPopup(character, isMainClass, pushEvent, (p) -> {
+				currentSpellPopup = p;
+			}, fiche_id);
+		});
+		mainElem.querySelector(".spells-btn.secondary").addEventListener("click", (_) -> {
+			new elems.SpellListPopup(character, false, pushEvent, (p) -> {
 				currentSpellPopup = p;
 			}, fiche_id);
 		});
@@ -142,12 +148,41 @@ class Fiche implements IJSAsync {
 	function bindLevelActions() {
 		var action = mainElem.querySelector(".field[data-id=level] .plus");
 		action.addEventListener("click", () -> {
-			new ContextMenu(cast action, ["Monter de niveau", "Ajouter un niveau négatif temporaire"], (choice) -> {
+			new ContextMenu(cast action, [
+				"Monter de niveau",
+				"Ajouter une classe (multiclassing)",
+				"Ajouter un niveau négatif temporaire"
+			], (choice) -> {
 				if (choice == 0) {
-					new YesNoAlert("Montée de niveau", "Valider la montée de niveau ?", () -> {
-						onActionLevelUp();
-					});
+					if (character.secondary_class != null) {
+						new ChoicesDialog("Monter de niveau de quelle classe ?", [
+							character.basics.characterClass.classToString(),
+							character.secondary_class.classToString()
+						], (choice) -> {
+							onActionLevelUp(choice == 0);
+						});
+					} else {
+						new YesNoAlert("Montée de niveau", "Valider la montée de niveau ?", () -> {
+							onActionLevelUp(true);
+						});
+					}
 				} else if (choice == 1) {
+					if (character.secondary_class != null) {
+						new Alert("Impossible", "Tu ne peux pas avoir plus de 2 classes !");
+						return true;
+					}
+					new SelectChoicePopup("Choisir une seconde classe",
+						CharacterClass.createAll()
+							.filter(n -> n != character.basics.characterClass)
+							.map(n -> {label: ProtocolUtil.classToString(n), value: n.getName()}),
+						1, (value) -> {
+							var newCls = CharacterClass.createByName(value[0]);
+							pushEvent(ADD_NEW_CLASS(newCls));
+							// Fix the value just for now, because we might need it before we get the event
+							character.secondary_class = newCls;
+							onActionLevelUp(false);
+						});
+				} else if (choice == 2) {
 					new AmountChoice("Niveau négatif temporaire", "Nombre de niveaux négatifs ?", {askReason: true, defaultValue: 1}, (result, reason) -> {
 						pushEvent(ADD_TEMPORARY_MODIFIER({on: NEGATIVE_LEVEL, mod: -result, why: reason}));
 					});
@@ -157,12 +192,16 @@ class Fiche implements IJSAsync {
 		});
 	}
 
-	@:jsasync function onActionLevelUp() {
-		var hd = character.getHitDice();
+	@:jsasync function onActionLevelUp(useMainClass:Bool) {
+		var hd = character.getHitDice(useMainClass);
 		var diceRoll = Api.rollDice(fiche_id, hd, 0, "level").jsawait();
 		var result = diceRoll.result;
 		new Alert("Montée de niveau", 'Résultat du lancer de dé de point de vie (d${hd}): $result');
-		pushEvent(LEVEL_UP(result));
+		if (useMainClass) {
+			pushEvent(LEVEL_UP(result));
+		} else {
+			pushEvent(LEVEL_UP_SECONDARY_CLASS(result));
+		}
 	}
 
 	function bindInitiativeActions() {
@@ -433,7 +472,8 @@ class Fiche implements IJSAsync {
 					mods.push(expMod);
 				Dice.roll(mods, apiResult.result, diceType, null, numDice);
 				var total = apiResult.result + mod + expMod;
-				if (character.basics.characterClass == ROUBLARD && dataParent.dataset.id == "damage") {
+				if ((character.basics.characterClass == ROUBLARD || character.secondary_class == ROUBLARD)
+					&& dataParent.dataset.id == "damage") {
 					var sneakDice = Std.int((character.level + 1) / 2);
 					new elems.YesNoAlert("Attaque sournoise ?", 'Ajouter ${sneakDice}d6 de dégâts d\'attaque sournoise ?', () -> {
 						var sneakRolls = [for (_ in 0...sneakDice) Std.int(Math.random() * 6) + 1];
@@ -762,6 +802,10 @@ class Fiche implements IJSAsync {
 		var outBasics:Dynamic = Reflect.copy(character.basics);
 		outBasics.alignement = character.basics.alignement.alignementToString();
 		outBasics.characterClass = character.basics.characterClass.classToString();
+		if (character.secondary_class != null) {
+			outBasics.characterClass += " " + (character.level - character.secondary_class_levels) + " / " + character.secondary_class.classToString() + " "
+				+ character.secondary_class_levels;
+		}
 		outBasics.sizeCategory = character.basics.sizeCategory.sizeCategoryToString();
 		outBasics.race = character.basics.race.raceToString();
 		outBasics.gender = character.basics.gender.genderToString();
@@ -789,11 +833,20 @@ class Fiche implements IJSAsync {
 		elems.SpellCastPopup.registerFieldNames(character.spells, fieldsNames);
 		updateBasics();
 		var spellsSection = mainElem.querySelector("section.spells-section");
-		if (character.basics.characterClass.canCastSpells()) {
+		if (character.canCastSpells()) {
 			spellsSection.classList.remove("hidden");
 		} else {
 			spellsSection.classList.add("hidden");
 		}
+		if (character.basics.characterClass.canCastSpells()
+			&& character.secondary_class != null
+			&& character.secondary_class.canCastSpells()) {
+			// Multi spell caster
+			spellsSection.querySelector(".secondary").innerText = 'Sorts (${character.secondary_class.classToString()})';
+		} else {
+			spellsSection.querySelector(".secondary").classList.add("hide");
+		}
+
 		if (character.characteristics == null) {
 			new ChoicesDialog("Caractéristiques", ["Tirer les caractéristiques", "Saisir les valeurs manuellement"], (choice) -> {
 				if (choice == 0)
@@ -839,7 +892,7 @@ class Fiche implements IJSAsync {
 		character.applyTempModsClass(bbaField, [NEGATIVE_LEVEL]);
 		availableFields.get("dmd").innerText = Rules.getDMD(character).string();
 		var levelField = availableFields.get("level");
-		levelField.innerText = character.getNLS().string();
+		levelField.innerText = (character.level + character.getTempMods([NEGATIVE_LEVEL]).sum()).string();
 		character.applyTempModsClass(levelField.parentElement, [NEGATIVE_LEVEL]);
 
 		addSkills();
@@ -859,7 +912,8 @@ class Fiche implements IJSAsync {
 		}
 
 		var animalFormBtn:js.html.AnchorElement = cast mainElem.querySelector("a.animal-form-btn");
-		var canTransform = character.basics.characterClass == METAMORPHE && character.level >= 4;
+		var canTransform = (character.basics.characterClass == METAMORPHE || character.secondary_class == METAMORPHE)
+			&& character.level >= 4;
 		animalFormBtn.classList.toggle("hidden", !canTransform);
 		if (canTransform) {
 			animalFormBtn.innerText = if (character.currentAnimalForm != 0) "Forme normale" else "Forme animale";

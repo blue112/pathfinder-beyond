@@ -118,7 +118,8 @@ class Rules {
 
 	// Returns the highest spell level the character has base slots for (ignoring ability bonuses).
 	static public function getMaxSpellLevel(cls:CharacterClass, char:FullCharacter):Int {
-		var base = getBaseSlots(cls, char.level - 1);
+		var thisClassLevel = if (cls == char.basics.characterClass) char.level - char.secondary_class_levels else char.secondary_class_levels;
+		var base = getBaseSlots(cls, thisClassLevel - 1);
 		var max = 0;
 		for (L in 0...10)
 			if (base[L] > 0)
@@ -132,7 +133,8 @@ class Rules {
 		if (!canCastSpells(cls))
 			return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		var bonus = getBonusSpellSlots(getCastingModifier(cls, char));
-		var slots = getBaseSlots(cls, char.level - 1);
+		var thisClassLevel = if (cls == char.basics.characterClass) char.level - char.secondary_class_levels else char.secondary_class_levels;
+		var slots = getBaseSlots(cls, thisClassLevel - 1);
 		var maxLevel = getMaxSpellLevel(cls, char);
 		for (L in 0...10) {
 			if (slots[L] > 0) {
@@ -249,7 +251,8 @@ class Rules {
 	}
 
 	static public function isClassSkill(char:FullCharacter, skill:SkillType) {
-		return RulesSkills.getSkill(skill).classSkillFor.contains(char.basics.characterClass);
+		return RulesSkills.getSkill(skill).classSkillFor.contains(char.basics.characterClass)
+			|| (char.secondary_class != null && RulesSkills.getSkill(skill).classSkillFor.contains(char.secondary_class));
 	}
 
 	static public function getRMRollMod(char:FullCharacter) {

@@ -2,275 +2,286 @@ package elems;
 
 import js.Browser;
 import Protocol;
-import ProtocolUtil;
-import Rules;
 
 using ProtocolUtil;
 using Rules;
 
 class SpellDetailPopup extends Popup {
-    var onBack:Void->Void;
+	var onBack:Void->Void;
 
-    public function new(spell:Spell, spellIndex:Int, character:FullCharacter, pushEvent:FicheEventType->Void, ficheId:String, onBack:Void->Void) {
-        super(spell.name);
-        this.onBack = onBack;
-        mainElem.classList.add("spell-detail");
+	public function new(spell:Spell, spellIndex:Int, character:FullCharacter, spellClass:CharacterClass, pushEvent:FicheEventType->Void, ficheId:String,
+			onBack:Void->Void) {
+		super(spell.name);
+		this.onBack = onBack;
+		mainElem.classList.add("spell-detail");
 
-        var main = mainElem.querySelector(".main");
+		var main = mainElem.querySelector(".main");
 
-        var backBtn = Browser.document.createAnchorElement();
-        backBtn.className = "back";
-        backBtn.innerText = "Retour";
-        backBtn.addEventListener("click", close);
-        main.insertBefore(backBtn, main.querySelector("h2"));
+		var backBtn = Browser.document.createAnchorElement();
+		backBtn.className = "back";
+		backBtn.innerText = "Retour";
+		backBtn.addEventListener("click", close);
+		main.insertBefore(backBtn, main.querySelector("h2"));
 
-        var editBtn = Browser.document.createAnchorElement();
-        editBtn.className = "edit-btn";
-        editBtn.innerText = "✎ Modifier";
-        main.insertBefore(editBtn, main.querySelector("h2"));
+		var editBtn = Browser.document.createAnchorElement();
+		editBtn.className = "edit-btn";
+		editBtn.innerText = "✎ Modifier";
+		main.insertBefore(editBtn, main.querySelector("h2"));
 
-        var content = getContent();
-        content.innerHTML = "<dl class='spell-detail-dl'></dl><div class='actions'><a class='cast-btn'>Lancer le sort</a></div>";
+		var content = getContent();
+		content.innerHTML = "<dl class='spell-detail-dl'></dl><div class='actions'><a class='cast-btn'>Lancer le sort</a></div>";
 
-        var dl = content.querySelector("dl.spell-detail-dl");
+		var dl = content.querySelector("dl.spell-detail-dl");
 
-        function addRow(label:String, value:String) {
-            var dt:js.html.Element = cast Browser.document.createElement("dt");
-            var dd:js.html.Element = cast Browser.document.createElement("dd");
-            dt.innerText = label;
-            dd.innerText = value;
-            dl.appendChild(dt);
-            dl.appendChild(dd);
-        }
+		function addRow(label:String, value:String) {
+			var dt:js.html.Element = cast Browser.document.createElement("dt");
+			var dd:js.html.Element = cast Browser.document.createElement("dd");
+			dt.innerText = label;
+			dd.innerText = value;
+			dl.appendChild(dt);
+			dl.appendChild(dd);
+		}
 
-        var nls = character.getNLS();
-        function resolveNls(s:String):String {
-            if (s.indexOf("NLS") < 0) return s;
-            return Std.string(MathExpr.eval(s.replace("NLS", Std.string(nls))));
-        }
+		var nls = character.getNLS();
+		function resolveNls(s:String):String {
+			if (s.indexOf("NLS") < 0)
+				return s;
+			return Std.string(MathExpr.eval(s.replace("NLS", Std.string(nls))));
+		}
 
-        var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
-        addRow("École", spell.school.spellSchoolToString());
-        if (!isPower) addRow("Niveau", Std.string(spell.level));
-        if (spell.shortDescription != null) addRow("Description courte", spell.shortDescription);
-        addRow("Temps d'incantation", spell.castingTime.spellCastingTimeToString(resolveNls));
-        var durationStr = spell.duration.spellDurationToString(resolveNls);
-        addRow("Durée", if (spell.canEndVoluntarily) '$durationStr (peut être terminé volontairement)' else durationStr);
-        addRow("Portée", spell.range.spellRangeToString(resolveNls, nls));
-        if (spell.components.length > 0) addRow("Composantes", spell.components.map(c -> c.spellComponentToString()).join(", "));
-        if (spell.targets != "") addRow("Cibles", spell.targets);
-        if (spell.areaOfEffect != null) addRow("Zone d'effet", spell.areaOfEffect);
-        if (spell.savingThrowType != null) {
-            var dcStr = if (isPower) {
-                if (spell.savingThrowDC != null) 'DD ${spell.savingThrowDC}' else null;
-            } else {
-                var mod = Rules.getCastingModifier(character.basics.characterClass, character);
-                var racialBonus = Rules.getRacialSpellDCBonus(character.basics.race, spell.school);
-                'DD ${10 + spell.level + mod + racialBonus}';
-            };
-            var stLabel = spell.savingThrowType.savingThrowToString();
-            addRow("Jet de sauvegarde", if (dcStr != null) '$stLabel ($dcStr)' else stLabel);
-            if (spell.saveEffect != null) addRow("Résultat de sauvegarde", spell.saveEffect.spellSaveEffectToString());
-        }
-        addRow("Résistance à la magie", if (spell.spellResistance) "Oui" else "Non");
-        if (spell.usesPerDay != null) addRow("Utilisations / jour", Std.string(spell.usesPerDay));
+		var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
+		addRow("École", spell.school.spellSchoolToString());
+		if (!isPower)
+			addRow("Niveau", Std.string(spell.level));
+		if (spell.shortDescription != null)
+			addRow("Description courte", spell.shortDescription);
+		addRow("Temps d'incantation", spell.castingTime.spellCastingTimeToString(resolveNls));
+		var durationStr = spell.duration.spellDurationToString(resolveNls);
+		addRow("Durée", if (spell.canEndVoluntarily) '$durationStr (peut être terminé volontairement)' else durationStr);
+		addRow("Portée", spell.range.spellRangeToString(resolveNls, nls));
+		if (spell.components.length > 0)
+			addRow("Composantes", spell.components.map(c -> c.spellComponentToString()).join(", "));
+		if (spell.targets != "")
+			addRow("Cibles", spell.targets);
+		if (spell.areaOfEffect != null)
+			addRow("Zone d'effet", spell.areaOfEffect);
+		if (spell.savingThrowType != null) {
+			var dcStr = if (isPower) {
+				if (spell.savingThrowDC != null)
+					'DD ${spell.savingThrowDC}'
+				else
+					null;
+			} else {
+				var mod = Rules.getCastingModifier(spellClass, character);
+				var racialBonus = Rules.getRacialSpellDCBonus(character.basics.race, spell.school);
+				'DD ${10 + spell.level + mod + racialBonus}';
+			};
+			var stLabel = spell.savingThrowType.savingThrowToString();
+			addRow("Jet de sauvegarde", if (dcStr != null) '$stLabel ($dcStr)' else stLabel);
+			if (spell.saveEffect != null)
+				addRow("Résultat de sauvegarde", spell.saveEffect.spellSaveEffectToString());
+		}
+		addRow("Résistance à la magie", if (spell.spellResistance) "Oui" else "Non");
+		if (spell.usesPerDay != null)
+			addRow("Utilisations / jour", Std.string(spell.usesPerDay));
 
-        if (spell.longDescription != "") {
-            var descBlock = Browser.document.createDivElement();
-            descBlock.className = "spell-long-desc";
-            descBlock.innerText = spell.longDescription;
-            content.insertBefore(descBlock, content.querySelector(".actions"));
-        }
+		if (spell.longDescription != "") {
+			var descBlock = Browser.document.createDivElement();
+			descBlock.className = "spell-long-desc";
+			descBlock.innerText = spell.longDescription;
+			content.insertBefore(descBlock, content.querySelector(".actions"));
+		}
 
-        var dicesSection = Browser.document.createDivElement();
-        dicesSection.className = "spell-dices";
-        var dicesLabel:js.html.Element = cast Browser.document.createElement("h3");
-        dicesLabel.innerText = "Dés associés au sort";
-        dicesSection.appendChild(dicesLabel);
-        var spellDices = if (spell.dices != null) spell.dices else [];
-        for (di in 0...spellDices.length) {
-            var d = spellDices[di];
-            var row = Browser.document.createDivElement();
-            row.className = "spell-dice-item";
-            var label = Browser.document.createSpanElement();
-            label.innerText = '${d.reason} : ${diceDisplayLabel(d.diceType, character.getNLS())}';
-            var del = Browser.document.createAnchorElement();
-            del.className = "spell-dice-del";
-            del.innerText = "×";
-            del.addEventListener("click", () -> {
-                pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di)));
-                dicesSection.removeChild(row);
-            });
-            row.appendChild(label);
-            row.appendChild(del);
-            dicesSection.appendChild(row);
-        }
-        var currentDiceCount = spellDices.length;
-        var addDiceBtn = Browser.document.createAnchorElement();
-        addDiceBtn.className = "add-dice-btn";
-        addDiceBtn.innerText = "+ Ajouter un dé";
-        addDiceBtn.addEventListener("click", () -> {
-            new elems.SpellDiceDialog(spell.name, (dice) -> {
-                var di = currentDiceCount++;
-                pushEvent(SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)));
-                var row = Browser.document.createDivElement();
-                row.className = "spell-dice-item";
-                var label = Browser.document.createSpanElement();
-                label.innerText = '${dice.reason} : ${diceDisplayLabel(dice.diceType, character.level)}';
-                var del = Browser.document.createAnchorElement();
-                del.className = "spell-dice-del";
-                del.innerText = "×";
-                del.addEventListener("click", () -> {
-                    pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di)));
-                    dicesSection.removeChild(row);
-                });
-                row.appendChild(label);
-                row.appendChild(del);
-                dicesSection.insertBefore(row, addDiceBtn);
-            });
-        });
-        dicesSection.appendChild(addDiceBtn);
-        content.insertBefore(dicesSection, content.querySelector(".actions"));
+		var dicesSection = Browser.document.createDivElement();
+		dicesSection.className = "spell-dices";
+		var dicesLabel:js.html.Element = cast Browser.document.createElement("h3");
+		dicesLabel.innerText = "Dés associés au sort";
+		dicesSection.appendChild(dicesLabel);
+		var spellDices = if (spell.dices != null) spell.dices else [];
+		for (di in 0...spellDices.length) {
+			var d = spellDices[di];
+			var row = Browser.document.createDivElement();
+			row.className = "spell-dice-item";
+			var label = Browser.document.createSpanElement();
+			label.innerText = '${d.reason} : ${diceDisplayLabel(d.diceType, character.getNLS())}';
+			var del = Browser.document.createAnchorElement();
+			del.className = "spell-dice-del";
+			del.innerText = "×";
+			del.addEventListener("click", () -> {
+				pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di)));
+				dicesSection.removeChild(row);
+			});
+			row.appendChild(label);
+			row.appendChild(del);
+			dicesSection.appendChild(row);
+		}
+		var currentDiceCount = spellDices.length;
+		var addDiceBtn = Browser.document.createAnchorElement();
+		addDiceBtn.className = "add-dice-btn";
+		addDiceBtn.innerText = "+ Ajouter un dé";
+		addDiceBtn.addEventListener("click", () -> {
+			new elems.SpellDiceDialog(spell.name, (dice) -> {
+				var di = currentDiceCount++;
+				pushEvent(SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice)));
+				var row = Browser.document.createDivElement();
+				row.className = "spell-dice-item";
+				var label = Browser.document.createSpanElement();
+				label.innerText = '${dice.reason} : ${diceDisplayLabel(dice.diceType, character.level)}';
+				var del = Browser.document.createAnchorElement();
+				del.className = "spell-dice-del";
+				del.innerText = "×";
+				del.addEventListener("click", () -> {
+					pushEvent(SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, di)));
+					dicesSection.removeChild(row);
+				});
+				row.appendChild(label);
+				row.appendChild(del);
+				dicesSection.insertBefore(row, addDiceBtn);
+			});
+		});
+		dicesSection.appendChild(addDiceBtn);
+		content.insertBefore(dicesSection, content.querySelector(".actions"));
 
-        var maxSpellLevel = Rules.getMaxSpellLevel(character.basics.characterClass, character);
-        editBtn.addEventListener("click", () -> {
-            closeSilent();
-            new elems.SpellDialog(character.basics.characterClass, maxSpellLevel, (edited) -> {
-                pushEvent(SPELL_EVENT(EDIT_SPELL(spellIndex, edited)));
-                new elems.SpellDetailPopup(edited, spellIndex, character, pushEvent, ficheId, onBack);
-            }, spell);
-        });
+		var maxSpellLevel = Rules.getMaxSpellLevel(spellClass, character);
+		editBtn.addEventListener("click", () -> {
+			closeSilent();
+			new elems.SpellDialog(spellClass, maxSpellLevel, (edited) -> {
+				pushEvent(SPELL_EVENT(EDIT_SPELL(spellIndex, edited)));
+				new elems.SpellDetailPopup(edited, spellIndex, character, pushEvent, ficheId, onBack);
+			}, spell);
+		});
 
-        var isSpontaneous = character.basics.characterClass.canCastSpells() && !character.basics.characterClass.needsSpellPreparation();
-        var castBtn:js.html.AnchorElement = cast content.querySelector("a.cast-btn");
-        if (isPower) {
-            castBtn.innerText = "Utiliser le pouvoir";
-            var usedCount = character.usedPowers.exists(spellIndex) ? character.usedPowers.get(spellIndex) : 0;
-            var remaining = spell.usesPerDay - usedCount;
-            if (remaining == 0) {
-                castBtn.classList.add("disabled");
-            } else {
-                var usageSpan = Browser.document.createSpanElement();
-                usageSpan.className = "cast-usage";
-                usageSpan.innerText = '($remaining utilisation${if (remaining > 1) "s" else ""} restante${if (remaining > 1) "s" else ""})';
-                castBtn.appendChild(usageSpan);
-                castBtn.addEventListener("click", () -> {
-                    new YesNoAlert("Utiliser le pouvoir", 'Confirmer l\'utilisation de "${spell.name}" ?', () -> {
-                        pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                        closeSilent();
-                        new elems.SpellCastPopup(spell, character, ficheId);
-                    });
-                });
-            }
-        } else if (spell.level == 0) {
-            var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
-            var canCast = isSpontaneous || preparedCount > 0;
-            if (!canCast) {
-                castBtn.classList.add("disabled");
-            } else {
-                var usageSpan = Browser.document.createSpanElement();
-                usageSpan.className = "cast-usage";
-                usageSpan.innerText = "(illimité)";
-                castBtn.appendChild(usageSpan);
-                castBtn.addEventListener("click", () -> {
-                    new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ?', () -> {
-                        pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                        closeSilent();
-                        new elems.SpellCastPopup(spell, character, ficheId);
-                    });
-                });
-            }
-        } else if (isSpontaneous) {
-            var slots = Rules.getSpellSlots(character.basics.characterClass, character);
-            // Find the lowest available slot at or above spell level
-            var availableSlotLevel:Null<Int> = null;
-            for (lvl in spell.level...10) {
-                var rem = slots[lvl] - (character.usedSlots.exists(lvl) ? character.usedSlots.get(lvl) : 0);
-                if (rem > 0) { availableSlotLevel = lvl; break; }
-            }
-            if (availableSlotLevel == null) {
-                castBtn.classList.add("disabled");
-            } else {
-                var remaining = slots[availableSlotLevel] - (character.usedSlots.exists(availableSlotLevel) ? character.usedSlots.get(availableSlotLevel) : 0);
-                var usageSpan = Browser.document.createSpanElement();
-                usageSpan.className = "cast-usage";
-                var slotDesc = if (availableSlotLevel == spell.level)
-                    '$remaining emplacement${if (remaining > 1) "s" else ""} restant${if (remaining > 1) "s" else ""}'
-                else
-                    'emplacement niv.$availableSlotLevel';
-                usageSpan.innerText = '($slotDesc)';
-                castBtn.appendChild(usageSpan);
-                castBtn.addEventListener("click", () -> {
-                    var slotMsg = if (availableSlotLevel == spell.level)
-                        'Un emplacement de niveau ${spell.level} sera consommé.'
-                    else
-                        'Aucun emplacement de niveau ${spell.level} disponible — un emplacement de niveau $availableSlotLevel sera consommé.';
-                    new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? $slotMsg', () -> {
-                        pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                        closeSilent();
-                        new elems.SpellCastPopup(spell, character, ficheId);
-                    });
-                });
-            }
-        } else {
-            var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
-            if (preparedCount == 0) {
-                castBtn.classList.add("disabled");
-            } else {
-                var usageSpan = Browser.document.createSpanElement();
-                usageSpan.className = "cast-usage";
-                usageSpan.innerText = '($preparedCount usage${if (preparedCount > 1) "s" else ""} restant${if (preparedCount > 1) "s" else ""})';
-                castBtn.appendChild(usageSpan);
-                castBtn.addEventListener("click", () -> {
-                    new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? L\'emplacement de sort sera consommé.', () -> {
-                        pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                        closeSilent();
-                        new elems.SpellCastPopup(spell, character, ficheId);
-                    });
-                });
-            }
+		var isSpontaneous = character.canCastSpells() && !character.needsSpellPreparation();
+		var castBtn:js.html.AnchorElement = cast content.querySelector("a.cast-btn");
+		if (isPower) {
+			castBtn.innerText = "Utiliser le pouvoir";
+			var usedCount = character.usedPowers.exists(spellIndex) ? character.usedPowers.get(spellIndex) : 0;
+			var remaining = spell.usesPerDay - usedCount;
+			if (remaining == 0) {
+				castBtn.classList.add("disabled");
+			} else {
+				var usageSpan = Browser.document.createSpanElement();
+				usageSpan.className = "cast-usage";
+				usageSpan.innerText = '($remaining utilisation${if (remaining > 1) "s" else ""} restante${if (remaining > 1) "s" else ""})';
+				castBtn.appendChild(usageSpan);
+				castBtn.addEventListener("click", () -> {
+					new YesNoAlert("Utiliser le pouvoir", 'Confirmer l\'utilisation de "${spell.name}" ?', () -> {
+						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+						closeSilent();
+						new elems.SpellCastPopup(spell, character, ficheId);
+					});
+				});
+			}
+		} else if (spell.level == 0) {
+			var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
+			var canCast = isSpontaneous || preparedCount > 0;
+			if (!canCast) {
+				castBtn.classList.add("disabled");
+			} else {
+				var usageSpan = Browser.document.createSpanElement();
+				usageSpan.className = "cast-usage";
+				usageSpan.innerText = "(illimité)";
+				castBtn.appendChild(usageSpan);
+				castBtn.addEventListener("click", () -> {
+					new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ?', () -> {
+						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+						closeSilent();
+						new elems.SpellCastPopup(spell, character, ficheId);
+					});
+				});
+			}
+		} else if (isSpontaneous) {
+			var slots = Rules.getSpellSlots(spellClass, character);
+			// Find the lowest available slot at or above spell level
+			var availableSlotLevel:Null<Int> = null;
+			for (lvl in spell.level...10) {
+				var rem = slots[lvl] - (character.usedSlots.exists(lvl) ? character.usedSlots.get(lvl) : 0);
+				if (rem > 0) {
+					availableSlotLevel = lvl;
+					break;
+				}
+			}
+			if (availableSlotLevel == null) {
+				castBtn.classList.add("disabled");
+			} else {
+				var remaining = slots[availableSlotLevel] - (character.usedSlots.exists(availableSlotLevel) ? character.usedSlots.get(availableSlotLevel) : 0);
+				var usageSpan = Browser.document.createSpanElement();
+				usageSpan.className = "cast-usage";
+				var slotDesc = if (availableSlotLevel == spell.level)
+					'$remaining emplacement${if (remaining > 1) "s" else ""} restant${if (remaining > 1) "s" else ""}' else
+					'emplacement niv.$availableSlotLevel';
+				usageSpan.innerText = '($slotDesc)';
+				castBtn.appendChild(usageSpan);
+				castBtn.addEventListener("click", () -> {
+					var slotMsg = if (availableSlotLevel == spell.level) 'Un emplacement de niveau ${spell.level} sera consommé.' else
+						'Aucun emplacement de niveau ${spell.level} disponible — un emplacement de niveau $availableSlotLevel sera consommé.';
+					new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? $slotMsg', () -> {
+						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+						closeSilent();
+						new elems.SpellCastPopup(spell, character, ficheId);
+					});
+				});
+			}
+		} else {
+			var preparedCount = character.preparedSpells.filter(p -> p.spellIndex == spellIndex).length;
+			if (preparedCount == 0) {
+				castBtn.classList.add("disabled");
+			} else {
+				var usageSpan = Browser.document.createSpanElement();
+				usageSpan.className = "cast-usage";
+				usageSpan.innerText = '($preparedCount usage${if (preparedCount > 1) "s" else ""} restant${if (preparedCount > 1) "s" else ""})';
+				castBtn.appendChild(usageSpan);
+				castBtn.addEventListener("click", () -> {
+					new YesNoAlert("Lancer le sort", 'Confirmer le lancement de "${spell.name}" ? L\'emplacement de sort sera consommé.', () -> {
+						pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+						closeSilent();
+						new elems.SpellCastPopup(spell, character, ficheId);
+					});
+				});
+			}
 
-            var healSpell = Rules.getSpontaneousHealSpell(spell.level);
-            if (character.basics.characterClass == PRETRE && spell.level > 0 && healSpell != null) {
-                var siBtn = Browser.document.createAnchorElement();
-                siBtn.className = "cast-btn si-btn";
-                siBtn.innerText = 'Invocation spontanée (${healSpell.name})';
-                if (preparedCount == 0) {
-                    siBtn.classList.add("disabled");
-                } else {
-                    siBtn.addEventListener("click", () -> {
-                        new YesNoAlert("Invocation spontanée", 'Remplacer "${spell.name}" par "${healSpell.name}" ? L\'emplacement de sort sera consommé.', () -> {
-                            pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
-                            closeSilent();
-                            new elems.SpellCastPopup(healSpell, character, ficheId);
-                        });
-                    });
-                }
-                content.querySelector(".actions").appendChild(siBtn);
-            }
-        }
-    }
+			var healSpell = Rules.getSpontaneousHealSpell(spell.level);
+			if (spellClass == PRETRE && spell.level > 0 && healSpell != null) {
+				var siBtn = Browser.document.createAnchorElement();
+				siBtn.className = "cast-btn si-btn";
+				siBtn.innerText = 'Invocation spontanée (${healSpell.name})';
+				if (preparedCount == 0) {
+					siBtn.classList.add("disabled");
+				} else {
+					siBtn.addEventListener("click", () -> {
+						new YesNoAlert("Invocation spontanée", 'Remplacer "${spell.name}" par "${healSpell.name}" ? L\'emplacement de sort sera consommé.',
+							() -> {
+								pushEvent(SPELL_EVENT(CAST_SPELL(spellIndex)));
+								closeSilent();
+								new elems.SpellCastPopup(healSpell, character, ficheId);
+							});
+					});
+				}
+				content.querySelector(".actions").appendChild(siBtn);
+			}
+		}
+	}
 
-    static function prettyFormula(s:String):String {
-        return s.replace("+", " + ").replace("-", " - ").replace("*", " × ").replace("/", " / ");
-    }
+	static function prettyFormula(s:String):String {
+		return s.replace("+", " + ").replace("-", " - ").replace("*", " × ").replace("/", " / ");
+	}
 
-    static function diceDisplayLabel(diceType:SpellDiceType, nls:Int):String {
-        switch (diceType) {
-            case MANUAL(formula) if (formula.indexOf("NLS") >= 0):
-                var resolved = formula.replace("NLS", Std.string(nls));
-                return '${prettyFormula(resolved)} (${prettyFormula(formula)})';
-            default:
-                return diceType.spellDiceTypeToString();
-        }
-    }
+	static function diceDisplayLabel(diceType:SpellDiceType, nls:Int):String {
+		switch (diceType) {
+			case MANUAL(formula) if (formula.indexOf("NLS") >= 0):
+				var resolved = formula.replace("NLS", Std.string(nls));
+				return '${prettyFormula(resolved)} (${prettyFormula(formula)})';
+			default:
+				return diceType.spellDiceTypeToString();
+		}
+	}
 
-    function closeSilent() {
-        super.close();
-    }
+	function closeSilent() {
+		super.close();
+	}
 
-    override public function close() {
-        super.close();
-        onBack();
-    }
+	override public function close() {
+		super.close();
+		onBack();
+	}
 }

@@ -19,6 +19,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
 		var currentSpells:Array<Spell> = [];
 		var currentProtections:Array<Protection> = [];
 		var currentWeapons:Array<Weapon> = [];
+		var mainClass:CharacterClass = null;
+		var secondaryClass:CharacterClass = null;
 		this.fiche_id = fiche_id;
 
 		var list = Browser.document.createUListElement();
@@ -26,7 +28,9 @@ class FicheEventHistory extends Popup implements IJSAsync {
 		for (i in events) {
 			var elem = Browser.document.createLIElement();
 			var event = switch (i.type) {
-				case CREATE(_): "Création du personnage";
+				case CREATE(basics):
+					mainClass = basics.characterClass;
+					"Création du personnage";
 				case SET_CHARACTERISTICS(_): "Lancer de caractéristiques initial";
 				case ADD_TEMPORARY_MODIFIER(mod):
 					currentMods.push(mod);
@@ -67,7 +71,11 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case CHANGE_BANK_MONEY(amount) if (amount > 0): 'Dépôt en banque (${amount} PO)';
 				case CHANGE_BANK_MONEY(amount): 'Retrait en banque (${- amount} PO)';
 				case CHANGE_MAX_HP(amount): 'Changement des PV max (${amount.asMod()} pv)';
-				case LEVEL_UP(dice): 'Montée d\'un niveau ! Dé de vie = + $dice pv';
+				case LEVEL_UP(dice): 'Montée d\'un niveau (${mainClass.classToString()}) ! Dé de vie = + $dice pv';
+				case ADD_NEW_CLASS(cls):
+					secondaryClass = cls;
+					'Ajout d\'une classe secondaire (${cls.classToString})';
+				case LEVEL_UP_SECONDARY_CLASS(dice): 'Montée d\'un niveau (${secondaryClass.classToString()}) ! Dé de vie = + $dice pv';
 				case ADD_PROTECTION(armor):
 					currentProtections.push(armor);
 					var malusStr = if (armor.armorMalus != null && armor.armorMalus != 0) ', malus ${armor.armorMalus.asMod()}' else "";
