@@ -16,14 +16,14 @@ enum CharacterACType {
 class Rules {
 	static public function canCastSpells(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case CONJURATEUR | MAGICIEN | PRETRE | ORACLE | BARDE | DRUIDE | ENSORCELEUR | PALADIN: true;
+			case CONJURATEUR | MAGICIEN | PRETRE | ORACLE | BARDE | DRUIDE | ENSORCELEUR | PALADIN | ALCHIMISTE: true;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: false;
 		};
 	}
 
 	static public function needsSpellPreparation(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case MAGICIEN | PRETRE | DRUIDE | PALADIN: true;
+			case MAGICIEN | PRETRE | DRUIDE | PALADIN | ALCHIMISTE: true;
 			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE | ENSORCELEUR | MOINE | ORACLE: false;
 		};
 	}
@@ -32,7 +32,7 @@ class Rules {
 	static public function getCastingModifier(cls:CharacterClass, char:FullCharacter):Int {
 		return switch (cls) {
 			case MAGICIEN: char.characteristicsMod.int;
-			case PRETRE | DRUIDE: char.characteristicsMod.wis;
+			case PRETRE | DRUIDE | ALCHIMISTE: char.characteristicsMod.wis; // Special hack
 			case CONJURATEUR | BARDE | ENSORCELEUR | PALADIN | ORACLE: char.characteristicsMod.cha;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: 0;
 		};
@@ -67,6 +67,19 @@ class Rules {
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4], // L7
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 4], // L8
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], // L9
+	];
+
+	static var spellSlotAlchmist = [
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // No level 0
+		[1, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5], // L1
+		[0, 0, 0, 1, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5], // L2
+		[0, 0, 0, 0, 1, 2, 1, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5], // L3
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5], // L4
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 3, 4, 4, 5, 5], // L5
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5], // L6
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // No L7
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // No L8
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // No L9
 	];
 
 	// Base spell slots for Ensorceleur: spell level (0–9) × char level (1–20).
@@ -109,6 +122,7 @@ class Rules {
 	static function getBaseSlots(cls:CharacterClass, charIdx:Int):Array<Int> {
 		return switch (cls) {
 			case MAGICIEN | PRETRE | DRUIDE: [for (L in 0...10) spellSlotBase[L][charIdx]];
+			case ALCHIMISTE: [for (L in 0...10) spellSlotAlchmist[L][charIdx]];
 			case ENSORCELEUR | ORACLE: [for (L in 0...10) spellSlotBaseEnsorceleur[L][charIdx]];
 			case CONJURATEUR | BARDE: [for (L in 0...10) spellSlotBaseConjurateurBarde[L][charIdx]];
 			case PALADIN: [for (L in 0...10) spellSlotBaseConjurateurPaladin[L][charIdx]];
@@ -166,6 +180,7 @@ class Rules {
 		MAGICIEN => [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
 		PRETRE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		ORACLE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+		ALCHIMISTE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 	];
 	static var savingThrowTables = [
 		ROUBLARD => [
@@ -227,6 +242,11 @@ class Rules {
 			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+		],
+		ALCHIMISTE => [
+			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
+			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 		],
 		CONJURATEUR_EIDOLON_BIPED => [
 			WILL => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9],
@@ -350,7 +370,10 @@ class Rules {
 	}
 
 	static public function getSavingThrowMod(char:FullCharacter, st:SavingThrow) {
-		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - 1];
+		var baseBonus = savingThrowTables.get(char.basics.characterClass).get(st)[char.level - char.secondary_class_levels - 1];
+		if (char.secondary_class != null) {
+			baseBonus += savingThrowTables.get(char.secondary_class).get(st)[char.secondary_class_levels - 1];
+		}
 		var permanentMod = if (char.savingThrowModifiers.exists(st)) char.savingThrowModifiers.get(st) else 0;
 		return getCaracMod(char, getSavingThrowCarac(st)) + baseBonus + permanentMod + char.getTempMods([NEGATIVE_LEVEL]).sum();
 	}

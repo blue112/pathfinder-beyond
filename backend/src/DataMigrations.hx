@@ -7,6 +7,7 @@ class DataMigrations implements IJSAsync {
 	@:jsasync static public function run() {
 		fixLegacyRaceGender().jsawait();
 		removeLegacyProtections().jsawait();
+		migrateSpellToBiclass().jsawait();
 	}
 
 	static function parseOldRace(s:String):CharacterRace {
@@ -36,6 +37,20 @@ class DataMigrations implements IJSAsync {
 			case _:
 				try CharacterGender.createByName(s.toUpperCase()) catch (_:Dynamic) null;
 		};
+	}
+
+	@:jsasync static function migrateSpellToBiclass() {
+		var rows = DatabaseHandler.exec("SELECT * FROM fiche_events WHERE event_type = 'SPELL_EVENT'").jsawait();
+		for (i in rows) {
+			var params = Unserializer.run(i.event_params.toString());
+			if (params.length == 1) {
+				// Need to migrate
+				params.push(true);
+				var paramsStr = Serializer.run(params);
+				DatabaseHandler.exec("UPDATE fiche_events SET event_params = ? WHERE id = ?", [paramsStr, i.id]).jsawait();
+				trace('Migrated event ${i.id}');
+			}
+		}
 	}
 
 	@:jsasync static function removeLegacyProtections() {

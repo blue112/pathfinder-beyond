@@ -127,10 +127,17 @@ class SpellCastPopup extends Popup {
 			var stSection = Browser.document.createDivElement();
 			stSection.className = "cast-saving-throw";
 
+			var nls = character.getNLS();
+			function resolveNls(s:String):String {
+				if (s.indexOf("NLS") < 0)
+					return s;
+				return Std.string(MathExpr.eval(s.replace("NLS", Std.string(nls))));
+			}
+
 			var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
 			var dcStr = if (isPower) {
 				if (spell.savingThrowDC != null)
-					'DD ${spell.savingThrowDC}'
+					'DD ${resolveNls(spell.savingThrowDC)}'
 				else
 					"";
 			} else {

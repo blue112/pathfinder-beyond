@@ -63,7 +63,17 @@ class RulesSkills {
 			label: "Art de la magie",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, DRUIDE, ENSORCELEUR, PALADIN, ORACLE],
+			classSkillFor: [
+				CONJURATEUR,
+				MAGICIEN,
+				PRETRE,
+				BARDE,
+				DRUIDE,
+				ENSORCELEUR,
+				PALADIN,
+				ORACLE,
+				ALCHIMISTE
+			],
 		},
 		{
 			name: ARTISANAT,
@@ -83,7 +93,8 @@ class RulesSkills {
 				ENSORCELEUR,
 				MOINE,
 				PALADIN,
-				ORACLE
+				ORACLE,
+				ALCHIMISTE
 			],
 		},
 		{
@@ -133,14 +144,14 @@ class RulesSkills {
 			label: "Connaissance (Mystères)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, ENSORCELEUR],
+			classSkillFor: [CONJURATEUR, MAGICIEN, PRETRE, BARDE, ENSORCELEUR, ALCHIMISTE],
 		},
 		{
 			name: CONNAISSANCE_NATURE,
 			label: "Connaissance (Nature)",
 			modifier: INTELLIGENCE,
 			needTraining: true,
-			classSkillFor: [CONJURATEUR, METAMORPHE, MAGICIEN, BARBARE, BARDE, DRUIDE],
+			classSkillFor: [CONJURATEUR, METAMORPHE, MAGICIEN, BARBARE, BARDE, DRUIDE, ALCHIMISTE],
 		},
 		{
 			name: CONNAISSANCE_NOBLESSE,
@@ -210,14 +221,14 @@ class RulesSkills {
 			label: "Escamotage",
 			modifier: DEXTERITY,
 			needTraining: true,
-			classSkillFor: [ROUBLARD, BARDE],
+			classSkillFor: [ROUBLARD, BARDE, ALCHIMISTE],
 		},
 		{
 			name: ESTIMATION,
 			label: "Estimation",
 			modifier: INTELLIGENCE,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, MAGICIEN, PRETRE, BARDE, ENSORCELEUR],
+			classSkillFor: [ROUBLARD, MAGICIEN, PRETRE, BARDE, ENSORCELEUR, ALCHIMISTE],
 		},
 		{
 			name: EVASION,
@@ -252,14 +263,23 @@ class RulesSkills {
 			label: "Perception",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [ROUBLARD, CONJURATEUR_EIDOLON_BIPED, METAMORPHE, BARBARE, BARDE, DRUIDE, MOINE],
+			classSkillFor: [
+				ROUBLARD,
+				CONJURATEUR_EIDOLON_BIPED,
+				METAMORPHE,
+				BARBARE,
+				BARDE,
+				DRUIDE,
+				MOINE,
+				ALCHIMISTE
+			],
 		},
 		{
 			name: PREMIERS_SECOURS,
 			label: "Premiers secours",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [PRETRE, DRUIDE, PALADIN, ORACLE],
+			classSkillFor: [PRETRE, DRUIDE, PALADIN, ORACLE, ALCHIMISTE],
 		},
 		{
 			name: PROFESSION,
@@ -276,7 +296,8 @@ class RulesSkills {
 				ENSORCELEUR,
 				MOINE,
 				ORACLE,
-				PALADIN
+				PALADIN,
+				ALCHIMISTE
 			],
 		},
 		{
@@ -298,28 +319,28 @@ class RulesSkills {
 			label: "Sabotage",
 			modifier: DEXTERITY,
 			needTraining: true,
-			classSkillFor: [ROUBLARD],
+			classSkillFor: [ROUBLARD, ALCHIMISTE],
 		},
 		{
 			name: SURVIE,
 			label: "Survie",
 			modifier: WISDOM,
 			needTraining: false,
-			classSkillFor: [METAMORPHE, GUERRIER, BARBARE, DRUIDE],
+			classSkillFor: [METAMORPHE, GUERRIER, BARBARE, DRUIDE, ALCHIMISTE],
 		},
 		{
 			name: UTILISATION_OBJETS_MAGIQUES,
 			label: "Utilisation d'objets magiques",
 			modifier: CHARISMA,
 			needTraining: true,
-			classSkillFor: [ROUBLARD, CONJURATEUR, BARDE, ENSORCELEUR],
+			classSkillFor: [ROUBLARD, CONJURATEUR, BARDE, ENSORCELEUR, ALCHIMISTE],
 		},
 		{
 			name: VOL,
 			label: "Vol",
 			modifier: DEXTERITY,
 			needTraining: false,
-			classSkillFor: [CONJURATEUR, METAMORPHE, MAGICIEN, DRUIDE, ENSORCELEUR],
+			classSkillFor: [CONJURATEUR, METAMORPHE, MAGICIEN, DRUIDE, ENSORCELEUR, ALCHIMISTE],
 		},
 	];
 

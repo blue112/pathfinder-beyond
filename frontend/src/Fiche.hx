@@ -843,6 +843,7 @@ class Fiche implements IJSAsync {
 			&& character.secondary_class != null
 			&& character.secondary_class.canCastSpells()) {
 			// Multi spell caster
+			spellsSection.querySelector(".primary").innerText = 'Sorts (${character.basics.characterClass.classToString()})';
 			spellsSection.querySelector(".secondary").innerText = 'Sorts (${character.secondary_class.classToString()})';
 		} else {
 			spellsSection.querySelector(".secondary").classList.add("hide");

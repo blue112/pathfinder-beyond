@@ -386,6 +386,7 @@ enum CharacterClass {
 	PRETRE;
 	PALADIN;
 	ORACLE;
+	ALCHIMISTE;
 }
 
 enum CharacterAlignement {

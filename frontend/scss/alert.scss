@@ -144,6 +144,15 @@
         }
         a.validate {
             align-self: flex-end;
+
+            display: block;
+            border: 1px solid black;
+            padding: 5px 20px;
+            font-size: 1.3em;
+            background: variables.$backgroundColor;
+
+            margin-top: 15px;
+            cursor: pointer;
         }
     }
 

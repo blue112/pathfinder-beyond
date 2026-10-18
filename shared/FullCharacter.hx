@@ -347,7 +347,7 @@ class FullCharacter {
 		var levels = 0;
 		if (Rules.canCastSpells(basics.characterClass))
 			levels += level - secondary_class_levels;
-		if (Rules.canCastSpells(secondary_class))
+		if (secondary_class != null && Rules.canCastSpells(secondary_class))
 			levels += secondary_class_levels;
 
 		return Std.int(Math.max(0, levels + getTempMods([NEGATIVE_LEVEL]).sum()));
@@ -388,7 +388,7 @@ class FullCharacter {
 		return switch (if (mainClass) basics.characterClass else secondary_class) {
 			case MAGICIEN, ENSORCELEUR:
 				6;
-			case CONJURATEUR, ROUBLARD, PRETRE, ORACLE, BARDE, DRUIDE:
+			case CONJURATEUR, ROUBLARD, PRETRE, ORACLE, BARDE, DRUIDE, ALCHIMISTE:
 				8;
 			case CONJURATEUR_EIDOLON_BIPED, METAMORPHE, GUERRIER, MOINE, PALADIN:
 				10;

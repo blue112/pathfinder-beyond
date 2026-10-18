@@ -70,7 +70,7 @@ class SpellDetailPopup extends Popup {
 		if (spell.savingThrowType != null) {
 			var dcStr = if (isPower) {
 				if (spell.savingThrowDC != null)
-					'DD ${spell.savingThrowDC}'
+					'DD ${resolveNls(spell.savingThrowDC)}'
 				else
 					null;
 			} else {
