@@ -37,6 +37,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
 					'Ajout d\'un modificateur temporaire (${mod.mod.asMod()}, ${mod.why.htmlEscape()})';
 				case REMOVE_TEMPORARY_MODIFIER(n):
 					var mod = currentMods.splice(n, 1)[0];
+					if (mod == null) // Known crash
+						continue;
 					'Retrait d\'un modificateur temporaire (${mod.why.htmlEscape()})';
 				case ADD_CLASS_SKILL(skill): 'Ajout d\'une compétence de classe (${RulesSkills.getSkillLabel(skill)})';
 				case SET_SKILL_MODIFIER(skill, mod): 'Ajout d\'un modificateur de compétence (${RulesSkills.getSkillLabel(skill)}): ${mod.asMod()}';
