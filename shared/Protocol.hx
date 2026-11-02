@@ -41,6 +41,7 @@ enum FicheEventType {
 	CHANGE_ITEM_NAME(item:Int, newName:String);
 	CHANGE_ITEM_PRIORITY(item:Int, priority:Int);
 	SPELL_EVENT(event:SpellEventType, mainClass:Bool);
+	USE_BOMB;
 	NEW_DAY;
 	SET_FAVORITE_MAGIC_SCHOOL(school:SpellSchool);
 	SET_PRIEST_DOMAIN(domain1:PriestDomain, domain2:PriestDomain);
@@ -386,7 +387,7 @@ enum CharacterClass {
 	PRETRE;
 	PALADIN;
 	ORACLE;
-	ALCHIMISTE;
+	MELANGISTE;
 }
 
 enum CharacterAlignement {

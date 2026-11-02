@@ -14,16 +14,23 @@ enum CharacterACType {
 }
 
 class Rules {
+	static public function canThrowBombs(cls:CharacterClass):Bool {
+		return switch (cls) {
+			case MELANGISTE: true;
+			default: false;
+		};
+	}
+
 	static public function canCastSpells(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case CONJURATEUR | MAGICIEN | PRETRE | ORACLE | BARDE | DRUIDE | ENSORCELEUR | PALADIN | ALCHIMISTE: true;
+			case CONJURATEUR | MAGICIEN | PRETRE | ORACLE | BARDE | DRUIDE | ENSORCELEUR | PALADIN | MELANGISTE: true;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: false;
 		};
 	}
 
 	static public function needsSpellPreparation(cls:CharacterClass):Bool {
 		return switch (cls) {
-			case MAGICIEN | PRETRE | DRUIDE | PALADIN | ALCHIMISTE: true;
+			case MAGICIEN | PRETRE | DRUIDE | PALADIN | MELANGISTE: true;
 			case CONJURATEUR | CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | BARDE | ENSORCELEUR | MOINE | ORACLE: false;
 		};
 	}
@@ -32,7 +39,7 @@ class Rules {
 	static public function getCastingModifier(cls:CharacterClass, char:FullCharacter):Int {
 		return switch (cls) {
 			case MAGICIEN: char.characteristicsMod.int;
-			case PRETRE | DRUIDE | ALCHIMISTE: char.characteristicsMod.wis; // Special hack
+			case PRETRE | DRUIDE | MELANGISTE: char.characteristicsMod.wis; // Special hack for alchemist
 			case CONJURATEUR | BARDE | ENSORCELEUR | PALADIN | ORACLE: char.characteristicsMod.cha;
 			case CONJURATEUR_EIDOLON_BIPED | ROUBLARD | METAMORPHE | GUERRIER | BARBARE | MOINE: 0;
 		};
@@ -122,7 +129,7 @@ class Rules {
 	static function getBaseSlots(cls:CharacterClass, charIdx:Int):Array<Int> {
 		return switch (cls) {
 			case MAGICIEN | PRETRE | DRUIDE: [for (L in 0...10) spellSlotBase[L][charIdx]];
-			case ALCHIMISTE: [for (L in 0...10) spellSlotAlchmist[L][charIdx]];
+			case MELANGISTE: [for (L in 0...10) spellSlotAlchmist[L][charIdx]];
 			case ENSORCELEUR | ORACLE: [for (L in 0...10) spellSlotBaseEnsorceleur[L][charIdx]];
 			case CONJURATEUR | BARDE: [for (L in 0...10) spellSlotBaseConjurateurBarde[L][charIdx]];
 			case PALADIN: [for (L in 0...10) spellSlotBaseConjurateurPaladin[L][charIdx]];
@@ -150,6 +157,7 @@ class Rules {
 		var thisClassLevel = if (cls == char.basics.characterClass) char.level - char.secondary_class_levels else char.secondary_class_levels;
 		var slots = getBaseSlots(cls, thisClassLevel - 1);
 		var maxLevel = getMaxSpellLevel(cls, char);
+
 		for (L in 0...10) {
 			if (slots[L] > 0) {
 				slots[L] += bonus[L];
@@ -180,7 +188,7 @@ class Rules {
 		MAGICIEN => [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
 		PRETRE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 		ORACLE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
-		ALCHIMISTE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
+		MELANGISTE => [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 11, 12, 12, 13, 14, 15],
 	];
 	static var savingThrowTables = [
 		ROUBLARD => [
@@ -243,7 +251,7 @@ class Rules {
 			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 			REFLEXES => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 		],
-		ALCHIMISTE => [
+		MELANGISTE => [
 			WILL => [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6],
 			VIGOR => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],
 			REFLEXES => [2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12],

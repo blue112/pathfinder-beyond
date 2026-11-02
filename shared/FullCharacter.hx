@@ -43,6 +43,8 @@ class FullCharacter {
 	public var damageResistances:Map<DamageType, Int>;
 	public var speed_mod:Int;
 
+	public var bombs_available:Int;
+
 	public var spell_register:SpellRegister;
 	public var secondary_spell_register:SpellRegister;
 	public var usedPowers:Map<Int, Int>;
@@ -297,6 +299,8 @@ class FullCharacter {
 
 				spellRegister.preparationLocked = true;
 				spellRegister.lockedPreparedIndices = spellRegister.preparedSpells.map(p -> p.spellIndex);
+			case USE_BOMB:
+				bombs_available -= 1;
 			case NEW_DAY:
 				for (spellRegister in [spell_register, secondary_spell_register]) {
 					spellRegister.preparedSpells = [];
@@ -305,6 +309,11 @@ class FullCharacter {
 					spellRegister.usedSlots = new Map();
 				}
 				usedPowers = new Map();
+				if (basics.characterClass.canThrowBombs())
+					bombs_available = (level - secondary_class_levels) + basics.characterClass.getCastingModifier(this);
+				else if (secondary_class != null && secondary_class.canThrowBombs())
+					bombs_available = secondary_class_levels + secondary_class.getCastingModifier(this);
+
 				current_hp = Math.min(current_hp + level, getMaxHitPoints()).int();
 			case SET_FAVORITE_MAGIC_SCHOOL(school):
 				favoriteMagicSchool = school;
@@ -388,7 +397,7 @@ class FullCharacter {
 		return switch (if (mainClass) basics.characterClass else secondary_class) {
 			case MAGICIEN, ENSORCELEUR:
 				6;
-			case CONJURATEUR, ROUBLARD, PRETRE, ORACLE, BARDE, DRUIDE, ALCHIMISTE:
+			case CONJURATEUR, ROUBLARD, PRETRE, ORACLE, BARDE, DRUIDE, MELANGISTE:
 				8;
 			case CONJURATEUR_EIDOLON_BIPED, METAMORPHE, GUERRIER, MOINE, PALADIN:
 				10;

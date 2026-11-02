@@ -8,6 +8,7 @@ class DataMigrations implements IJSAsync {
 		fixLegacyRaceGender().jsawait();
 		removeLegacyProtections().jsawait();
 		migrateSpellToBiclass().jsawait();
+		migrateAlchimisteClass().jsawait();
 	}
 
 	static function parseOldRace(s:String):CharacterRace {
@@ -37,6 +38,19 @@ class DataMigrations implements IJSAsync {
 			case _:
 				try CharacterGender.createByName(s.toUpperCase()) catch (_:Dynamic) null;
 		};
+	}
+
+	@:jsasync static function migrateAlchimisteClass() {
+		var rows = DatabaseHandler.exec("SELECT * FROM fiche_events WHERE event_type = 'ADD_NEW_CLASS'").jsawait();
+		for (i in rows) {
+			var ep:String = i.event_params.toString();
+			if (ep.indexOf("y10:ALCHIMISTE") != -1) {
+				ep = ep.replace("y10:ALCHIMISTE", "y10:MELANGISTE");
+				// Need to migrate
+				DatabaseHandler.exec("UPDATE fiche_events SET event_params = ? WHERE id = ?", [ep, i.id]).jsawait();
+				trace('Migrated event ${i.id}');
+			}
+		}
 	}
 
 	@:jsasync static function migrateSpellToBiclass() {

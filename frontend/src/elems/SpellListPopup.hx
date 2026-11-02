@@ -82,7 +82,7 @@ class SpellListPopup extends Popup {
 		super.close();
 	}
 
-	public function render() {
+	override public function render() {
 		var spellRegister = if (isForMainClass) character.spell_register else character.secondary_spell_register;
 		var needsPrep = character.needsSpellPreparation();
 		var slots = Rules.getSpellSlots(currentClass, character);

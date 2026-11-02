@@ -3,7 +3,8 @@
 
 // Sorts button on the fiche grid
 section.spells-section {
-    .spells-btn {
+    .spells-btn,
+    .bombs-btn {
         display: block;
         text-align: center;
         font-weight: bold;
@@ -204,7 +205,8 @@ section.spells-section {
 }
 
 // Spell list popup
-.popup.spell-list {
+.popup.spell-list,
+.popup.bombs {
     .main {
         top: 5%;
         height: 90%;
@@ -897,6 +899,89 @@ section.spells-section {
                 &:hover {
                     opacity: 1;
                 }
+            }
+        }
+    }
+}
+
+.popup.bombs {
+    .bomb {
+        border: 3px solid variables.$redColor;
+        background: color.adjust($color: variables.$backgroundColor, $lightness: -10%);
+        width: 50%;
+        min-width: 500px;
+        padding: 10px;
+
+        display: flex;
+        flex-direction: column;
+
+        h2,
+        h3,
+        h4 {
+            border: none;
+            margin: 0;
+        }
+
+        h3,
+        h4 {
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        a.btn {
+            margin: auto;
+            margin-top: 10px;
+
+            display: inline-block;
+            padding: 10px 40px;
+            background: variables.$redColor;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 1.1em;
+
+            &:hover {
+                opacity: 0.85;
+            }
+
+            .cast-usage {
+                margin-left: 8px;
+                font-weight: normal;
+                font-size: 0.8em;
+                opacity: 0.7;
+            }
+
+            &.disabled {
+                background: #aaa;
+                cursor: default;
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+            border-top: 3px solid color.adjust($color: #b8ae98, $lightness: -20%);
+
+            &.show {
+                display: block;
+            }
+
+            h3.direct {
+                display: none;
+            }
+
+            &.damage-rolled h3.direct {
+                display: block;
+            }
+
+            h2 {
+                text-align: left;
+                margin-top: 10px;
             }
         }
     }

@@ -25,7 +25,7 @@ class Fiche implements IJSAsync {
 
 	var mainElem:DivElement;
 	var ws:WsTalker;
-	var currentSpellPopup:Null<elems.SpellListPopup>;
+	var currentPopup:Null<Popup>;
 
 	public function new(fiche_id:String) {
 		mainElem = Browser.document.createDivElement();
@@ -135,12 +135,17 @@ class Fiche implements IJSAsync {
 		mainElem.querySelector(".spells-btn.primary").addEventListener("click", (_) -> {
 			var isMainClass = character.basics.characterClass.canCastSpells();
 			new elems.SpellListPopup(character, isMainClass, pushEvent, (p) -> {
-				currentSpellPopup = p;
+				currentPopup = p;
 			}, fiche_id);
+		});
+		mainElem.querySelector(".bombs-btn").addEventListener("click", (_) -> {
+			new elems.BombPopup(character, fiche_id, pushEvent, (p) -> {
+				currentPopup = p;
+			});
 		});
 		mainElem.querySelector(".spells-btn.secondary").addEventListener("click", (_) -> {
 			new elems.SpellListPopup(character, false, pushEvent, (p) -> {
-				currentSpellPopup = p;
+				currentPopup = p;
 			}, fiche_id);
 		});
 	}
@@ -828,8 +833,8 @@ class Fiche implements IJSAsync {
 	}
 
 	private function updateFiche() {
-		if (currentSpellPopup != null)
-			currentSpellPopup.render();
+		if (currentPopup != null)
+			currentPopup.render();
 		elems.SpellCastPopup.registerFieldNames(character.spell_register.spells, fieldsNames);
 		elems.SpellCastPopup.registerFieldNames(character.secondary_spell_register.spells, fieldsNames);
 		updateBasics();
@@ -847,6 +852,16 @@ class Fiche implements IJSAsync {
 			spellsSection.querySelector(".secondary").innerText = 'Sorts (${character.secondary_class.classToString()})';
 		} else {
 			spellsSection.querySelector(".secondary").classList.add("hide");
+		}
+
+		if (character.basics.characterClass.canThrowBombs()
+			|| character.secondary_class != null
+			&& character.secondary_class.canThrowBombs()) {
+			spellsSection.classList.remove("hidden");
+			spellsSection.querySelector(".bombs-btn").classList.remove("hide");
+			spellsSection.querySelector(".bombs-btn").innerText = 'Bombes (${character.bombs_available})';
+		} else {
+			spellsSection.querySelector(".bombs-btn").classList.add("hide");
 		}
 
 		if (character.characteristics == null) {

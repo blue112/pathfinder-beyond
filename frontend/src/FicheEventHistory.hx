@@ -125,6 +125,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
 					'Modification d\'un sort : ${spell.name.htmlEscape()}';
 				case SPELL_EVENT(FINISH_SPELL_PREPARATION, _):
 					'Fin de la phase de préparation des sorts';
+				case USE_BOMB:
+					'Utilisation d\'une bombe';
 				case NEW_DAY:
 					'Nouveau jour';
 				case SET_FAVORITE_MAGIC_SCHOOL(school):

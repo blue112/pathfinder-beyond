@@ -292,8 +292,7 @@ class SpellDialog extends Popup implements IJSAsync {
 			case BARDE: "barde";
 			case DRUIDE: "druide";
 			case PALADIN: "paladin";
-			case MAGICIEN | ENSORCELEUR: "magicien";
-			case ALCHIMISTE: "alchimiste";
+			case MAGICIEN | ENSORCELEUR | MELANGISTE: "magicien";
 			case PRETRE | ORACLE: "pretre";
 			default: "magicien"; // fallback, shouldn't be reached
 		};
