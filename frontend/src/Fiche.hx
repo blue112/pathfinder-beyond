@@ -1169,6 +1169,9 @@ class Fiche implements IJSAsync {
 		if (what == "caracroll") {
 			generateCharac(ficheId);
 			return "Ok";
+		} else if (what == "changedivinity") {
+			Api.pushEvent(ficheId, CHANGE_BASIC(DIVINITY_NAME(param1)));
+			return "Ok";
 		} else if (what == "maxhp") {
 			Api.pushEvent(ficheId, CHANGE_MAX_HP(param1.parseInt()));
 			return "Ok";

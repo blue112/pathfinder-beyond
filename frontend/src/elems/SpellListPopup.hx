@@ -185,7 +185,7 @@ class SpellListPopup extends Popup {
 			if (showAvailable) {
 				var availSpan = Browser.document.createSpanElement();
 				if (isPower) {
-					var usedCount = character.usedPowers.exists(originalIndex) ? character.usedPowers.get(originalIndex) : 0;
+					var usedCount = spellRegister.usedPowers.exists(originalIndex) ? spellRegister.usedPowers.get(originalIndex) : 0;
 					var remaining = spell.usesPerDay - usedCount;
 					availSpan.className = 'spell-available ${if (remaining > 0) "has-charges" else "empty"}';
 					availSpan.innerText = '×$remaining';

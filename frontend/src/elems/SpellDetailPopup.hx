@@ -46,9 +46,14 @@ class SpellDetailPopup extends Popup {
 
 		var nls = character.getNLS();
 		function resolveNls(s:String):String {
-			if (s.indexOf("NLS") < 0)
+			s = s.toLowerCase();
+			if (s.indexOf("nls") < 0)
 				return s;
-			return Std.string(MathExpr.eval(s.replace("NLS", Std.string(nls))));
+			s = s.replace("nls", Std.string(nls));
+			for (i in Reflect.fields(character.characteristicsMod)) {
+				s = s.toLowerCase().replace(i, Reflect.field(character.characteristicsMod, i));
+			}
+			return Std.string(MathExpr.eval(s));
 		}
 
 		var isPower = spell.usesPerDay != null && spell.usesPerDay > 0;
@@ -157,7 +162,7 @@ class SpellDetailPopup extends Popup {
 		var castBtn:js.html.AnchorElement = cast content.querySelector("a.cast-btn");
 		if (isPower) {
 			castBtn.innerText = "Utiliser le pouvoir";
-			var usedCount = character.usedPowers.exists(spellIndex) ? character.usedPowers.get(spellIndex) : 0;
+			var usedCount = spellRegister.usedPowers.exists(spellIndex) ? spellRegister.usedPowers.get(spellIndex) : 0;
 			var remaining = spell.usesPerDay - usedCount;
 			if (remaining == 0) {
 				castBtn.classList.add("disabled");

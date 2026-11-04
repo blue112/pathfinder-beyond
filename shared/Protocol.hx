@@ -3,6 +3,9 @@ import RulesSkills.SkillType;
 // Name matters, order does not
 enum FicheEventType {
 	CREATE(data:BasicFicheData);
+	CHANGE_BASIC(which:BasicFicheDataChange);
+	CHANGE_ALIGNEMENT(alignement:CharacterAlignement); // To replace with CHANGE_BASIC
+	CHANGE_AGE(age:Int); // To replace with CHANGE_BASIC
 	SET_CHARACTERISTICS(data:Characteristics);
 	CHANGE_CARAC(carac:Characteristic, amount:Int);
 	ADD_WEAPON(weapon:Weapon);
@@ -24,8 +27,6 @@ enum FicheEventType {
 	SET_SKILL_MODIFIER(skill:SkillType, mod:Int);
 	SET_SAVING_THROW_MODIFIER(st:SavingThrow, mod:Int);
 	SET_SPEED_MODIFIER(mod:Int);
-	CHANGE_ALIGNEMENT(alignement:CharacterAlignement);
-	CHANGE_AGE(age:Int);
 	ADD_EXCEPTIONAL_MODIFIER(mod:TemporaryModifier);
 	ADD_PROTECTION(armor:Protection);
 	REMOVE_PROTECTION(index:Int);
@@ -336,6 +337,22 @@ enum SavingThrow {
 	REFLEXES;
 	VIGOR;
 	WILL;
+}
+
+enum BasicFicheDataChange {
+	PLAYER_NAME(playerName:String);
+	CHARACTER_NAME(characterName:String);
+	ALIGNEMENT(alignement:CharacterAlignement);
+	DIVINITY_NAME(divinityName:String);
+	ORIGIN(origin:String);
+	RACE(race:CharacterRace);
+	GENDER(gender:CharacterGender);
+	SIZE_CATEGORY(sizeCategory:SizeCategory);
+	AGE(age:Int);
+	HEIGHT_CM(heightCm:Int);
+	WEIGHT_KG(weightKg:Int);
+	HAIR(hair:String);
+	EYES(eyes:String);
 }
 
 typedef BasicFicheData = {

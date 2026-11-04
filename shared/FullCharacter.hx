@@ -12,6 +12,7 @@ typedef SpellRegister = {
 	public var preparationLocked:Bool;
 	public var lockedPreparedIndices:Array<Int>;
 	public var usedSlots:Map<Int, Int>;
+	public var usedPowers:Map<Int, Int>;
 };
 
 class FullCharacter {
@@ -47,7 +48,6 @@ class FullCharacter {
 
 	public var spell_register:SpellRegister;
 	public var secondary_spell_register:SpellRegister;
-	public var usedPowers:Map<Int, Int>;
 	public var firedWeapons:Map<Int, Bool>;
 	public var favoriteMagicSchool:Null<SpellSchool>;
 	public var priestDomains:Null<Array<PriestDomain>>;
@@ -83,16 +83,17 @@ class FullCharacter {
 			usedSlots: new Map(),
 			lockedPreparedIndices: [],
 			preparationLocked: false,
-			preparedSpells: []
+			preparedSpells: [],
+			usedPowers: new Map(),
 		};
 		this.secondary_spell_register = {
 			spells: [],
 			usedSlots: new Map(),
 			lockedPreparedIndices: [],
 			preparationLocked: false,
-			preparedSpells: []
+			preparedSpells: [],
+			usedPowers: new Map(),
 		};
-		this.usedPowers = new Map();
 		this.firedWeapons = new Map();
 		this.feats = [];
 		this.currentAnimalForm = 0;
@@ -110,6 +111,22 @@ class FullCharacter {
 				this.basics.alignement = alignement;
 			case CHANGE_AGE(age):
 				this.basics.age = age;
+			case CHANGE_BASIC(basic):
+				switch (basic) {
+					case PLAYER_NAME(playerName): basics.playerName = playerName;
+					case CHARACTER_NAME(characterName): basics.characterName = characterName;
+					case ALIGNEMENT(alignement): basics.alignement = alignement;
+					case DIVINITY_NAME(divinityName): basics.divinityName = divinityName;
+					case ORIGIN(origin): basics.origin = origin;
+					case RACE(race): basics.race = race;
+					case GENDER(gender): basics.gender = gender;
+					case SIZE_CATEGORY(sizeCategory): basics.sizeCategory = sizeCategory;
+					case AGE(age): basics.age = age;
+					case HEIGHT_CM(heightCm): basics.heightCm = heightCm;
+					case WEIGHT_KG(weightKg): basics.weightKg = weightKg;
+					case HAIR(hair): basics.hair = hair;
+					case EYES(eyes): basics.eyes = eyes;
+				}
 			case SET_CHARACTERISTICS(data):
 				this.characteristics = data;
 				updateCharacts();
@@ -260,7 +277,7 @@ class FullCharacter {
 
 				var spell = spellRegister.spells[spellIndex];
 				if (spell.usesPerDay != null) {
-					usedPowers.set(spellIndex, (usedPowers.exists(spellIndex) ? usedPowers.get(spellIndex) : 0) + 1);
+					spellRegister.usedPowers.set(spellIndex, (spellRegister.usedPowers.exists(spellIndex) ? spellRegister.usedPowers.get(spellIndex) : 0) + 1);
 				} else if (spell.level == 0) {
 					// Cantrips are unlimited — no slot consumed
 				} else if (needsSpellPreparation()) {
@@ -307,8 +324,8 @@ class FullCharacter {
 					spellRegister.preparationLocked = false;
 					spellRegister.lockedPreparedIndices = [];
 					spellRegister.usedSlots = new Map();
+					spellRegister.usedPowers = new Map();
 				}
-				usedPowers = new Map();
 				if (basics.characterClass.canThrowBombs())
 					bombs_available = (level - secondary_class_levels) + basics.characterClass.getCastingModifier(this);
 				else if (secondary_class != null && secondary_class.canThrowBombs())

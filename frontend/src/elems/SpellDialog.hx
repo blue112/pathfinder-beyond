@@ -479,6 +479,7 @@ class SpellDialog extends Popup implements IJSAsync {
 				longDescription: inputValue("long-description"),
 				priority: Std.parseInt(inputValue("priority")),
 				savingThrowDC: if (dcVal == "") null else dcVal,
+				dices: if (editSpell != null) editSpell.dices else null,
 			};
 
 			onChoice(spell);

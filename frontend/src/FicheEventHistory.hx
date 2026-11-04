@@ -31,6 +31,31 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case CREATE(basics):
 					mainClass = basics.characterClass;
 					"Création du personnage";
+				case CHANGE_BASIC(basic):
+					var basicName = switch (basic) {
+						case PLAYER_NAME(_): "Nom du joueur.euse";
+						case CHARACTER_NAME(_): "Nom du personnage";
+						case ALIGNEMENT(_): "Alignement";
+						case DIVINITY_NAME(_): "Nom de la divinité";
+						case ORIGIN(_): "Origine";
+						case RACE(_): "Race";
+						case GENDER(_): "Genre";
+						case SIZE_CATEGORY(_): "Catégorie de taille";
+						case AGE(_): "Age";
+						case HEIGHT_CM(_): "Taille (en cm)";
+						case WEIGHT_KG(_): "Poids (en kg)";
+						case HAIR(_): "Couleur des cheveux";
+						case EYES(_): "Couleur des yeux";
+					};
+					var value = switch (basic) {
+						case PLAYER_NAME(value), CHARACTER_NAME(value), DIVINITY_NAME(value), ORIGIN(value), HAIR(value), EYES(value): value;
+						case AGE(value), HEIGHT_CM(value), WEIGHT_KG(value): value.string();
+						case GENDER(gender): gender.genderToString();
+						case ALIGNEMENT(alignement): alignement.alignementToString();
+						case RACE(race): race.raceToString();
+						case SIZE_CATEGORY(sizeCategory): sizeCategory.sizeCategoryToString();
+					}
+					"";
 				case SET_CHARACTERISTICS(_): "Lancer de caractéristiques initial";
 				case ADD_TEMPORARY_MODIFIER(mod):
 					currentMods.push(mod);
