@@ -178,28 +178,32 @@ class Campaign implements IJSAsync {
 					new TemporaryModifiersList(char.fiche_id, fc.tempMods);
 				});
 				elem.querySelector(".add-encounter a").addEventListener('click', () -> {
+					var character = charactersByFicheId.get(char.fiche_id);
 					var alreadyIn = campaignState.encounter.exists(e -> switch (e.entity) {
 						case CHARACTER(id): id == char.fiche_id;
 						case NPC(_): false;
 					});
 					if (alreadyIn) {
-						new elems.Alert("Rencontre", '${charactersByFicheId.get(char.fiche_id).basics.characterName} est déjà dans la rencontre.');
+						new elems.Alert("Rencontre", '${character.basics.characterName} est déjà dans la rencontre.');
 						return;
 					}
 					var roll = latestDiceRollByFicheId.get(char.fiche_id);
 					var initiative:Int;
+					var initiativeMod:Int;
 					if (roll != null && roll.field_name == "initiative") {
 						initiative = roll.result + (if (roll.mod != null) roll.mod else 0);
+						initiativeMod = roll.mod;
 					} else {
-						var input = js.Browser.window.prompt('Initiative de ${charactersByFicheId.get(char.fiche_id).basics.characterName} ?');
+						var input = js.Browser.window.prompt('Initiative de ${character.basics.characterName} ?');
 						if (input == null)
 							return;
 						var parsed = input.parseInt();
 						if (parsed == null)
 							return;
 						initiative = parsed;
+						initiativeMod = character.characteristicsMod.dex + character.getTempMods([INITIATIVE]).sum();
 					}
-					pushEvent(ADD_TO_ENCOUNTER(CHARACTER(char.fiche_id), initiative));
+					pushEvent(ADD_TO_ENCOUNTER(CHARACTER(char.fiche_id), initiative * 100 + initiativeMod));
 				});
 
 				characters.querySelector("tbody").appendChild(elem);
@@ -293,7 +297,7 @@ class Campaign implements IJSAsync {
 			});
 			row.querySelector(".add-encounter a").addEventListener("click", () -> {
 				var initiative = dice(20) + npc.initiativeModifier;
-				pushEvent(ADD_TO_ENCOUNTER(NPC(npc.name), initiative));
+				pushEvent(ADD_TO_ENCOUNTER(NPC(npc.name), initiative * 100 + npc.initiativeModifier));
 			});
 			tbody.appendChild(row);
 			for (weapon in npc.weapons) {

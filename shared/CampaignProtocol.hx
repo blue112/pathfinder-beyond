@@ -1,3 +1,4 @@
+import Protocol.StatusType;
 import Protocol.DamageType;
 import Protocol.WeaponDamageType;
 
@@ -47,6 +48,7 @@ typedef EncounterEntry = {
 	var currentHp:Null<Int>;
 	var currentAc:Null<Int>;
 	var note:Null<String>;
+	var turnModifiers:Array<TurnModifier>;
 };
 
 enum CampaignEventType {
@@ -70,8 +72,19 @@ enum CampaignEventType {
 }
 
 enum EncounterEntityModifier {
-	ADD_SPELL(spellName:String, num_turns:Int);
-	REMOVE_SPELL(spellName:String);
+	ADD_EFFECT(effectName:TurnModifierEffect, num_turns:Int);
+	REMOVE_EFFECT(effectName:TurnModifierEffect);
+}
+
+typedef TurnModifier = {
+	var initiative:Int;
+	var effect:TurnModifierEffect;
+	var turnsLeft:Int;
+};
+
+enum TurnModifierEffect {
+	LABEL(label:String);
+	STATUS(type:StatusType);
 }
 
 typedef CampaignEventTs = {

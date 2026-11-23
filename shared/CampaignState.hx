@@ -31,7 +31,8 @@ class CampaignState {
 					initiative: initiative,
 					currentHp: npcMaxHp(entity),
 					currentAc: npcBaseAc(entity),
-					note: null
+					note: null,
+					turnModifiers: [],
 				});
 				encounter.sort((a, b) -> b.initiative - a.initiative);
 
@@ -47,6 +48,10 @@ class CampaignState {
 				if (currentTurn > index) {
 					currentTurn--;
 				}
+				if (currentTurn >= encounter.length) {
+					currentTurn = encounter.length - 1;
+				}
+
 			case CLEAR_ENCOUNTER:
 				encounter = [];
 				currentTurn = null;
@@ -83,13 +88,40 @@ class CampaignState {
 				encounter.sort((a, b) -> b.initiative - a.initiative);
 
 				var newPos = encounter.findIndex(e -> e.entity == entity);
-				if (newPos > currentTurn && newPos > index)
+				if (index <= currentTurn && newPos > index) {
 					currentTurn--;
+				}
 
-			case ADD_TURNS_MODIFIER(index, init, modifier):
-				// Fixme
+			case ADD_TURNS_MODIFIER(index, initiative, modifier):
+				var entity = encounter[index];
+				switch (modifier) {
+					case ADD_EFFECT(effect, num_turns):
+						entity.turnModifiers.push({turnsLeft: num_turns, effect: effect, initiative: initiative});
+					case REMOVE_EFFECT(effect):
+						var index = entity.turnModifiers.findIndex(n -> n.effect.equals(effect));
+						if (index != null) {
+							entity.turnModifiers.splice(index, 1);
+						}
+				}
 			case NEXT_TURN:
+				// Otyug 2801
+				// Maelgor 2501
+				// Spell 2501
+				// Tess 2201
+				// Spell 2201
+
 				currentTurn = (currentTurn + 1) % encounter.length;
+				// Decrease turn based effets and remove those at 0
+				var prevInitiative = if (currentTurn == 0) 5000 else encounter[currentTurn - 1].initiative;
+				for (e in encounter) {
+					for (tm in e.turnModifiers.copy()) {
+						if (tm.turnsLeft == 0) {
+							e.turnModifiers.remove(tm);
+						} else if (tm.initiative < prevInitiative && tm.initiative >= encounter[currentTurn].initiative) {
+							tm.turnsLeft--;
+						}
+					}
+				}
 			case SET_PLAYER_COLOR(ficheId, color):
 				playerColor.set(ficheId, color);
 			case SET_SHOW_HIDE(index, show):

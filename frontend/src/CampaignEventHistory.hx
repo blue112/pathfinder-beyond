@@ -29,7 +29,9 @@ class CampaignEventHistory extends Popup {
 					currentEncounter.push({entity: entity, initiative: initiative});
 					currentEncounter.sort((a, b) -> b.initiative - a.initiative);
 					var entityName = entityToName(entity, ficheNames);
-					'Ajout à la rencontre: ${entityName.htmlEscape()} (init $initiative)';
+					var initValue = Math.round(initiative / 100);
+					var mod = initiative - initValue * 100;
+					'Ajout à la rencontre: ${entityName.htmlEscape()} (init ${initValue}, mod ${mod.asMod()})';
 				case REMOVE_FROM_ENCOUNTER(index):
 					var removed = currentEncounter.splice(index, 1)[0];
 					var entityName = entityToName(removed.entity, ficheNames);

@@ -431,6 +431,36 @@ enum SizeCategory {
 	SIZE_C;
 }
 
+enum StatusType {
+	GRAPPLED;
+	DEAFENED;
+	BLINDED;
+	BLEED;
+	CONFUSED;
+	COWERING;
+	DAZED;
+	DAZZLED;
+	DISABLED;
+	DYING;
+	ENTANGLED;
+	EXHAUSTED;
+	FASCINATED;
+	FATIGUED;
+	FRIGHTENED;
+	HELPLESS;
+	INVISIBLE;
+	NAUSEATED;
+	PANICKED;
+	PARALYZED;
+	PETRIFIED;
+	PINNED;
+	PRONE;
+	SHAKEN;
+	SICKENED;
+	STAGGERED;
+	STUNNED;
+}
+
 enum WSClientMessage {
 	SUB_EVENTS(fiche_id:String, latest_event:Int, withDiceRolls:Bool);
 	SUB_EVENTS_CAMPAIGN(fiche_id:String, latest_event:Int);

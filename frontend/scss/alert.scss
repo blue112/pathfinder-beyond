@@ -245,19 +245,23 @@
         }
     }
 
-    &.damage {
-        p.damage-types-label {
+    &.damage,
+    &.status {
+        p.damage-types-label,
+        p.status-types-label {
             margin-top: 20px;
             margin-bottom: 4px;
         }
 
-        .damage-types {
+        .damage-types,
+        .status-types {
             display: flex;
             flex-direction: column;
             gap: 6px;
             padding: 8px 15px;
 
-            .category {
+            .category,
+            .statuses {
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
