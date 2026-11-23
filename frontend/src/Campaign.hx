@@ -1,3 +1,4 @@
+import elems.campaign.InitiativeMarkers;
 import haxe.Timer;
 import utils.Relatime;
 import js.html.AnchorElement;
@@ -31,35 +32,39 @@ class Campaign implements IJSAsync {
 	var latestDiceRollByFicheId:StringMap<PublicDiceRoll>;
 	var campaignState:CampaignState;
 	var campaignEvents:Array<CampaignEventTs>;
+	var initiativeDisplay:InitiativeMarkers;
 
-	public function new(campaign_id:String) {
+	public function new(campaign_id:String, showInitiative:Bool) {
 		this.campaign_id = campaign_id;
 
-		mainElem = Browser.document.createDivElement();
-		mainElem.classList.add("campaign");
-		mainElem.innerHTML = Resource.getString('campaign.html');
-		Browser.document.body.appendChild(mainElem);
+		if (!showInitiative) {
+			mainElem = Browser.document.createDivElement();
+			mainElem.classList.add("campaign");
+			mainElem.innerHTML = Resource.getString('campaign.html');
+			Browser.document.body.appendChild(mainElem);
 
-		mainElem.querySelector(".add-npc").addEventListener("click", () -> {
-			new elems.AddNPCDialog((npc) -> {
-				pushEvent(ADD_NPC(npc));
+			mainElem.querySelector(".add-npc").addEventListener("click", () -> {
+				new elems.AddNPCDialog((npc) -> {
+					pushEvent(ADD_NPC(npc));
+				});
 			});
-		});
 
-		mainElem.querySelector(".end-encounter").addEventListener("click", () -> {
-			new elems.YesNoAlert("Terminer la rencontre", "Terminer la rencontre en cours ?", () -> {
-				pushEvent(CLEAR_ENCOUNTER);
+			mainElem.querySelector(".end-encounter").addEventListener("click", () -> {
+				new elems.YesNoAlert("Terminer la rencontre", "Terminer la rencontre en cours ?", () -> {
+					pushEvent(CLEAR_ENCOUNTER);
+				});
 			});
-		});
 
-		mainElem.querySelector("a.history").addEventListener("click", () -> {
-			var ficheNames = new StringMap<String>();
-			for (ficheId in charactersByFicheId.keys()) {
-				ficheNames.set(ficheId, charactersByFicheId.get(ficheId).basics.characterName);
-			}
-			new CampaignEventHistory(campaign_id, campaignEvents, ficheNames);
-		});
-
+			mainElem.querySelector("a.history").addEventListener("click", () -> {
+				var ficheNames = new StringMap<String>();
+				for (ficheId in charactersByFicheId.keys()) {
+					ficheNames.set(ficheId, charactersByFicheId.get(ficheId).basics.characterName);
+				}
+				new CampaignEventHistory(campaign_id, campaignEvents, ficheNames);
+			});
+		} else {
+			initiativeDisplay = new InitiativeMarkers(pushEvent);
+		}
 		load();
 	}
 
@@ -108,90 +113,101 @@ class Campaign implements IJSAsync {
 			return;
 
 		var result:CampaignLoadResult = Api.load('/campaign/$campaign_id').jsawait();
-		mainElem.querySelector("h1").innerText = result.name;
-
-		var characters = mainElem.querySelector(".characters");
-
 		charactersByFicheId = new StringMap();
 		tableLineByFicheId = new StringMap();
 		latestDiceRollByFicheId = new StringMap();
 		campaignState = new CampaignState();
+
+		for (char in result.fiches) {
+			var fc = new FullCharacter();
+			charactersByFicheId.set(char.fiche_id, fc);
+			for (event in char.events) {
+				fc.processEvent(event.type);
+			}
+		}
+
 		campaignEvents = result.campaignEvents;
 		for (event in result.campaignEvents) {
 			campaignState.processEvent(event.type);
 		}
-		renderNpcs();
-		renderEncounter();
-		for (char in result.fiches) {
-			var elem = Browser.document.createTableRowElement();
-			elem.innerHTML = Resource.getString('campaign_character.html');
 
-			var fc = new FullCharacter();
-			for (event in char.events) {
-				fc.processEvent(event.type);
-			}
-			charactersByFicheId.set(char.fiche_id, fc);
+		if (mainElem != null) {
+			mainElem.querySelector("h1").innerText = result.name;
+			var characters = mainElem.querySelector(".characters");
 
-			(cast elem.querySelector("a") : AnchorElement).href = '/fiche/${char.fiche_id}';
-			var img = Browser.document.createImageElement();
-			img.src = fc.basics.characterClass.classToIconPath();
-			img.title = fc.basics.characterClass.classToString();
-			img.alt = fc.basics.characterClass.classToString();
-			var nameCell = elem.querySelector(".name");
-			nameCell.appendChild(img);
-			nameCell.appendChild(Browser.document.createTextNode(' ' + char.characterName.split(' ')[0]));
+			renderNpcs();
+			renderEncounter();
+			for (char in result.fiches) {
+				var elem = Browser.document.createTableRowElement();
+				elem.innerHTML = Resource.getString('campaign_character.html');
 
-			tableLineByFicheId.set(char.fiche_id, elem);
-			latestDiceRollByFicheId.set(char.fiche_id, char.latestDiceRoll);
-			updateChar(char.fiche_id);
-
-			elem.querySelector(".perception").addEventListener("click", () -> {
 				var fc = charactersByFicheId.get(char.fiche_id);
-				var perceptionMod = fc.getSkillsMods().find(s -> s.name == PERCEPTION).mod;
-				var expMods = fc.exceptionalModifiers.filter(m -> Type.enumEq(m.on, SKILL(PERCEPTION)));
-				var doRoll = (extraMod:Int) -> {
-					new elems.SkillRollDialog("Perception", perceptionMod, extraMod);
-				};
-				if (expMods.length > 0) {
-					new elems.ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(m -> '${m.why} (${m.mod.asMod()})')), (choice) -> {
-						doRoll(if (choice == 0) 0 else expMods[choice - 1].mod);
-					});
-				} else {
-					doRoll(0);
-				}
-			});
-			elem.querySelector(".roll").addEventListener('click', () -> {
-				new DiceRollHistory(char.fiche_id, null);
-			});
-			elem.querySelector(".tempmod .count").addEventListener('click', () -> {
-				new TemporaryModifiersList(char.fiche_id, fc.tempMods);
-			});
-			elem.querySelector(".add-encounter a").addEventListener('click', () -> {
-				var alreadyIn = campaignState.encounter.exists(e -> switch (e.entity) {
-					case CHARACTER(id): id == char.fiche_id;
-					case NPC(_): false;
-				});
-				if (alreadyIn) {
-					new elems.Alert("Rencontre", '${charactersByFicheId.get(char.fiche_id).basics.characterName} est déjà dans la rencontre.');
-					return;
-				}
-				var roll = latestDiceRollByFicheId.get(char.fiche_id);
-				var initiative:Int;
-				if (roll != null && roll.field_name == "initiative") {
-					initiative = roll.result + (if (roll.mod != null) roll.mod else 0);
-				} else {
-					var input = js.Browser.window.prompt('Initiative de ${charactersByFicheId.get(char.fiche_id).basics.characterName} ?');
-					if (input == null)
-						return;
-					var parsed = input.parseInt();
-					if (parsed == null)
-						return;
-					initiative = parsed;
-				}
-				pushEvent(ADD_TO_ENCOUNTER(CHARACTER(char.fiche_id), initiative));
-			});
 
-			characters.querySelector("tbody").appendChild(elem);
+				(cast elem.querySelector("a") : AnchorElement).href = '/fiche/${char.fiche_id}';
+				var img = Browser.document.createImageElement();
+				img.src = fc.basics.characterClass.classToIconPath();
+				img.title = fc.basics.characterClass.classToString();
+				img.alt = fc.basics.characterClass.classToString();
+				var nameCell = elem.querySelector(".name");
+				nameCell.appendChild(img);
+				nameCell.appendChild(Browser.document.createTextNode(' ' + char.characterName.split(' ')[0]));
+
+				tableLineByFicheId.set(char.fiche_id, elem);
+				latestDiceRollByFicheId.set(char.fiche_id, char.latestDiceRoll);
+				updateChar(char.fiche_id);
+
+				elem.querySelector(".perception").addEventListener("click", () -> {
+					var fc = charactersByFicheId.get(char.fiche_id);
+					var perceptionMod = fc.getSkillsMods().find(s -> s.name == PERCEPTION).mod;
+					var expMods = fc.exceptionalModifiers.filter(m -> Type.enumEq(m.on, SKILL(PERCEPTION)));
+					var doRoll = (extraMod:Int) -> {
+						new elems.SkillRollDialog("Perception", perceptionMod, extraMod);
+					};
+					if (expMods.length > 0) {
+						new elems.ChoicesDialog("Lancer avec modificateur ?", ["Normal"].concat(expMods.map(m -> '${m.why} (${m.mod.asMod()})')), (choice) -> {
+							doRoll(if (choice == 0) 0 else expMods[choice - 1].mod);
+						});
+					} else {
+						doRoll(0);
+					}
+				});
+				elem.querySelector(".roll").addEventListener('click', () -> {
+					new DiceRollHistory(char.fiche_id, null);
+				});
+				elem.querySelector(".tempmod .count").addEventListener('click', () -> {
+					new TemporaryModifiersList(char.fiche_id, fc.tempMods);
+				});
+				elem.querySelector(".add-encounter a").addEventListener('click', () -> {
+					var alreadyIn = campaignState.encounter.exists(e -> switch (e.entity) {
+						case CHARACTER(id): id == char.fiche_id;
+						case NPC(_): false;
+					});
+					if (alreadyIn) {
+						new elems.Alert("Rencontre", '${charactersByFicheId.get(char.fiche_id).basics.characterName} est déjà dans la rencontre.');
+						return;
+					}
+					var roll = latestDiceRollByFicheId.get(char.fiche_id);
+					var initiative:Int;
+					if (roll != null && roll.field_name == "initiative") {
+						initiative = roll.result + (if (roll.mod != null) roll.mod else 0);
+					} else {
+						var input = js.Browser.window.prompt('Initiative de ${charactersByFicheId.get(char.fiche_id).basics.characterName} ?');
+						if (input == null)
+							return;
+						var parsed = input.parseInt();
+						if (parsed == null)
+							return;
+						initiative = parsed;
+					}
+					pushEvent(ADD_TO_ENCOUNTER(CHARACTER(char.fiche_id), initiative));
+				});
+
+				characters.querySelector("tbody").appendChild(elem);
+			}
+		}
+
+		if (initiativeDisplay != null) {
+			initiativeDisplay.update(campaignState, charactersByFicheId);
 		}
 
 		var ws:WsTalker = null;
@@ -199,7 +215,21 @@ class Campaign implements IJSAsync {
 			for (i in result.fiches) {
 				ws.subscribe(i.fiche_id, i.events[i.events.length - 1].id, true);
 			}
+			ws.subscribeCampaign(campaign_id, campaignEvents[campaignEvents.length - 1].id);
 		}, () -> {});
+		ws.onNewCampaignEvent = (campaign_id:String, event:CampaignEventTs) -> {
+			trace('New event from ws $event');
+			campaignState.processEvent(event.type);
+			campaignEvents.push({type: event.type, id: event.id, ts: event.ts});
+
+			if (mainElem != null) {
+				renderNpcs();
+				renderEncounter();
+			}
+			if (initiativeDisplay != null) {
+				initiativeDisplay.update(campaignState, charactersByFicheId);
+			}
+		};
 		ws.onNewEvent = (fiche_id:String, event:FicheEventTs) -> {
 			var fc = charactersByFicheId.get(fiche_id);
 			if (fc != null) {
@@ -436,13 +466,18 @@ class Campaign implements IJSAsync {
 		}
 	}
 
-	@:jsasync private function pushEvent(event:CampaignEventType) {
-		var result = Api.pushCampaignEvent(campaign_id, event).jsawait();
-		if (result.success) {
-			campaignState.processEvent(event);
-			campaignEvents.push({type: event, id: result.eventId, ts: result.eventTs});
-			renderNpcs();
-			renderEncounter();
+	@:expose("cdebug")
+	@:jsasync static private function debug(what:String, param1:String, param2:String, param3:String, param4:String, param5:String, param6:String) {
+		var campaign_id = Browser.window.location.pathname.split("/")[2];
+		if (what == "color") {
+			Api.pushCampaignEvent(campaign_id, SET_PLAYER_COLOR(param1, param2));
+			return "ok";
 		}
+
+		return 'unknown debug $what';
+	}
+
+	@:jsasync private function pushEvent(event:CampaignEventType) {
+		Api.pushCampaignEvent(campaign_id, event).jsawait();
 	}
 }

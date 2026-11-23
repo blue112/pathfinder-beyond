@@ -16,7 +16,8 @@ class FicheEventHistory extends Popup implements IJSAsync {
 
 		var currentMods = [];
 		var currentItems = [];
-		var currentSpells:Array<Spell> = [];
+		var currentSpellsA:Array<Spell> = [];
+		var currentSpellsB:Array<Spell> = [];
 		var currentProtections:Array<Protection> = [];
 		var currentWeapons:Array<Weapon> = [];
 		var mainClass:CharacterClass = null;
@@ -128,27 +129,35 @@ class FicheEventHistory extends Popup implements IJSAsync {
 				case REMOVE_INVENTORY_ITEM(item_n):
 					var item = currentItems.splice(item_n, 1)[0];
 					'Suppression d\'un objet de l\'inventaire: ${item.name.htmlEscape()}';
-				case SPELL_EVENT(ADD_SPELL(spell), _):
+				case SPELL_EVENT(ADD_SPELL(spell), mainRegister):
+					var currentSpells = if (mainRegister) currentSpellsA else currentSpellsB;
 					currentSpells.push(Reflect.copy(spell));
 					'Ajout d\'un sort: ${spell.name.htmlEscape()} (niv.${spell.level}, ${spell.school.spellSchoolToString()})';
-				case SPELL_EVENT(REMOVE_SPELL(index), _):
+				case SPELL_EVENT(REMOVE_SPELL(index), mainRegister):
+					var currentSpells = if (mainRegister) currentSpellsA else currentSpellsB;
 					var spell = currentSpells.splice(index, 1)[0];
 					'Suppression d\'un sort: ${spell.name.htmlEscape()}';
-				case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel), _):
+				case SPELL_EVENT(PREPARE_SPELL(spellIndex, slotLevel), mainRegister):
+					var currentSpells = if (mainRegister) currentSpellsA else currentSpellsB;
 					'Préparation d\'un sort: ${currentSpells[spellIndex].name.htmlEscape()} (emplacement niv.$slotLevel)';
-				case SPELL_EVENT(UNPREPARE_SPELL(spellIndex), _):
+				case SPELL_EVENT(UNPREPARE_SPELL(spellIndex), mainRegister):
+					var currentSpells = if (mainRegister) currentSpellsA else currentSpellsB;
 					'Dépréparation d\'un sort: ${currentSpells[spellIndex].name.htmlEscape()}';
-				case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice), _):
+				case SPELL_EVENT(ADD_SPELL_DICE(spellIndex, dice), mainRegister):
+					var currentSpells = if (mainRegister) currentSpellsA else currentSpellsB;
 					'Dé ajouté à ${currentSpells[spellIndex].name.htmlEscape()}: ${dice.reason.htmlEscape()} (${dice.diceType.spellDiceTypeToString()})';
-				case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, _), _):
+				case SPELL_EVENT(REMOVE_SPELL_DICE(spellIndex, _), mainRegister):
+					var currentSpells = if (mainRegister) currentSpellsA else currentSpellsB;
 					'Dé retiré de ${currentSpells[spellIndex].name.htmlEscape()}';
-				case SPELL_EVENT(CAST_SPELL(spellIndex), _):
+				case SPELL_EVENT(CAST_SPELL(spellIndex), mainRegister):
+					var currentSpells = if (mainRegister) currentSpellsA else currentSpellsB;
 					'Sort lancé: ${currentSpells[spellIndex].name.htmlEscape()}';
-				case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority), _):
+				case SPELL_EVENT(SET_SPELL_PRIORITY(spellIndex, priority), mainRegister):
+					var currentSpells = if (mainRegister) currentSpellsA else currentSpellsB;
 					'Priorité du sort ${currentSpells[spellIndex].name.htmlEscape()} modifiée : $priority';
-				case SPELL_EVENT(EDIT_SPELL(index, spell), _):
+				case SPELL_EVENT(EDIT_SPELL(index, spell), mainRegister):
 					'Modification d\'un sort : ${spell.name.htmlEscape()}';
-				case SPELL_EVENT(FINISH_SPELL_PREPARATION, _):
+				case SPELL_EVENT(FINISH_SPELL_PREPARATION, mainRegister):
 					'Fin de la phase de préparation des sorts';
 				case USE_BOMB:
 					'Utilisation d\'une bombe';

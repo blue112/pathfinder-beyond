@@ -1,12 +1,17 @@
+import haxe.ds.StringMap;
 import CampaignProtocol;
 
 class CampaignState {
 	public var npcs:Array<NPCInfo>;
 	public var encounter:Array<EncounterEntry>;
+	public var playerColor:StringMap<String>;
+	public var currentTurn:Int;
 
 	public function new() {
 		this.npcs = [];
 		this.encounter = [];
+		this.playerColor = new StringMap();
+		this.currentTurn = null;
 	}
 
 	public function processEvent(type:CampaignEventType) {
@@ -29,10 +34,22 @@ class CampaignState {
 					note: null
 				});
 				encounter.sort((a, b) -> b.initiative - a.initiative);
+
+				var newPos = encounter.findIndex(e -> e.entity == entity);
+				if (newPos <= currentTurn)
+					currentTurn++;
+
+				if (currentTurn == null) {
+					currentTurn = 0;
+				}
 			case REMOVE_FROM_ENCOUNTER(index):
 				encounter.splice(index, 1);
+				if (currentTurn > index) {
+					currentTurn--;
+				}
 			case CLEAR_ENCOUNTER:
 				encounter = [];
+				currentTurn = null;
 			case DAMAGE_NPC_IN_ENCOUNTER(index, amount, damageType):
 				var entry = encounter[index];
 				if (entry.currentHp != null) {
@@ -61,8 +78,21 @@ class CampaignState {
 				if (npc != null)
 					npc.damageReduction = damageReduction;
 			case SET_INITIATIVE_IN_ENCOUNTER(index, initiative):
+				var entity = encounter[index].entity;
 				encounter[index].initiative = initiative;
 				encounter.sort((a, b) -> b.initiative - a.initiative);
+
+				var newPos = encounter.findIndex(e -> e.entity == entity);
+				if (newPos > currentTurn && newPos > index)
+					currentTurn--;
+
+			case ADD_TURNS_MODIFIER(index, init, modifier):
+				// Fixme
+			case NEXT_TURN:
+				currentTurn = (currentTurn + 1) % encounter.length;
+			case SET_PLAYER_COLOR(ficheId, color):
+				playerColor.set(ficheId, color);
+			case SET_SHOW_HIDE(index, show):
 		}
 	}
 

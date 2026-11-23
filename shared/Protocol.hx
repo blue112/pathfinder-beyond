@@ -1,3 +1,4 @@
+import CampaignProtocol.CampaignEventTs;
 import RulesSkills.SkillType;
 
 // Name matters, order does not
@@ -432,12 +433,14 @@ enum SizeCategory {
 
 enum WSClientMessage {
 	SUB_EVENTS(fiche_id:String, latest_event:Int, withDiceRolls:Bool);
+	SUB_EVENTS_CAMPAIGN(fiche_id:String, latest_event:Int);
 	PING;
 }
 
 enum WSServerMessage {
 	SUB_OK;
 	NEW_EVENTS(fiche_id:String, events:Array<FicheEventTs>);
+	NEW_CAMPAIGN_EVENTS(campaign_id:String, events:Array<CampaignEventTs>);
 	NEW_DICE_ROLL(fiche_id:String, dr:PublicDiceRoll);
 	PONG;
 }

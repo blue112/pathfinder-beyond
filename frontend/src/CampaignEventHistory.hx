@@ -58,6 +58,11 @@ class CampaignEventHistory extends Popup {
 					currentEncounter.sort((a, b) -> b.initiative - a.initiative); // Need to change to order for index to be valid
 					var entityName = if (index < currentEncounter.length) entityToName(currentEncounter[index].entity, ficheNames) else '?';
 					'Initiative modifiée sur ${entityName.htmlEscape()}: $initiative';
+				case SET_PLAYER_COLOR(ficheId,
+					color): 'Changement de la couleur de ${if (ficheNames.exists(ficheId)) ficheNames.get(ficheId) else ficheId} en $color';
+				case ADD_TURNS_MODIFIER(index, init, modifier): "";
+				case NEXT_TURN: "Tour suivant";
+				case SET_SHOW_HIDE(index, show): "";
 			};
 			elem.innerHTML = '<a class="del">x</a> <small>[${Date.fromTime(i.ts).format("%d/%m/%y %H:%M:%S")}]</small> $event';
 			list.appendChild(elem);
