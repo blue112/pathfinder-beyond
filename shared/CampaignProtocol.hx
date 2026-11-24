@@ -48,13 +48,14 @@ typedef EncounterEntry = {
 	var currentHp:Null<Int>;
 	var currentAc:Null<Int>;
 	var note:Null<String>;
+	var hidden:Bool;
 	var turnModifiers:Array<TurnModifier>;
 };
 
 enum CampaignEventType {
 	ADD_NPC(npc:NPCInfo);
 	REMOVE_NPC(npcName:String);
-	ADD_TO_ENCOUNTER(entity:EncounterEntityType, initiative:Int);
+	ADD_TO_ENCOUNTER(entity:EncounterEntityType, initiative:Int, hidden:Bool);
 	REMOVE_FROM_ENCOUNTER(index:Int);
 	CLEAR_ENCOUNTER;
 	DAMAGE_NPC_IN_ENCOUNTER(index:Int, amount:Int, damageType:DamageType);

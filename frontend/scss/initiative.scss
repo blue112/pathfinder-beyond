@@ -60,9 +60,34 @@ div.initiative {
                 border-radius: 50%;
 
                 background: var(--icon) no-repeat;
+                background-size: cover;
+                background-color: #ffda8f;
 
                 border: 5px solid var(--marker-color);
             }
+        }
+
+        > span.note {
+            display: none;
+        }
+
+        &.has-note > span.note {
+            transition: all 1s;
+            display: block;
+            position: absolute;
+            left: 183px;
+            background: red;
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            line-height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: #cccccc;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         > span.initiative,

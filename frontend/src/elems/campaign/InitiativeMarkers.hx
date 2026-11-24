@@ -35,7 +35,6 @@ class InitiativeMarkers {
 		this.pushEvent = pushEvent;
 
 		actions.querySelector(".next").addEventListener("click", () -> {
-			// fixme
 			pushEvent(NEXT_TURN);
 		});
 	}
@@ -46,13 +45,18 @@ class InitiativeMarkers {
 		this.campaignState = campaignState;
 
 		for (k in 0...encounter.length) {
-			var marker = markers.find(n -> n.entity == encounter[k].entity);
+			var enc = encounter[k];
+			var marker = markers.find(n -> n.entity == enc.entity);
 			if (marker == null) {
-				marker = addMarker(encounter[k].entity, charactersByFicheId, campaignState.playerColor);
+				marker = new elems.campaign.EncounterMarker(enc.entity, charactersByFicheId, campaignState.playerColor, enc.hidden);
+
+				list.append(marker.elem);
+				markers.push(marker);
+				bind(marker);
 			}
-			marker.elem.style.order = (5000 - encounter[k].initiative).string();
-			setEffects(marker, encounter[k].turnModifiers);
-			setInitiative(marker, encounter[k].initiative);
+			marker.elem.style.order = (5000 - enc.initiative).string();
+			marker.update(enc);
+			setEffects(marker, enc.turnModifiers);
 		}
 		for (i in markers.copy()) {
 			if (!encounter.exists(n -> n.entity == i.entity)) {
@@ -75,34 +79,6 @@ class InitiativeMarkers {
 		}
 
 		markers[turn].elem.classList.add("playing");
-	}
-
-	public function addMarker(entity:EncounterEntityType, charactersByFicheId:StringMap<FullCharacter>, playerColor:StringMap<String>) {
-		var marker = switch (entity) {
-			case CHARACTER(ficheId):
-				var firstName = charactersByFicheId.get(ficheId).basics.characterName.split(" ")[0];
-				var color = if (playerColor.exists(ficheId)) playerColor.get(ficheId) else "#00FF00";
-				newPlayer(color, firstName);
-			case NPC(npcName):
-				newNPC(npcName);
-		}
-
-		list.append(marker);
-		var added = {
-			entity: entity,
-			elem: marker,
-			initiative: 0
-		};
-		markers.push(added);
-		bind(added);
-
-		return added;
-	}
-
-	public function setInitiative(marker:EncounterMarker, init:Int) {
-		marker.elem.querySelector(".initiative").innerText = Math.round(init / 100).string();
-		marker.elem.querySelector(".initiative-full").innerText = init.string();
-		marker.initiative = init;
 	}
 
 	public function setEffects(marker:EncounterMarker, effects:Array<TurnModifier>) {
@@ -141,7 +117,14 @@ class InitiativeMarkers {
 
 	public function bind(marker:EncounterMarker) {
 		marker.elem.addEventListener("click", () -> {
-			new ContextMenu(marker.elem, ["Ajouter un effet", "Ajouter un status", "Changer l'initiative"], (choice) -> {
+			new ContextMenu(marker.elem, [
+				"Ajouter un effet",
+				"Ajouter un status",
+				"Changer l'initiative",
+				"Réveler/Cacher",
+				"Fermer"
+			], (choice) -> {
+				var entityIndex = markers.indexOf(marker);
 				if (choice == 0) {
 					new AmountChoice("Quel effet ajouter", "Combien de tours ?", {
 						defaultValue: 1,
@@ -149,17 +132,19 @@ class InitiativeMarkers {
 						canBeNegative: false
 					}, (turns:Int, name:String) -> {
 						var turnInit = campaignState.encounter[campaignState.currentTurn].initiative;
-						pushEvent(ADD_TURNS_MODIFIER(markers.indexOf(marker), turnInit, ADD_EFFECT(LABEL(name), turns)));
+						pushEvent(ADD_TURNS_MODIFIER(entityIndex, turnInit, ADD_EFFECT(LABEL(name), turns)));
 					});
 				} else if (choice == 1) {
 					new StatusChoice((turns:Int, status:StatusType) -> {
 						var turnInit = campaignState.encounter[campaignState.currentTurn].initiative;
-						pushEvent(ADD_TURNS_MODIFIER(markers.indexOf(marker), turnInit, ADD_EFFECT(STATUS(status), turns)));
+						pushEvent(ADD_TURNS_MODIFIER(entityIndex, turnInit, ADD_EFFECT(STATUS(status), turns)));
 					});
-				} else {
+				} else if (choice == 2) {
 					new elems.AmountChoice("Initiative", "Nouvelle valeur d'initiative :", {defaultValue: marker.initiative}, (newInitiative, _) -> {
-						pushEvent(SET_INITIATIVE_IN_ENCOUNTER(markers.indexOf(marker), newInitiative));
+						pushEvent(SET_INITIATIVE_IN_ENCOUNTER(entityIndex, newInitiative));
 					});
+				} else if (choice == 3) {
+					pushEvent(SET_SHOW_HIDE(entityIndex, marker.hidden));
 				}
 				return true;
 			});
@@ -190,24 +175,6 @@ class InitiativeMarkers {
 		markerElem.style.setProperty("--marker-color", color);
 		markerElem.style.setProperty("--icon", 'url(/assets/icons/players/${name.toLowerCase()}.png)');
 
-		if (name == "Tess") {
-			var stateMarker = document.createDivElement();
-			stateMarker.innerHTML = "<span class='name'>Fatiguée</span><span class='turns'>15</span>";
-			stateMarker.classList.add("state");
-			markerElem.append(stateMarker);
-			var stateMarker = document.createDivElement();
-			stateMarker.innerHTML = "<span class='name'>Arme Protectrice</span><span class='turns'>0</span>";
-			stateMarker.classList.add("expired");
-			stateMarker.classList.add("state");
-			markerElem.append(stateMarker);
-		}
-
 		return markerElem;
 	}
-}
-
-typedef EncounterMarker = {
-	var elem:LIElement;
-	var entity:EncounterEntityType;
-	var initiative:Int;
 }

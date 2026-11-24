@@ -1,3 +1,4 @@
+import js.html.MouseEvent;
 import elems.campaign.InitiativeMarkers;
 import haxe.Timer;
 import utils.Relatime;
@@ -61,6 +62,11 @@ class Campaign implements IJSAsync {
 					ficheNames.set(ficheId, charactersByFicheId.get(ficheId).basics.characterName);
 				}
 				new CampaignEventHistory(campaign_id, campaignEvents, ficheNames);
+			});
+			mainElem.querySelector("a.initiative-btn").addEventListener("click", () -> {
+				var result = Browser.window.open(Browser.window.location.href + "/initiative", "initPopup",
+					"popup=true,location=false,toolbar=false,width=350,innerHeight=995,left=0,top=0");
+				trace(result);
 			});
 		} else {
 			initiativeDisplay = new InitiativeMarkers(pushEvent);
@@ -203,7 +209,7 @@ class Campaign implements IJSAsync {
 						initiative = parsed;
 						initiativeMod = character.characteristicsMod.dex + character.getTempMods([INITIATIVE]).sum();
 					}
-					pushEvent(ADD_TO_ENCOUNTER(CHARACTER(char.fiche_id), initiative * 100 + initiativeMod));
+					pushEvent(ADD_TO_ENCOUNTER(CHARACTER(char.fiche_id), initiative * 100 + initiativeMod, false));
 				});
 
 				characters.querySelector("tbody").appendChild(elem);
@@ -295,9 +301,9 @@ class Campaign implements IJSAsync {
 					return true;
 				});
 			});
-			row.querySelector(".add-encounter a").addEventListener("click", () -> {
+			row.querySelector(".add-encounter a").addEventListener("click", (e:MouseEvent) -> {
 				var initiative = dice(20) + npc.initiativeModifier;
-				pushEvent(ADD_TO_ENCOUNTER(NPC(npc.name), initiative * 100 + npc.initiativeModifier));
+				pushEvent(ADD_TO_ENCOUNTER(NPC(npc.name), initiative * 100 + npc.initiativeModifier, !e.shiftKey));
 			});
 			tbody.appendChild(row);
 			for (weapon in npc.weapons) {

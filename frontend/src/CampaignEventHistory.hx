@@ -25,7 +25,7 @@ class CampaignEventHistory extends Popup {
 				case ADD_NPC(npc): 'Ajout d\'un PNJ: ${npc.name.htmlEscape()}';
 				case REMOVE_NPC(npcName): 'Suppression du PNJ: ${npcName.htmlEscape()}';
 				case ADD_NPC_WEAPON(npcName, weapon): 'Ajout d\'une arme à ${npcName.htmlEscape()}: ${weapon.name.htmlEscape()}';
-				case ADD_TO_ENCOUNTER(entity, initiative):
+				case ADD_TO_ENCOUNTER(entity, initiative, hidden):
 					currentEncounter.push({entity: entity, initiative: initiative});
 					currentEncounter.sort((a, b) -> b.initiative - a.initiative);
 					var entityName = entityToName(entity, ficheNames);
@@ -62,7 +62,7 @@ class CampaignEventHistory extends Popup {
 					'Initiative modifiée sur ${entityName.htmlEscape()}: $initiative';
 				case SET_PLAYER_COLOR(ficheId,
 					color): 'Changement de la couleur de ${if (ficheNames.exists(ficheId)) ficheNames.get(ficheId) else ficheId} en $color';
-				case ADD_TURNS_MODIFIER(index, init, modifier): "";
+				case ADD_TURNS_MODIFIER(index, init, modifier): 'Ajout d\'un effet sur ${entityToName(currentEncounter[index].entity, ficheNames)}';
 				case NEXT_TURN: "Tour suivant";
 				case SET_SHOW_HIDE(index, show): "";
 			};

@@ -25,13 +25,14 @@ class CampaignState {
 				var npc = npcs.find(n -> n.name == npcName);
 				if (npc != null)
 					npc.weapons.push(weapon);
-			case ADD_TO_ENCOUNTER(entity, initiative):
+			case ADD_TO_ENCOUNTER(entity, initiative, hidden):
 				encounter.push({
 					entity: entity,
 					initiative: initiative,
 					currentHp: npcMaxHp(entity),
 					currentAc: npcBaseAc(entity),
 					note: null,
+					hidden: hidden,
 					turnModifiers: [],
 				});
 				encounter.sort((a, b) -> b.initiative - a.initiative);
@@ -104,12 +105,6 @@ class CampaignState {
 						}
 				}
 			case NEXT_TURN:
-				// Otyug 2801
-				// Maelgor 2501
-				// Spell 2501
-				// Tess 2201
-				// Spell 2201
-
 				currentTurn = (currentTurn + 1) % encounter.length;
 				// Decrease turn based effets and remove those at 0
 				var prevInitiative = if (currentTurn == 0) 5000 else encounter[currentTurn - 1].initiative;
@@ -125,6 +120,7 @@ class CampaignState {
 			case SET_PLAYER_COLOR(ficheId, color):
 				playerColor.set(ficheId, color);
 			case SET_SHOW_HIDE(index, show):
+				encounter[index].hidden = !show;
 		}
 	}
 
