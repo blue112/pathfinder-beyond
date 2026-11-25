@@ -43,7 +43,7 @@ class EncounterMarker {
 			note = null;
 		}
 
-		elem.classList.addIf("has-note", note != null);
+		elem.classList.addIf("has-note", note != null && note.length > 0);
 		if (note != null) {
 			elem.querySelector(".note").innerText = note;
 		}

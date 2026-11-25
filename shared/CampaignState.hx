@@ -38,12 +38,12 @@ class CampaignState {
 				encounter.sort((a, b) -> b.initiative - a.initiative);
 
 				var newPos = encounter.findIndex(e -> e.entity == entity);
-				if (newPos <= currentTurn)
-					currentTurn++;
 
 				if (currentTurn == null) {
 					currentTurn = 0;
-				}
+				} else if (newPos <= currentTurn)
+					currentTurn++;
+
 			case REMOVE_FROM_ENCOUNTER(index):
 				encounter.splice(index, 1);
 				if (currentTurn > index) {
