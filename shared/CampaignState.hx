@@ -89,7 +89,7 @@ class CampaignState {
 				encounter.sort((a, b) -> b.initiative - a.initiative);
 
 				var newPos = encounter.findIndex(e -> e.entity == entity);
-				if (index <= currentTurn && newPos > index) {
+				if (index < currentTurn && newPos > index) {
 					currentTurn--;
 				}
 
